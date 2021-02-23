@@ -1,0 +1,241 @@
+@font-face {
+    font-family: 'lato';
+    src: url('Lato-Regular.ttf') format('opentype');
+} 
+
+@keyframes ldio-v3xoc9chw0a {
+    0% { transform: rotate(0deg) }
+    50% { transform: rotate(180deg) }
+    100% { transform: rotate(360deg) }
+    }
+    .ldio-v3xoc9chw0a div {
+    position: absolute;
+    animation: ldio-v3xoc9chw0a 1.45s linear infinite;
+    width: 48px;
+    height: 48px;
+    top: 26px;
+    left: 26px;
+    border-radius: 50%;
+    box-shadow: 0 7.9px 0 0 #bbdcf4;
+    transform-origin: 24px 27.95px;
+    margin-left: 20px;
+    }
+    .loadingio-spinner-eclipse-f1acnqblv1t {
+    width: 48px;
+    height: 48px;
+    display: inline-block;
+    overflow: hidden;
+    background: none;
+    }
+    .ldio-v3xoc9chw0a {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform: translateZ(0) scale(0.48);
+    backface-visibility: hidden;
+    transform-origin: 0 0; /* see note above */
+    }
+    .ldio-v3xoc9chw0a div { box-sizing: content-box; }
+
+html
+{
+    min-height: 100vh;
+    margin: 0;
+}
+
+body
+{
+    background-color: rgb(31, 31, 31);
+    color: #accbe4;
+    font-family: 'lato';
+    font-size: 22px;
+    text-align: center;
+    font-weight: 500;
+    min-height: 100vh;
+    margin: 0;
+}
+
+div.totaldiv
+{
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    width: 100%;
+    font-size: 44px;
+    color: #ffffff;
+}
+
+div.totaldiv-label
+{
+    margin-right: auto;
+    text-align: left;
+}
+
+div.totaldiv-val
+{
+    margin-left: auto;
+    text-align: right;
+}
+
+div.tokenp
+{
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+    width: 100%;
+    font-size: 16px;
+}
+
+div.tokenp_left
+{
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+    margin-right: auto;
+}
+
+div.tokenp_left img
+{
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+div.maincolumn
+{
+    width: 600px;
+    margin: auto;
+    padding-top: 50px;
+}
+
+.inpaddress
+{
+    color: rgb(183, 192, 216);
+    border: 1px solid rgb(151, 151, 151);
+    font-size: 16px;
+    font-family: 'lato';
+    width: 80%;
+    display: block;
+    background-color: transparent;
+    width: 100%;
+    margin: 18px 0;
+}
+
+.inpaddress:active
+{
+    color: #fff600;
+}
+
+.inputarea 
+{
+    margin-top: 70px;
+}
+
+.inputarea p
+{
+    margin: 0;
+}
+
+.whichaddress
+{
+    color: rgb(151, 151, 151);
+    font-size: 16px;
+    font-family: 'lato';
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.refresherbutton
+{
+    border-radius: 12px;
+    font-size: 24px;
+    color: rgb(151, 151, 151);
+    border-color: rgb(151, 151, 151);
+    background-color: transparent;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-family: 'lato';
+    display: inline-block;
+}
+
+.refresherbutton:hover
+{
+    color: #fff600;
+    border-color: #fff600;
+}
+
+.refresherbutton:active
+{
+    color: #accbe4;
+    background-color: rgb(19, 19, 19);
+    border-color: #fff600;
+}
+
+.title
+{
+    position: absolute;
+    left: 30px;
+    top: 20px;
+}
+
+/* .title 
+{
+    display: block;
+    padding: 20px 0;
+    border-bottom: 1px solid #fff600;
+    cursor: default;
+}
+
+.title span
+{
+    font-size: 60px;
+    margin: 0 60px;
+}
+
+.title img
+{
+    width: 54px;
+    height: 54px;
+} */
+
+.gold
+{
+    color: #fff600;
+}
+
+div.tokenp_text
+{
+    display: block;
+}
+
+div.tokenname, div.tokenp_right
+{
+    color: white;
+}
+
+div.usd_value
+{
+    color: white;
+}
+
+div.tokenp_right
+{
+    text-align: right;
+    margin-left: auto;
+}
+
+div.tokendetails, div.token_total
+{
+    color: rgb(151, 151, 151);
+}
+
+div.nowloading
+{
+    font-size: 32px;
+    text-align: center;
+    vertical-align: middle;
+    color: rgb(151, 151, 151);
+    margin-bottom: 20px;
+}

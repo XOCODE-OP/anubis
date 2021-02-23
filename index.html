@@ -1,1 +1,74 @@
-this is the index
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Grant Us Eyes</title>
+    <script src='./web3.min.js'></script>
+    <script src='./abi.js'></script>
+    <script src='./balances.js'></script>
+</head>
+<body>
+    
+    <img src="logo.png"  class='title'/>
+
+    <div class='maincolumn'>
+
+        <div id='content'>
+
+            
+            
+            <div class='totaldiv'>
+                <div class='totaldiv-label'>Total value</div>
+                <div class='totaldiv-val'>$0</div>
+            </div>
+
+            <div class='nowloading'>
+                <span> Now Processing</span><div class="loadingio-spinner-eclipse-f1acnqblv1t"><div class="ldio-v3xoc9chw0a">
+                    <div></div>
+                    </div></div>
+            </div>
+            <div class='whichaddress'>0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb</div>
+
+            
+
+            <div class='tokenp'>
+                <div class='tokenp_left'>
+                    <img src='' />
+                    <div class='tokenp_text'>
+                        <div class='tokenname'>base</div>
+                        <div class='tokendetails'></div>
+                    </div>
+                </div>
+                <div class='tokenp_right'>
+                    <div class='usd_value' data-val='0'>0</div>
+                    <div class='token_total'>0</div>
+                </div>
+            </div>
+
+        </div>
+        <div class='inputarea'>
+            <p>Input your Ethereum address:</p>
+            <input type='text' placeholder="0x..." value="0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb" class='inpaddress' />
+            <button onclick="refreshPortfolio();" class='refresherbutton'>Go</button>
+        </div>
+        
+        <!-- <p style='margin-bottom: 50px;'>
+            Right now, we just poll from "All token" (whitelist).<br />
+            I think the obvious real approach would be, to look at the transaction history of an 
+            address and from that, determine all tokens the address might have, instead of guessing. Especially 
+            since every guess is a node/infura request and also slow.
+        </p> -->
+
+    </div>
+   
+
+    <script>
+        
+
+
+    </script>
+
+</body>
+</html>
