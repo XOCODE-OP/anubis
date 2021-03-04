@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face {
+            font-family: 'lato';
+            src: url('Lato-Regular.ttf') format('opentype');
+        } 
+
+        body
+        {
+            background-color: rgb(31, 31, 31);
+            color: #accbe4;
+            font-family: 'lato';
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+    <title>Document</title>
+    <script src='./web3.min.js'></script>
+    <script src='./abi.js'></script>
+</head>
+<body>
+    
+    <div class='maincolumn'>
+
+        <div id='content'>
+            
+
+        </div>
+
+    </div>
+
+    <script src='./abi.js'></script>
+    <script>
+        
+        const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
+        const wallet_addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
+        let web3 = new Web3(rpcURLmainnet);
+
+        const erc20ABI = abi();
+        
+        document.addEventListener("DOMContentLoaded", function(event)
+        {
+            let content_div = document.getElementById("content");
+
+            // web3.eth.getTransactionCount(wallet_addr, function(r)
+            // {
+            //     content_div.innerHTML = `result: ${r}`;
+            // });
+
+            //dodo();
+
+            batchTest();
+        });
+
+        async function dodo()
+        {
+            let rr = await web3.eth.getTransactionCount(wallet_addr);
+            console.log(rr);
+        }
+
+        function callb(ye)
+        {
+            console.log(`yoo: ${ye}`);
+        }
+
+        function batchTest()
+        {
+            var batch = new web3.BatchRequest();
+
+            let pols_contract = new web3.eth.Contract(erc20ABI, "0x83e6f1e41cdd28eaceb20cb649155049fac3d5aa");
+            let index_contract = new web3.eth.Contract(erc20ABI, "0x0954906da0bf32d5479e25f46056d22f08464cab");
+
+            // batch.add(web3.eth.getBalance.request('0x0000000000000000000000000000000000000000', 'latest', callback));
+            // batch.add(contract.methods.balance(address).call.request({from: '0x0000000000000000000000000000000000000000'}, callback2));
+            batch.add(pols_contract.methods.balanceOf(wallet_addr).call(callb(balance)));
+            batch.add(index_contract.methods.balanceOf(wallet_addr).call.request({from: '0x0000000000000000000000000000000000000000'}, callb(val));
+            batch.execute();
+        }
+
+
+        // function getTransactionsByAccount(myaccount, startBlockNumber, endBlockNumber)
+        // {
+        //     if (endBlockNumber == null)
+        //     {
+        //         endBlockNumber = web3.eth.blockNumber;
+        //         console.log("Using endBlockNumber: " + endBlockNumber);
+        //     }
+        //     if (startBlockNumber == null)
+        //     {
+        //         startBlockNumber = endBlockNumber - 1000;
+        //         console.log("Using startBlockNumber: " + startBlockNumber);
+        //     }
+        //     console.log("Searching for transactions to/from account \"" + myaccount + 
+        //     "\" within blocks "  + startBlockNumber + " and " + endBlockNumber);
+
+        //     for (var i = startBlockNumber; i <= endBlockNumber; i++)
+        //     {
+        //         if (i % 1000 == 0)  console.log("Searching block " + i);
+        //         var block = web3.eth.getBlock(i, true);
+        //         if (block != null && block.transactions != null)
+        //         {
+        //             block.transactions.forEach( function(e)
+        //             {
+        //                 if (myaccount == "*" || myaccount == e.from || myaccount == e.to)
+        //                 {
+        //                     console.log("  tx hash          : " + e.hash + "\n"
+        //                         + "   nonce           : " + e.nonce + "\n"
+        //                         + "   blockHash       : " + e.blockHash + "\n"
+        //                         + "   blockNumber     : " + e.blockNumber + "\n"
+        //                         + "   transactionIndex: " + e.transactionIndex + "\n"
+        //                         + "   from            : " + e.from + "\n" 
+        //                         + "   to              : " + e.to + "\n"
+        //                         + "   value           : " + e.value + "\n"
+        //                         + "   time            : " + block.timestamp + " " + new Date(block.timestamp * 1000).toGMTString() + "\n"
+        //                         + "   gasPrice        : " + e.gasPrice + "\n"
+        //                         + "   gas             : " + e.gas + "\n"
+        //                         + "   input           : " + e.input);
+        //                 }
+        //             });
+        //         }
+        //     }
+        // }
+
+    </script>
+
+</body>
+</html>

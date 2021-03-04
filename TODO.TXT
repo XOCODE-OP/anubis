@@ -1,0 +1,50 @@
+//TODO:
+
+
+
+//remember address via storage
+//multiple addresses
+//sample addresses
+// local storage
+// sort by value
+
+add metamask connector for pasting address (and then use metamask instead of infura?)
+
+add a sort of console visually on screen because shit takes a long time
+
+/*
+Right now, we just poll from "All token" (whitelist).<br />
+I think the obvious real approach would be, to look at the transaction history of an 
+address and from that, determine all tokens the address might have, instead of guessing. Especially 
+since every guess is a node/infura request and also slow.
+            */
+
+
+
+            /*
+
+Poll markets from coingecko
+https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=decentralized_finance_defi&order=market_cap_desc&per_page=200&page=1&sparkline=false
+this is sorted by marketcap, contains prices and icons.
+in order go through and poll the balances.
+contracts addresses can be found in the uniswap list (all_tokens)
+https://tokens.coingecko.com/uniswap/all.json
+
+            */
+
+https://api.etherscan.io/api?module=account&action=tokentx&address=0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb&startblock=0&endblock=999999999&sort=asc&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ
+
+
+
+
+
+after etherscan, or rather after white list is done,
+create divs from that
+fetch all infure balances simultaneously 
+then async inject infura balance into the divs
+calculate usd by multiply with coingecko markets price.
+IF that is non existant then query coingecko with slow
+
+somehow callback to calc the total
+
+
