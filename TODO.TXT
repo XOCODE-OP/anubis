@@ -7,6 +7,7 @@
 //sample addresses
 // local storage
 // sort by value
+// by changing the currency to eth and btc in coingecko request for prices, we can add a valuations in eth and btc, and I think thats worth it
 
 add metamask connector for pasting address (and then use metamask instead of infura?)
 

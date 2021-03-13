@@ -6,6 +6,16 @@
 // jshint unused:true
 // jshint varstmt:true
 
+Object.prototype.originalValueOf = Object.prototype.valueOf;
+
+Object.prototype.valueOf = function() {
+  if (typeof this !== 'number') {
+    throw new Error('Object is not a Number');
+  }
+
+  return this.originalValueOf();
+}
+
 const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
 //let coingecko_markets; //https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false
@@ -18,7 +28,7 @@ const erc20ABI = abi();
 let web3 = new Web3(rpcURLmainnet);
 let content_div;
 let baseTokenElement, totalDivElem, totalValElem, nowloadingElem, refresherbuttonElem,
-inputbarElem, inputArea, whichaddressElem;
+inputbarElem, inputArea, whichaddressElem, checkButton;
 const defaultAddr = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
 
@@ -40,10 +50,11 @@ document.addEventListener("DOMContentLoaded", function(event)
     whichaddressElem = document.querySelector(".whichaddress");
     whichaddressElem.innerText = defaultAddr;
     whichaddressElem.style.display = "none";
+    checkButton = document.querySelector("#btn_main_check");
 
     inputbarElem.addEventListener("keyup", function(event)
     {
-        if (event.key == "Enter" || event.keyCode === 13)
+        if (!checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
         {
             refreshPortfolio();
             return;
@@ -67,7 +78,8 @@ async function refreshPortfolio()
     }
 
     let addr = inputbarElem.value;
-    inputArea.style.display = "none";
+    checkButton.disabled = true;
+    checkButton.innerText = "please wait";
     whichaddressElem.style.display = "block";
     whichaddressElem.innerText = addr;
     nowloadingElem.style.display = "block";
@@ -77,9 +89,6 @@ async function refreshPortfolio()
 
     //coingecko_markets = await fetchJson("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false");
     coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
-
-    //https://api.coingecko.com/api/v3/simple/price?ids=bitcoin%2Cethereum%2Clitecoin&vs_currencies=usd
-
 
     uniswapTokenList = await fetchUniswapTokenList();
     //uniswapTokenList is filtered by relevant contract addresses
@@ -106,13 +115,20 @@ async function refreshPortfolio()
         query_coins_part = query_coins_part + token.coingecko_id;
         if (i < uniswapTokenList.length - 1) query_coins_part = query_coins_part + "%2C";
     }
-    query_coins_part = query_coins_part + "&vs_currencies=usd";
+    query_coins_part = query_coins_part + "&vs_currencies=usd,eth,btc"; //added eth and btc prices
     let coingeckoPrices = await fetchJson(query_coins_part);
 
     for (let i = 0; i < uniswapTokenList.length; i++)
     {
         const token = uniswapTokenList[i];
-        token.injected_current_price = coingeckoPrices[token.coingecko_id].usd;
+        if (!token.coingecko_id || !coingeckoPrices[token.coingecko_id] || !coingeckoPrices[token.coingecko_id].usd)
+        {
+            token.injected_current_price = 0;
+            console.log(`Error: Symbol ${token.symbol} is not supported.`);
+        }
+        else
+            token.injected_current_price = coingeckoPrices[token.coingecko_id];
+            //token.injected_current_price = coingeckoPrices[token.coingecko_id].usd;
         token.contract = new web3.eth.Contract(erc20ABI, token.address);
         
         await token.contract.methods.balanceOf(addr).call().then(function (bal)
@@ -124,11 +140,19 @@ async function refreshPortfolio()
             if (token.balance > 0)
             {
                 div_elem = ui_addTokenDiv(token.name, token.symbol, token.balance, token.logoURI);
-                if (!token.injected_current_price) token.tokenprice = 0;
-                token.tokenprice = parseFloat(token.injected_current_price);
-                token.total_usd = parseFloat(parseFloat(token.tokenprice) * parseFloat(token.balance)); 
+                if (!token.tokenprice) token.tokenprice = {};
+                if (!token.injected_current_price)
+                {
+                    token.tokenprice.usd = 0;
+                    token.tokenprice.eth = 0;
+                    token.tokenprice.btc = 0;
+                }
+                token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
+                token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
+                token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
+                token.total_usd = parseFloat(parseFloat(token.tokenprice_usd) * parseFloat(token.balance)); 
                 div_elem.querySelector('.usd_value').innerText  = "$" + token.total_usd.toFixed(2);
-                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $${token.tokenprice.toFixed(2)}`;
+                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $${token.tokenprice_usd.toFixed(2)}`;
                 div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
             }
         });
@@ -158,7 +182,9 @@ async function refreshPortfolio()
     totalDivElem.style.display = "flex";
     nowloadingElem.style.display = "none";
 
-    inputArea.style.display = "block";
+    //checkButton.style.display = "inline-block";
+    checkButton.disabled = false;
+    checkButton.innerText = "Check";
     
 }
 

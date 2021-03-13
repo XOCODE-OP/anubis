@@ -11,7 +11,15 @@
 </head>
 <body>
     
-    <img src="logo.png"  class='title'/>
+    <div class='leftcol'>
+        <img src="logo.png"  class='title'/>
+        <div class='inputarea'>
+            <p>Input your Ethereum address:</p>
+            <input type='text' placeholder="0x..." value="" class='inpaddress' />
+            <button id='btn_main_check' onclick="refreshPortfolio();" >Check</button>
+        </div>
+    </div>
+   
 
     <div class='maincolumn'>
 
@@ -48,11 +56,6 @@
             </div>
 
         </div>
-        <div class='inputarea'>
-            <p>Input your Ethereum address:</p>
-            <input type='text' placeholder="0x..." value="" class='inpaddress' />
-            <button onclick="refreshPortfolio();" class='refresherbutton'>Go</button>
-        </div>
         
         <!-- <p style='margin-bottom: 50px;'>
             Right now, we just poll from "All token" (whitelist).<br />
@@ -62,6 +65,10 @@
         </p> -->
 
     </div>
+
+
+
+    
    
 
     <script>
