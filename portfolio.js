@@ -47,8 +47,6 @@ document.addEventListener("DOMContentLoaded", function(event)
     totalDivElem.style.display = "none";
     baseTokenElement.style.display = "none";
 
-    mainPlaceholderLabel.parentNode.removeChild(mainPlaceholderLabel);
-
     let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
     //console.log(savedData);
     if (!savedData && savedData == null || !savedData.lastAddr)
@@ -159,6 +157,7 @@ async function refreshPortfolio(addr)
 
     totalDivElem.style.display = "none";
     nowloadingElem.style.display = "block";
+    mainPlaceholderLabel.style.display = "none";
     
     let listofdivs = document.querySelectorAll('.tokenp');
     for (let i = 0; i < listofdivs.length; i++)
@@ -318,6 +317,7 @@ async function refreshPortfolio(addr)
     divTotalBTCvalue.innerText = `BTC ${numberWithCommas(total_btc.toFixed(2))}`;
 
     checkButton.disabled = false;
+    btn_metamask.disabled = false;
     checkButton.innerText = "Check";
     
     ui_sortTokenDivs();

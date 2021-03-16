@@ -142,7 +142,7 @@ body
 
 .maincolumn h1
 {
-    margin-top: 170px;
+    margin-top: 25%;
     font-size: 18px;
 }
 
@@ -288,20 +288,20 @@ body
     vertical-align: middle;
 }
 
-.inputarea button:disabled
+.inputarea button:disabled, #btn_metamask:disabled
 {
     cursor: default;
     color: rgb(151, 151, 151);
 }
 
-.inputarea button:hover:enabled
+.inputarea button:hover:enabled, #btn_metamask:hover:enabled
 {
     
     color: #fff600;
     border-color: #fff600;
 }
 
-.inputarea button:active:enabled
+.inputarea button:active:enabled, #btn_metamask:active:enabled
 {
     color: #accbe4;
     background-color: rgb(19, 19, 19);
@@ -383,4 +383,81 @@ body
     vertical-align: middle;
     color: rgb(151, 151, 151);
     margin-bottom: 20px;
+}
+
+@media (max-width: 1100px)
+{
+    body
+    {
+        font-size: 11px;
+        display: block;
+    }
+
+    .maincolumn
+    {
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .whichaddress
+    {
+        font-size: 9px;
+    }
+
+    
+    .leftcol
+    {
+        width: 100%;
+        display: 100%;
+        text-align: center;
+    }
+
+    .leftcol div
+    {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 10px 0;
+        border-radius: 0;
+    }
+
+    .sample_addrs h4
+    {
+        font-size: 12px;
+    }
+
+    .tokenp
+    {
+        margin: 12px 0;
+        font-size: 12px;
+    }
+
+    .totaldiv
+    {
+        font-size: 18px;
+    }
+
+    #content
+    {
+        overflow-x: hidden;
+    }
+
+    .inputarea button
+    {
+        font-size: 16px;
+        margin-top: 10px;
+        padding: 4px 0;
+        width: 100%;
+    }
+
+    #btn_metamask
+    {
+        margin-left: 0;
+    }
+
+    .maincolumn h1
+    {
+        font-size: 16px;
+    }
 }
