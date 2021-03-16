@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="animate.min.css" /> -->
     <link rel="stylesheet" href="style.css">
     <title>CoinEye - Grant Us Eyes</title>
     <script src='./web3.min.js'></script>
@@ -16,20 +17,32 @@
         <div class='inputarea'>
             <p>Input your Ethereum address:</p>
             <input type='text' placeholder="0x..." value="" class='inpaddress' />
-            <button id='btn_main_check' onclick="refreshPortfolio();" >Check</button>
+            <button id='btn_main_check' >Check</button>
+        </div>
+        <div class='sample_addrs'>
+            <h4>Sample Addresses</h4>
+            <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
+            <a href='#' data-addr="0x886F2e91d761BC072F661aCCC925f5180a63a01a">0x886F2e91d761BC072F661aCCC925f5180a63a01a</a>
+            <a href='#' data-addr="0x4d246bE90C2f36730bb853aD41d0a189061192d3">0x4d246bE90C2f36730bb853aD41d0a189061192d3</a>
+            <a href='#' data-addr="0x74de5d4FCbf63E00296fd95d33236B9794016631">0x74de5d4FCbf63E00296fd95d33236B9794016631</a>
+            
         </div>
     </div>
    
 
     <div class='maincolumn'>
-
+        <h1>Tokens will appear here</h1>
         <div id='content'>
 
-            
-            
             <div class='totaldiv'>
                 <div class='totaldiv-label'>Total value</div>
-                <div class='totaldiv-val'>$0</div>
+                <div class='totaldiv-val-container'>
+                    <div class='coin_vals'>
+                        <div class='tot_btcv'></div>
+                        <div class='tot_ethv'></div>
+                    </div>
+                    <div class='totaldiv-val'>$0</div>
+                </div>
             </div>
 
             <div class='nowloading'>
@@ -39,9 +52,7 @@
             </div>
             <div class='whichaddress'></div>
 
-            
-
-            <div class='tokenp'>
+            <div class='tokenp  animate__fadeIn'>
                 <div class='tokenp_left'>
                     <img src='' />
                     <div class='tokenp_text'>
@@ -50,8 +61,15 @@
                     </div>
                 </div>
                 <div class='tokenp_right'>
-                    <div class='usd_value' data-val='0'>0</div>
-                    <div class='token_total'>0</div>
+                    <div class='value_totals'>
+                        <div class='btc_value'>0</div>
+                        <div class='eth_value'>0</div>
+                        <div class='usd_value' data-val='0'>0</div>
+                    </div>
+                    <div class="coin_holdings">
+                        <div class='token_total'>0</div>
+                        <div class='perc'>? %</div>
+                    </div>
                 </div>
             </div>
 

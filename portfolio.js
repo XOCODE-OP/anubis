@@ -6,15 +6,13 @@
 // jshint unused:true
 // jshint varstmt:true
 
-Object.prototype.originalValueOf = Object.prototype.valueOf;
-
-Object.prototype.valueOf = function() {
-  if (typeof this !== 'number') {
-    throw new Error('Object is not a Number');
-  }
-
-  return this.originalValueOf();
-}
+// Object.prototype.originalValueOf = Object.prototype.valueOf;
+// Object.prototype.valueOf = function() {
+//   if (typeof this !== 'number') {
+//     throw new Error('Object is not a Number');
+//   }
+//   return this.originalValueOf();
+// }
 
 const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
@@ -23,61 +21,98 @@ let coingecko_ids; //https://api.coingecko.com/api/v3/coins/list?include_platfor
 let uniswapTokenList = [];
 let relevantContractAddresses = [];
 let symbolBlackList = ["MNE"];
-//let 
 const erc20ABI = abi();
+const STORAGE_KEY = "coineyedata";
 let web3 = new Web3(rpcURLmainnet);
 let content_div;
 let baseTokenElement, totalDivElem, totalValElem, nowloadingElem, refresherbuttonElem,
-inputbarElem, inputArea, whichaddressElem, checkButton;
-const defaultAddr = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
+inputbarElem, inputArea, whichaddressElem, checkButton, mainPlaceholderLabel, divTotalBTCvalue, divTotalETHvalue;
+const DEFAULT_SAMPLE_ADDR = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
-
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
-    content_div = document.getElementById("content");
-    baseTokenElement = document.querySelector('.tokenp');
-    totalDivElem = document.querySelector('.totaldiv');
+    content_div         = document.getElementById("content");
+    baseTokenElement    = document.querySelector('.tokenp');
+    totalDivElem        = document.querySelector('.totaldiv');
+    totalValElem        = document.querySelector(".totaldiv-val");
+    nowloadingElem      = document.querySelector(".nowloading");
+    refresherbuttonElem = document.querySelector(".refresherbutton");
+    inputArea           = document.querySelector(".inputarea");
+    inputbarElem        = document.querySelector(".inpaddress");
+    whichaddressElem    = document.querySelector(".whichaddress");
+    checkButton         = document.querySelector("#btn_main_check");
+    mainPlaceholderLabel= document.querySelector(".maincolumn h1");
+    divTotalBTCvalue    = document.querySelector(".tot_btcv");
+    divTotalETHvalue    = document.querySelector(".tot_ethv"); 
+
+    nowloadingElem.style.display = "none";
+    whichaddressElem.style.display = "none";
     totalDivElem.style.display = "none";
     baseTokenElement.style.display = "none";
-    totalValElem = document.querySelector(".totaldiv-val");
-    nowloadingElem = document.querySelector(".nowloading");
-    nowloadingElem.style.display = "none";
-    refresherbuttonElem = document.querySelector(".refresherbutton");
-    inputArea = document.querySelector(".inputarea");
-    inputbarElem = document.querySelector(".inpaddress");
-    inputbarElem.value = defaultAddr;
-    whichaddressElem = document.querySelector(".whichaddress");
-    whichaddressElem.innerText = defaultAddr;
-    whichaddressElem.style.display = "none";
-    checkButton = document.querySelector("#btn_main_check");
+
+    mainPlaceholderLabel.parentNode.removeChild(mainPlaceholderLabel);
+
+    let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    //console.log(savedData);
+    if (!savedData && savedData == null || !savedData.lastAddr)
+    {
+        console.log("defaulting save state");
+        let defaultData = {};
+        defaultData.lastAddr = DEFAULT_SAMPLE_ADDR;
+        console.log("writing to storage:");
+        console.log(defaultData);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+        savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));    
+        console.log("loaded:");
+        console.log(savedData);
+    }
+    inputbarElem.value = savedData.lastAddr;
+    whichaddressElem.innerText = savedData.lastAddr;
 
     inputbarElem.addEventListener("keyup", function(event)
     {
         if (!checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
         {
-            refreshPortfolio();
+            refreshPortfolio(inputbarElem.value);
             return;
         }
     });
 
-    baseTokenElement.parentNode.removeChild(baseTokenElement);
+    checkButton.addEventListener("click", function (event)
+    {
+        refreshPortfolio(inputbarElem.value);
+    });
 
-    //elem.parentNode.removeChild(elem);
-    
-    //main();
+    let sampleLinks = document.querySelectorAll(".sample_addrs a");
+    for (let i = 0; i < sampleLinks.length; i++)
+    {
+        let _addr = sampleLinks[i].dataset.addr;
+        sampleLinks[i].addEventListener("click", function (event)
+        {
+            refreshPortfolio(_addr);
+        });
+    }
+
+    baseTokenElement.parentNode.removeChild(baseTokenElement);
 });
 
-async function refreshPortfolio()
+async function refreshPortfolio(addr)
 {
-    let pollThesePrices = [];
+    let storeData = {};
+    storeData.lastAddr = addr;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
+
+    totalDivElem.style.display = "none";
+    nowloadingElem.style.display = "block";
+    
     let listofdivs = document.querySelectorAll('.tokenp');
     for (let i = 0; i < listofdivs.length; i++)
     {
         listofdivs[i].parentNode.removeChild(listofdivs[i]);
     }
 
-    let addr = inputbarElem.value;
+    inputbarElem.value = addr;
     checkButton.disabled = true;
     checkButton.innerText = "please wait";
     whichaddressElem.style.display = "block";
@@ -87,12 +122,10 @@ async function refreshPortfolio()
     relevantContractAddresses = [];
     relevantContractAddresses = await getRelevantContractAddresses(addr);
 
-    //coingecko_markets = await fetchJson("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false");
     coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
 
     uniswapTokenList = await fetchUniswapTokenList();
     //uniswapTokenList is filtered by relevant contract addresses
-    //content_div.innerHTML = "";
 
     for (let i = 0; i < uniswapTokenList.length; i++)
     {
@@ -108,7 +141,7 @@ async function refreshPortfolio()
         }
     }
 
-    let query_coins_part = "https://api.coingecko.com/api/v3/simple/price?ids=";
+    let query_coins_part = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2C";
     for (let i = 0; i < uniswapTokenList.length; i++)
     {
         const token = uniswapTokenList[i];
@@ -121,14 +154,19 @@ async function refreshPortfolio()
     for (let i = 0; i < uniswapTokenList.length; i++)
     {
         const token = uniswapTokenList[i];
+        let notsupported = false;
         if (!token.coingecko_id || !coingeckoPrices[token.coingecko_id] || !coingeckoPrices[token.coingecko_id].usd)
         {
-            token.injected_current_price = 0;
+            token.injected_current_price = {};
+            token.injected_current_price.usd = 0;
+            token.injected_current_price.eth = 0;
+            token.injected_current_price.btc = 0;
             console.log(`Error: Symbol ${token.symbol} is not supported.`);
+            notsupported = true;
         }
         else
             token.injected_current_price = coingeckoPrices[token.coingecko_id];
-            //token.injected_current_price = coingeckoPrices[token.coingecko_id].usd;
+            
         token.contract = new web3.eth.Contract(erc20ABI, token.address);
         
         await token.contract.methods.balanceOf(addr).call().then(function (bal)
@@ -146,73 +184,143 @@ async function refreshPortfolio()
                     token.tokenprice.usd = 0;
                     token.tokenprice.eth = 0;
                     token.tokenprice.btc = 0;
+                    console.log("There was no injected price for " + token.symbol);
                 }
                 token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
                 token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
                 token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
                 token.total_usd = parseFloat(parseFloat(token.tokenprice_usd) * parseFloat(token.balance)); 
-                div_elem.querySelector('.usd_value').innerText  = "$" + token.total_usd.toFixed(2);
-                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $${token.tokenprice_usd.toFixed(2)}`;
+                token.total_eth = parseFloat(parseFloat(token.tokenprice_eth) * parseFloat(token.balance)); 
+                token.total_btc = parseFloat(parseFloat(token.tokenprice_btc) * parseFloat(token.balance)); 
+                div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(token.total_eth.toFixed(2))}`;
+                div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
+                div_elem.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(token.total_btc.toFixed(2))}`;
+                div_elem.querySelector('.btc_value').dataset.val = token.total_btc;
+                div_elem.querySelector('.usd_value').innerText  = "$" + numberWithCommas(token.total_usd.toFixed(2));
+                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
                 div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
+                if (notsupported)
+                {
+                    div_elem.classList.add("notsupported");
+                    div_elem.querySelector('.eth_value').classList.add("notsupported");
+                    div_elem.querySelector('.btc_value').classList.add("notsupported");
+                    div_elem.querySelector('.usd_value').classList.add("notsupported");
+                    div_elem.querySelector('.tokendetails').classList.add("notsupported");
+                    div_elem.querySelector('.token_total').classList.add("notsupported");
+                    div_elem.querySelector('.tokenname').classList.add("notsupported");
+                    div_elem.querySelector('.tokenname').innerHTML += "<br />[NOT SUPPORTED]";
+                }
             }
         });
-
-        //token.balance = web3.utils.fromWei(balance_raw, 'ether');
     }
 
     let eth_raw_balance = await web3.eth.getBalance(addr); //string
-    let eth_decimal_balance = web3.utils.fromWei(eth_raw_balance, 'ether'); //string
-    let ethprice_raw = await getCoinPriceInUSD("ethereum");
-    let ethprice = ethprice_raw["ethereum"].usd;
+    let eth_decimal_balance = parseFloat(web3.utils.fromWei(eth_raw_balance, 'ether'));
+    let ethprice = coingeckoPrices["ethereum"];
     let ethDiv = ui_addTokenDiv("Ethereum", "ETH", eth_decimal_balance, "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880");
-    let eth_total_usd = (ethprice*parseFloat(eth_decimal_balance));
-    ethDiv.querySelector('.usd_value').innerText  = "$" + eth_total_usd.toFixed(2);
-    ethDiv.querySelector('.tokendetails').innerText  = `ETH - $${ethprice.toFixed(2)}`;
+    let eth_total_usd = (ethprice.usd*eth_decimal_balance);
+    let eth_total_btc = (ethprice.btc*eth_decimal_balance);
+    
+    ethDiv.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(eth_decimal_balance.toFixed(2))}`;
+    ethDiv.querySelector('.eth_value').dataset.val = eth_decimal_balance;
+    ethDiv.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(eth_total_btc.toFixed(2))}`;
+    ethDiv.querySelector('.btc_value').dataset.val = eth_total_btc;
+    ethDiv.querySelector('.usd_value').innerText  = "$" + numberWithCommas(eth_total_usd.toFixed(2));
     ethDiv.querySelector('.usd_value').dataset.val = eth_total_usd;
+    ethDiv.querySelector('.tokendetails').innerText  = `ETH - $${numberWithCommas(parseFloat(ethprice.usd).toFixed(2))}`;
 
     let listUsdValues = document.querySelectorAll('.usd_value');
+    let ethValues = document.querySelectorAll('.eth_value');
+    let btcValues = document.querySelectorAll('.btc_value');
     let total_usd = 0;
+    let total_eth = 0;
+    let total_btc = 0;
     for (let i = 0; i < listUsdValues.length; i++)
     {
         let elem = listUsdValues[i];
-        let num = parseFloat(elem.dataset.val);
-        total_usd = total_usd + num;
+        let part_usd = parseFloat(elem.dataset.val);
+        total_usd = total_usd + part_usd;
     }
-    totalValElem.innerText = `$${total_usd.toFixed(2)}`;
+    for (let i = 0; i < ethValues.length; i++)
+    {
+        let elem = ethValues[i];
+        let part_eth = parseFloat(elem.dataset.val);
+        total_eth = total_eth + part_eth;
+    }
+    for (let i = 0; i < btcValues.length; i++)
+    {
+        let elem = btcValues[i];
+        let part_btc = parseFloat(elem.dataset.val);
+        total_btc = total_btc + part_btc;
+    }
+    totalValElem.innerText = `$${numberWithCommas(total_usd.toFixed(2))}`;
+    totalValElem.dataset.val = total_usd;
     totalDivElem.style.display = "flex";
     nowloadingElem.style.display = "none";
+    
+    divTotalETHvalue.dataset.val = total_eth;
+    divTotalETHvalue.innerText = `ETH ${numberWithCommas(total_eth.toFixed(2))}`;
+    divTotalBTCvalue.dataset.val = total_btc;
+    divTotalBTCvalue.innerText = `BTC ${numberWithCommas(total_btc.toFixed(2))}`;
 
-    //checkButton.style.display = "inline-block";
     checkButton.disabled = false;
     checkButton.innerText = "Check";
     
+    ui_sortTokenDivs();
 }
+
+function ui_sortTokenDivs()
+{
+    let tokenDivEntries = document.querySelectorAll('.tokenp');
+    let orderedList = [];
+    for (let i = 0; i < tokenDivEntries.length; i++)
+    {
+        let e = tokenDivEntries[i];
+        orderedList.push(e);
+        e.parentNode.removeChild(e);
+    }
+
+    orderedList.sort(function(a, b)
+    {
+        return parseFloat(a.querySelector('.usd_value').dataset.val) - 
+        parseFloat(b.querySelector('.usd_value').dataset.val);
+    });
+
+    //resinsert divs sorted
+    //also calc percentages
+    let totalval = parseFloat(totalValElem.dataset.val);
+    for (let i = 0; i < orderedList.length; i++)
+    {
+        let e = orderedList[i];
+        let myval = parseFloat(e.querySelector('.usd_value').dataset.val);
+        //(small / total) * 100 = percent
+        let perc = ((myval / totalval) * 100.0);
+        let percdiv = e.querySelector('.perc');
+        percdiv.dataset.val = perc;
+        e.dataset.percval = perc;
+        percdiv.innerText = perc.toFixed(1) + "%";
+
+        e.classList.remove("animate__animated");
+        whichaddressElem.after(e);
+    }
+}
+
+
 
 function ui_addTokenDiv(_name, _symbol, _token_total, _icon)
 {
     let clone = baseTokenElement.cloneNode(true);
-    clone.style.display = "flex";
     //clone.id = 'elem2';
     clone.className += " cloned "+_symbol;
-
     _token_total = parseFloat(_token_total);
-    clone.querySelector('.token_total').innerText  = _token_total.toFixed(2) + " " + _symbol;
+    clone.querySelector('.token_total').innerText  = numberWithCommas(_token_total.toFixed(2)) + " " + _symbol;
     clone.querySelector('.tokenname').innerText  = _name;
-    
     clone.querySelector('img').src = _icon;
     clone.style.display = "flex";
     whichaddressElem.after(clone);
-    //console.log(`adding ${_symbol}`);
 
     return clone;
 }
-
-// async function getCoingeckoIDs()
-// {
-//     let _response = await fetch("./coingecko_markets.json"); 
-//     if (_response.ok) return await _response.json();
-//     else return null;
-// }
 
 async function getRelevantContractAddresses(in_addr)
 {
@@ -222,6 +330,10 @@ async function getRelevantContractAddresses(in_addr)
     {
         llist.push(tokens.result[i].contractAddress);
     }
+    
+    //filter helper
+    function onlyUnique(value, index, self) { return self.indexOf(value) === index; }
+    
     return llist.filter(onlyUnique);
 }
 
@@ -239,26 +351,6 @@ async function getTokenEventsFromEtherscan(in_addr)
     if (_response.ok) return await _response.json();
     else return null;
 };
-
-// web3.eth.getBalance(addr, function(err, wei)
-// {
-//     let balance = web3.utils.fromWei(wei, 'ether');
-//     console.log(balance + " ETH");
-// });
-
-//let token_pols = web3.eth.contract(_abi).at(contractAddr_POLS);
-
-// let tokenContractPols = new web3.eth.Contract(erc20ABI, contractAddr_POLS);
-
-
-// tokenContractPols.methods.name().call(function(err, name)
-// {
-//   if(err) { console.log(err); }
-//   if(name) { console.log('The token name is: ' + name); }
-// });
-
-//filter helper
-function onlyUnique(value, index, self) { return self.indexOf(value) === index; }
 
 async function fetchUniswapTokenList()
 {
@@ -302,56 +394,6 @@ async function fetchUniswapTokenList()
     }
 }
 
-async function getCoinPriceInUSD(_coingecko_token_id)
-{
-    let _query = `https://api.coingecko.com/api/v3/simple/price?ids=${_coingecko_token_id}&vs_currencies=usd`;
-    let _response = await fetch(_query); 
-    if (_response.ok) return await _response.json();
-    else return null;
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
-
-
-
-// tokenContractPols.methods.symbol().call(function(err, symbol)
-// {
-//   if(err) { console.log(err); }
-//   if(symbol) { console.log('The token symbol is: ' + symbol); }
-// });
-
-// tokenContractPols.methods.symbol().call(function(err, decimals)
-// {
-//   if(err) { console.log(err); }
-//   if(decimals) { console.log('The token decimals are: ' + decimals); }
-// });
-
-// tokenContractPols.methods.balanceOf(addr).call(function(err, balance)
-// {
-//     if(err) { console.log(err); }
-//   //console.log('The balance is: ' + balance.toString(10));
-//   let bal = web3.utils.fromWei(balance, 'ether');
-//   console.log('The balance is: ' + bal + " POLS");
-// });
-
-
-
-
-
-
-
-
-//web3.eth.getGasPrice([callback])
-
-
-// async function main()
-// {
-//     let wei_total = await web3.eth.getBalance(addr);
-//     let eth_total = web3.utils.fromWei(wei_total, 'ether');
-//     console.log( "Balance of " + addr + ":" );
-//     console.log(wei_total + " wei");
-//     console.log(eth_total + " ETH");
-// }
-// main();
-
-
-

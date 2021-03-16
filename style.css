@@ -61,13 +61,78 @@ body
     text-align: left;
 }
 
+.leftcol div
+{
+    margin: 30px auto;
+    background-color: rgb(31, 31, 31);
+    border-radius: 8px;
+    border: 1px solid #727462;
+    padding: 20px 0;
+}
+
 .title
 {
     margin-left: 40px;
     margin-top: 20px;
 }
 
-div.maincolumn
+.sample_addrs
+{
+    overflow: hidden;
+    text-align: left;
+}
+
+.sample_addrs *
+{
+    margin: 8px;
+}
+
+.sample_addrs h4
+{
+    font-size: 18px;
+}
+
+.sample_addrs a
+{
+    font-size: 14px;
+    color: gray;
+    text-decoration: none;
+    text-overflow: ellipsis;
+}
+
+.sample_addrs a:hover
+{
+    color: yellow;
+}
+
+.eth_value, .btc_value
+{
+    font-size: 12px;
+    color: cyan;
+}
+
+.btc_value
+{
+    color: orange;
+}
+
+.value_totals
+{
+    display: flex;
+    flex-direction: row;
+}
+
+.value_totals div
+{
+    margin-left: 10px;
+}
+
+.notsupported
+{
+    color: rgb(255, 81, 81) !important;
+}
+
+.maincolumn
 {
     width: 60%;
     margin: 30px auto;
@@ -77,17 +142,33 @@ div.maincolumn
     min-height: 200px;
 }
 
-.inputarea 
+.maincolumn h1
 {
-    margin: 30px auto;
-    background-color: rgb(31, 31, 31);
-    border-radius: 8px;
-    border: 1px solid #727462;
-    padding: 20px 0;
-    text-align: center;
+    margin-top: 170px;
+    font-size: 18px;
 }
 
-div.totaldiv
+.coin_holdings
+{
+    
+}
+
+.coin_holdings .token_total
+{
+    display: inline-block;
+}
+
+.coin_holdings .perc
+{
+    display: inline-block;
+    margin-left: 14px;
+    background-color: rgb(255, 0, 200);
+    color: white;
+    padding: 2px 4px;
+    font-size: 12px;
+}
+
+.totaldiv
 {
     display: flex;
     flex-direction: row;
@@ -99,19 +180,39 @@ div.totaldiv
     margin-right: 20px;
 }
 
-div.totaldiv-label
+.totaldiv-label
 {
     margin-right: auto;
     text-align: left;
 }
 
-div.totaldiv-val
+.totaldiv-val-container .coin_vals, .totaldiv-val-container .totaldiv-val
+{
+    margin-left: 20px;
+    display: inline-block;
+}
+
+.tot_btcv
+{
+    color: orange;
+    display: block;
+    font-size: 18px;
+}
+
+.tot_ethv
+{
+    color: cyan;
+    display: block;
+    font-size: 18px;
+}
+
+.totaldiv-val-container
 {
     margin-left: auto;
     text-align: right;
 }
 
-div.tokenp
+.tokenp
 {
     display: flex;
     flex-direction: row;
@@ -119,7 +220,7 @@ div.tokenp
     font-size: 16px;
 }
 
-div.tokenp_left
+.tokenp_left
 {
     display: flex;
     flex-direction: row;
@@ -127,7 +228,7 @@ div.tokenp_left
     margin-right: auto;
 }
 
-div.tokenp_left img
+.tokenp_left img
 {
     width: 32px;
     height: 32px;
@@ -163,6 +264,11 @@ div.tokenp_left img
     margin-bottom: 40px;
 }
 
+.inputarea
+{
+    text-align: center;
+}
+
 .inputarea p
 {
     margin: 0;
@@ -173,7 +279,7 @@ div.tokenp_left img
 {
     border-radius: 12px;
     font-size: 24px;
-    color: rgb(151, 151, 151);
+    color: rgb(235, 235, 235);
     border-color: rgb(151, 151, 151);
     background-color: transparent;
     padding: 12px 20px;
@@ -184,9 +290,10 @@ div.tokenp_left img
     margin-top: 18px;
 }
 
-.inputarea button:hover:disabled, .inputarea button:active:disabled
+.inputarea button:disabled
 {
     cursor: default;
+    color: rgb(151, 151, 151);
 }
 
 .inputarea button:hover:enabled
@@ -229,33 +336,36 @@ div.tokenp_left img
     color: #fff600;
 }
 
-div.tokenp_text
+.tokenp_text
 {
     display: block;
 }
 
-div.tokenname, div.tokenp_right
+.tokenname, .tokenp_right
 {
     color: white;
 }
 
-div.usd_value
+.usd_value
 {
     color: white;
+    font-size: 18px;
+    padding: 2px 2px;
+    border: 1px solid black;
 }
 
-div.tokenp_right
+.tokenp_right
 {
     text-align: right;
     margin-left: auto;
 }
 
-div.tokendetails, div.token_total
+.tokendetails, .token_total
 {
     color: rgb(151, 151, 151);
 }
 
-div.nowloading
+.nowloading
 {
     font-size: 32px;
     text-align: center;

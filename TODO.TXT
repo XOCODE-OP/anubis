@@ -1,17 +1,18 @@
 //TODO:
 
 
-
-//remember address via storage
-//multiple addresses
 //sample addresses
+
+Done needs testing:
+//remember address via storage
 // local storage
-// sort by value
-// by changing the currency to eth and btc in coingecko request for prices, we can add a valuations in eth and btc, and I think thats worth it
 
-add metamask connector for pasting address (and then use metamask instead of infura?)
+//multiple addresses
 
-add a sort of console visually on screen because shit takes a long time
+> instead of saying on the console that a symbol is not supported, make a div for it saying it on the UI, different class
+> add metamask connector for pasting address (and then use metamask instead of infura?)
+
+
 
 /*
 Right now, we just poll from "All token" (whitelist).<br />
