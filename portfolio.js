@@ -6,14 +6,6 @@
 // jshint unused:true
 // jshint varstmt:true
 
-// Object.prototype.originalValueOf = Object.prototype.valueOf;
-// Object.prototype.valueOf = function() {
-//   if (typeof this !== 'number') {
-//     throw new Error('Object is not a Number');
-//   }
-//   return this.originalValueOf();
-// }
-
 const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
 //let coingecko_markets; //https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false
@@ -24,8 +16,9 @@ let symbolBlackList = ["MNE"];
 const erc20ABI = abi();
 const STORAGE_KEY = "coineyedata";
 let web3 = new Web3(rpcURLmainnet);
+let metamaskweb3 = null;
 let content_div;
-let baseTokenElement, totalDivElem, totalValElem, nowloadingElem, refresherbuttonElem,
+let baseTokenElement, totalDivElem, totalValElem, nowloadingElem, refresherbuttonElem, btn_metamask, 
 inputbarElem, inputArea, whichaddressElem, checkButton, mainPlaceholderLabel, divTotalBTCvalue, divTotalETHvalue;
 const DEFAULT_SAMPLE_ADDR = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
@@ -45,6 +38,9 @@ document.addEventListener("DOMContentLoaded", function(event)
     mainPlaceholderLabel= document.querySelector(".maincolumn h1");
     divTotalBTCvalue    = document.querySelector(".tot_btcv");
     divTotalETHvalue    = document.querySelector(".tot_ethv"); 
+    btn_metamask        = document.querySelector("#btn_metamask"); 
+
+    if (!window.ethereum) btn_metamask.parentNode.removeChild(btn_metamask);
 
     nowloadingElem.style.display = "none";
     whichaddressElem.style.display = "none";
@@ -95,7 +91,65 @@ document.addEventListener("DOMContentLoaded", function(event)
     }
 
     baseTokenElement.parentNode.removeChild(baseTokenElement);
+
+    btn_metamask.addEventListener("click", function (event)
+    {
+        getMetamaskAccounts();
+    });
+
 });
+
+function handleAccountsChanged(accounts)
+{
+    if (accounts.length === 0)
+    {
+        // MetaMask is locked or the user has not connected any accounts
+        console.log('Please connect to MetaMask.');
+    }
+    else
+    {
+        refreshPortfolio(accounts[0]);
+    }
+}
+
+async function getMetamaskAccounts()
+{
+    if (window.ethereum)
+    {
+        //metamaskweb3 = new Web3(window.ethereum);
+        // const rpc_response = await window.ethereum.send('eth_requestAccounts');
+        // const accounts = rpc_response.result;
+        // refreshPortfolio(accounts[0]);
+        window.ethereum
+        .request({ method: 'eth_requestAccounts' })
+        .then(handleAccountsChanged)
+        .catch(function(err)
+        {
+            if (err.code === 4001)
+            {
+                // EIP-1193 userRejectedRequest error
+                // If this happens, the user rejected the connection request.
+                console.log('Please connect to MetaMask.');
+            } else {
+                console.error(err);
+            }
+        });
+
+        window.ethereum.on('accountsChanged', function(accounts)
+        {
+            console.log("ACCOUNTS CHANGED");
+            handleAccountsChanged(accounts);
+        });
+        window.ethereum.on('chainChanged', function(_chainId)
+        {
+            window.location.reload();
+        });
+    }
+    else
+    {
+        console.log("no metamask");
+    }
+}
 
 async function refreshPortfolio(addr)
 {

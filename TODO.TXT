@@ -1,12 +1,5 @@
 //TODO:
 
-
-//sample addresses
-
-Done needs testing:
-//remember address via storage
-// local storage
-
 //multiple addresses
 
 > instead of saying on the console that a symbol is not supported, make a div for it saying it on the UI, different class

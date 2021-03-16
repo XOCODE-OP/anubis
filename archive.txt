@@ -63,3 +63,11 @@ async function getCoinPriceInUSD(_coingecko_token_id)
 //     console.log(eth_total + " ETH");
 // }
 // main();
+
+// Object.prototype.originalValueOf = Object.prototype.valueOf;
+// Object.prototype.valueOf = function() {
+//   if (typeof this !== 'number') {
+//     throw new Error('Object is not a Number');
+//   }
+//   return this.originalValueOf();
+// }
