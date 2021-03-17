@@ -14,11 +14,28 @@
     
     <div class='leftcol'>
         <img src="logo.png"  class='title'/>
+        <div class='special_nopadding'>
+            <div class="gasheader">Current Gas Prices</div>
+            <div class='gasrow' data-ss='https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ'>
+                <div class='cheapgas'>
+                    CHEAP <span class='gas'></span>
+                </div>
+                <div class='modgas'>
+                    MODERATE <span class='gas'></span>
+                </div>
+                <div class='fastgas'>
+                    FAST <span class='gas'></span>
+                </div>
+            </div>
+        </div>
         <div class='inputarea'>
             <p>Input your Ethereum address:</p>
             <input type='text' placeholder="0x..." value="" class='inpaddress' />
             <button id='btn_main_check' >Check</button>
             <button id='btn_metamask' ></button>
+        </div>
+        <div >
+            portfolio add multiple here
         </div>
         <div class='sample_addrs'>
             <h4>Sample Addresses</h4>
@@ -28,6 +45,7 @@
             <a href='#' data-addr="0x6003D144C99CC18125571D04853F455EA4E794EB">0x6003D144C99CC18125571D04853F455EA4E794EB</a>
             
         </div>
+        
     </div>
    
 

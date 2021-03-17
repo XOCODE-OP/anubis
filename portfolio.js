@@ -95,7 +95,17 @@ document.addEventListener("DOMContentLoaded", function(event)
         getMetamaskAccounts();
     });
 
+    fillInGasPrices();
+
 });
+
+async function fillInGasPrices()
+{
+    let gasdata = await fetchJson("https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ");
+    document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.result.SafeGasPrice;
+    document.querySelector(".modgas .gas").innerHTML = ""+gasdata.result.ProposeGasPrice;
+    document.querySelector(".fastgas .gas").innerHTML = ""+gasdata.result.FastGasPrice;
+}
 
 function handleAccountsChanged(accounts)
 {
