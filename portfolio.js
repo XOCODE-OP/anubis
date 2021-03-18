@@ -97,6 +97,11 @@ document.addEventListener("DOMContentLoaded", function(event)
 
     fillInGasPrices();
 
+    console.log("LETS DOWNLOAD THE UNISWAP JSON WHILE WAITING FOR USER INPUT. AND OVERRIDE THE LOCAL ONE");
+    console.log("download uniswap coingecko");
+    console.log("download coingecko ID list");
+    //download these if 24h have passed or something
+
 });
 
 async function fillInGasPrices()

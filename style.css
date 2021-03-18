@@ -53,12 +53,27 @@ body
     font-weight: 500;
     margin: 0;
     display: flex;
+    padding: 20px;
 }
 
+.title
+{
+    display: block;
+    position: absolute;
+    right: 3px;
+    top: 6px;
+    z-index: -10;
+}
+
+/* .auxcol
+{
+    max-width: 440px;
+} */
+    
 .leftcol
 {
-    width: 30%;
     text-align: left;
+    max-width: 440px;
 }
 
 .leftcol>div
@@ -67,12 +82,6 @@ body
     background-color: rgb(31, 31, 31);
     border: 1px solid #727462;
     padding: 20px 0;
-}
-
-.title
-{
-    margin-left: 40px;
-    margin-top: 20px;
 }
 
 .sample_addrs
@@ -131,9 +140,10 @@ body
 
 .maincolumn
 {
+    position: relative;
     width: 60%;
-    margin: 30px auto;
-    background-color: rgb(31, 31, 31);
+    margin: 0 20px;
+    background-color: rgba(5, 5, 5, 0.479);
     border: 1px solid #727462;
     min-height: 200px;
 }
@@ -143,6 +153,79 @@ body
     margin-top: 25%;
     font-size: 18px;
 }
+
+
+
+
+.chainswitcher_container
+{
+    width: 100%;
+    display: block;
+    text-align: left;
+}
+
+.chainswitcher_title
+{
+    display: block;
+    text-align: left;
+}
+
+.chainswitcher_switchrow
+{
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+}
+
+.chainbutton_eth, .chainbutton_bsc, .chainbutton_matic
+{
+    display: inline-block;
+    cursor: pointer;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 16px;
+    font-family: monospace;
+    padding-left: 40px;
+    background-repeat: no-repeat;
+    background-size: auto 80%;
+    background-position: 5% center;
+}
+
+.chainbutton_eth
+{
+    background-image: url(https://logos.covalenthq.com/tokens/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png);
+}
+
+.chainbutton_bsc
+{
+    background-image: url(https://logos.covalenthq.com/tokens/0xb8c77482e45f1f44de1745f52c74426c631bdd52.png);
+}
+
+.chainbutton_matic
+{
+    background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
+}
+
+.chainbutton_eth, .chainbutton_bsc, .chainbutton_matic
+{
+    background-color: #111;
+    border: 1px solid #111;
+    margin: 0;
+}
+
+.chainbutton_eth:hover, .chainbutton_bsc:hover, .chainbutton_matic:hover
+{
+    border-color: wheat;
+}
+
+.chosen_chain
+{
+    background-color: wheat;
+    border-color: wheat;
+    color: black;
+}
+
+
 
 .coin_holdings
 {
@@ -424,94 +507,4 @@ body
     background-position: right center;
     background-repeat: no-repeat;
     padding-right: 26px;
-}
-
-@media (max-width: 1100px)
-{
-    body
-    {
-        font-size: 11px;
-        display: block;
-    }
-
-    .maincolumn
-    {
-        width: 100%;
-        margin: 0;
-    }
-
-    .whichaddress
-    {
-        font-size: 9px;
-    }
-
-    
-    .leftcol
-    {
-        width: 100%;
-        display: block;
-        text-align: center;
-    }
-
-    .leftcol>div
-    {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: 10px 0;
-    }
-
-    .sample_addrs
-    {
-        display: none !important;
-    }
-
-    .inpaddress
-    {
-        width: 100%;
-        font-size: 16px;
-        text-align: center;
-    }
-
-    .tokenp
-    {
-        margin: 12px 0;
-        font-size: 12px;
-    }
-
-    .totaldiv
-    {
-        font-size: 18px;
-    }
-
-    #content
-    {
-        overflow-x: hidden;
-    }
-
-    .inputarea button
-    {
-        font-size: 16px;
-        margin-top: 10px;
-        padding: 4px 0;
-        width: 100%;
-    }
-
-    #btn_metamask
-    {
-        margin-left: 0;
-    }
-
-    .maincolumn h1
-    {
-        font-size: 16px;
-    }
-
-    .title
-    {
-        display: block;
-        margin: 0;
-        background-color: rgb(26, 26, 26);
-        width: 100%;
-    }
 }
