@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="animate.min.css" /> -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mobile.css">
     <title>CoinEye - Grant Us Eyes</title>
@@ -15,15 +14,22 @@
 
     <div class='leftcol' data-chain='eth' >
         <div class='inputarea'>
-            <p>Input Ethereum address:</p>
-            <input type='text' placeholder="0x..." value="" class='inpaddress' />
-            <a href='#'>Add one more address</a>
-            <button id='btn_main_check' >Check</button>
-            <button id='btn_metamask' ></button>
+            <p>Input <span class='input_label_unit'>Ethereum</span> address:</p>
+            <div class='address_list'>
+                <div class='address_div'>
+                    <span class='minus_address_icon' style='visibility: hidden'></span>
+                    <input type='text' placeholder="0x..." value="" class='inpaddress' />
+                </div>
+                <div class='newaddresslink'>Add one more address</div>
+            </div>
+            <div class="input_buttons">
+                <button id='btn_main_check' >Check</button>
+                <button id='btn_metamask' ></button>
+            </div>
         </div>
 
-        <div class='special_nopadding'>
-            <div class="gasheader">Current Gas Prices</div>
+        <div class='special_nopadding eth_gas_box'>
+            <div class="gasheader">Current Ethereum Gas Prices</div>
             <div class='gasrow' data-ss='https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ'>
                 <div class='cheapgas'>
                     CHEAP <span class='gas'></span>
@@ -37,34 +43,47 @@
             </div>
         </div>
 
-        <div >
-            portfolio add multiple here
-            <br /><br />
-            UPDATE UNISWAP JSON
-        </div>
-
         <div class='sample_addrs'>
             <h4>Sample Addresses</h4>
-            <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
-            <a href='#' data-addr="0x886F2e91d761BC072F661aCCC925f5180a63a01a">0x886F2e91d761BC072F661aCCC925f5180a63a01a</a>
-            <a href='#' data-addr="0x4d246bE90C2f36730bb853aD41d0a189061192d3">0x4d246bE90C2f36730bb853aD41d0a189061192d3</a>
-            <a href='#' data-addr="0x6003D144C99CC18125571D04853F455EA4E794EB">0x6003D144C99CC18125571D04853F455EA4E794EB</a>
+            
+            <div class='samples_eth'>
+                <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
+                <a href='#' data-addr="0x886F2e91d761BC072F661aCCC925f5180a63a01a">0x886F2e91d761BC072F661aCCC925f5180a63a01a</a>
+                <a href='#' data-addr="0x4d246bE90C2f36730bb853aD41d0a189061192d3">0x4d246bE90C2f36730bb853aD41d0a189061192d3</a>
+                <a href='#' data-addr="0x6003D144C99CC18125571D04853F455EA4E794EB">0x6003D144C99CC18125571D04853F455EA4E794EB</a>
+            </div>
+            <div class='samples_bsc'>
+                <a href='#' data-addr="0x6093A0b32C9FB18F61198a5Fe869d3EF9549f61a">0x6093A0b32C9FB18F61198a5Fe869d3EF9549f61a</a>
+            </div>
+            <div class='samples_matic'>
+                <a href='#' data-addr="0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716">0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716</a>
+            </div>
             
         </div>
     </div>
 
 
     <div class='maincolumn'>
-        <img src="logo.png"  class='title'/>
-        <div class='chainswitcher_switchrow'>
-            <div class="chainbutton_eth chosen_chain">ETHEREUM</div>
-            <div class="chainbutton_bsc">BINANCE SMART</div>
-            <div class="chainbutton_matic">POLYGON MATIC</div>
-        </div>
-        <h1>Tokens will appear here</h1>
-        <div id='content'>
 
-            <div class='totaldiv'>
+        <img src="logo.png"  class='title'/>
+        
+        <div class='chainswitcher_switchrow'>
+            <div data-chain='eth' class="chainbutton chainbutton_eth chosen_chain">ETHEREUM</div>
+            <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART</div>
+            <div data-chain='matic' class="chainbutton chainbutton_matic">POLYGON MATIC</div>
+        </div>
+
+        <div class='nowloading'>
+            <span> Now Processing</span><div class="loadingio-spinner-eclipse-f1acnqblv1t"><div class="ldio-v3xoc9chw0a">
+                <div></div>
+                </div></div>
+        </div>
+        
+        <h1>Tokens will appear here</h1>
+
+        <div class='content content_eth' data-chain='eth'>
+
+            <div class='totaldiv' data-chain='eth'>
                 <div class='totaldiv-label'>Total value</div>
                 <div class='totaldiv-val-container'>
                     <div class='coin_vals'>
@@ -74,15 +93,9 @@
                     <div class='totaldiv-val'>$0</div>
                 </div>
             </div>
+            <div class='whichaddress whichaddress_eth'></div>
 
-            <div class='nowloading'>
-                <span> Now Processing</span><div class="loadingio-spinner-eclipse-f1acnqblv1t"><div class="ldio-v3xoc9chw0a">
-                    <div></div>
-                    </div></div>
-            </div>
-            <div class='whichaddress'></div>
-
-            <div class='tokenp  animate__fadeIn'>
+            <div class='tokenp'>
                 <div class='tokenp_left'>
                     <img src='' />
                     <div class='tokenp_text'>
@@ -104,6 +117,42 @@
                     </div>
                 </div>
             </div>
+
+        </div>
+
+        <div class='content content_bsc' data-chain='bsc' >
+
+            <div class='totaldiv' data-chain='bsc'>
+                <div class='totaldiv-label'>Total value</div>
+                <div class='totaldiv-val-container'>
+                    <div class='coin_vals'>
+                        <div class='tot_btcv'></div>
+                        <div class='tot_ethv'></div>
+                    </div>
+                    <div class='totaldiv-val'>$0</div>
+                </div>
+            </div>
+            <div class='whichaddress whichaddress_bsc'></div>
+
+            <button onclick='testbsc();'>test</button>
+
+        </div>
+
+        <div class='content content_matic' data-chain='matic'>
+
+            <div class='totaldiv' data-chain='matic'>
+                <div class='totaldiv-label'>Total value</div>
+                <div class='totaldiv-val-container'>
+                    <div class='coin_vals'>
+                        <div class='tot_btcv'></div>
+                        <div class='tot_ethv'></div>
+                    </div>
+                    <div class='totaldiv-val'>$0</div>
+                </div>
+            </div>
+            <div class='whichaddress whichaddress_matic'></div>
+
+            <button onclick='testmatic();'>test</button>
 
         </div>
         

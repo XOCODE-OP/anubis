@@ -81,7 +81,7 @@ body
     margin: 30px auto;
     background-color: rgb(31, 31, 31);
     border: 1px solid #727462;
-    padding: 20px 0;
+    padding: 16px 0;
 }
 
 .sample_addrs
@@ -154,7 +154,34 @@ body
     font-size: 18px;
 }
 
+.input_buttons
+{
+    margin-top: 12px;
+}
 
+.address_list
+{
+    text-align: center;
+}
+
+.newaddresslink
+{
+    text-decoration: none;
+    font-size: 14px;
+    color: orange;
+    padding-left: 42px;
+    background-image: url(./plus.png);
+    background-position: 14px 14px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    cursor: pointer;
+    display: inline;
+}
+
+.newaddresslink:hover
+{
+    filter: brightness(4.0);
+}
 
 
 .chainswitcher_container
@@ -177,7 +204,7 @@ body
     text-align: left;
 }
 
-.chainbutton_eth, .chainbutton_bsc, .chainbutton_matic
+.chainbutton
 {
     display: inline-block;
     cursor: pointer;
@@ -314,22 +341,34 @@ body
     margin-right: 10px;
 }
 
+.minus_address_icon
+{
+    background-image: url(./minus.png);
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    margin-right: 6px;
+    cursor: pointer;
+    margin-bottom: -4px;
+}
 
+.minus_address_icon:hover
+{
+    filter: brightness(4);
+}
 
 .inpaddress
 {
-    color: #ccc39d;
     border: 1px solid rgb(151, 151, 151);
     font-size: 14px;
     font-family: 'lato';
-    width: 80%;
-    display: block;
-    background-color: transparent;
+    width: 77%;
+    display: inline-block;
     margin: auto;
-
-        background-color: black;
-        color: #eee;
-        padding: 10px 3px;
+    background-color: black;
+    color: #eee;
+    padding: 5px 3px;
+    margin: 2px 0;
 }
 
 .inpaddress:hover
@@ -344,7 +383,7 @@ body
     font-family: 'lato';
     display: block;
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .inputarea
