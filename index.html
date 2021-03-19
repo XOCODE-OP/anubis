@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mobile.css">
-    <title>CoinEye - Grant Us Eyes</title>
+    <title>ANUBIS LINK</title>
     <script src='./web3.min.js'></script>
     <script src='./abi.js'></script>
     <script src='./portfolio.js'></script>
 </head>
 <body>
 
-    <div class='leftcol' data-chain='eth' >
+    <div class='leftcol'  >
+
+        <div class='title' ></div>
+
         <div class='inputarea'>
             <p>Input <span class='input_label_unit'>Ethereum</span> address:</p>
             <div class='address_list'>
@@ -44,7 +47,7 @@
         </div>
 
         <div class='sample_addrs'>
-            <h4>Sample Addresses</h4>
+            <h4>Sample <span class='input_label_unit'>Ethereum</span> Addresses</h4>
             
             <div class='samples_eth'>
                 <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
@@ -65,8 +68,6 @@
 
     <div class='maincolumn'>
 
-        <img src="logo.png"  class='title'/>
-        
         <div class='chainswitcher_switchrow'>
             <div data-chain='eth' class="chainbutton chainbutton_eth chosen_chain">ETHEREUM</div>
             <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART</div>
@@ -159,7 +160,9 @@
     </div>
 
 
-    
+    <div class='pageloader'>
+
+    </div>
    
 
     <script>

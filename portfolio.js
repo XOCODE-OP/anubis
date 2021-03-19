@@ -7,6 +7,8 @@
 // jshint varstmt:true
 // jshint browser: true 
 
+//coingecko uniswap list https://tokens.coingecko.com/uniswap/all.json
+
 const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
 //let coingecko_markets; //https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false
@@ -21,7 +23,7 @@ let metamaskweb3 = null;
 let baseTokenElement, nowloadingElem, refresherbuttonElem, 
 btn_metamask, inputbarElem, inputArea, checkButton, mainPlaceholderLabel, 
 divTotalBTCvalue, divTotalETHvalue, divAddress_list, baseAddressElement, newaddresslink,
-contents, chainswitcher_switchrow, unitLabel;
+contents, chainswitcher_switchrow, unitLabel, pageLoader;
 let totalDivElem_eth, totalValElem_eth, totalDivElem_bsc, totalValElem_bsc, totalDivElem_matic, totalValElem_matic;
 let content_eth, content_bsc, content_matic;
 let whichaddressElem_eth, whichaddressElem_bsc, whichaddressElem_matic;
@@ -50,6 +52,22 @@ document.addEventListener("DOMContentLoaded", function(event)
     totalDivElem_matic.style.display = "none";
     content_bsc.style.display = "none";
     content_matic.style.display = "none";
+    pageLoader          = document.querySelector('.pageloader');
+    pageLoader.style.opacity = "1.0";
+    setTimeout(function()
+    {
+        let interval = setInterval(function ()
+        {
+            pageLoader.style.opacity-=0.05;
+            if (pageLoader.style.opacity <= 0.0)
+            {
+                clearInterval(interval);
+                pageLoader.parentNode.removeChild(pageLoader);
+            }
+        }, 20);
+
+    }, 360); 
+
 
     baseTokenElement    = document.querySelector('.tokenp');
     nowloadingElem      = document.querySelector(".nowloading");
@@ -65,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     baseAddressElement  = document.querySelectorAll(".address_div")[0]; 
     newaddresslink      = document.querySelector(".newaddresslink");
     contents            = document.querySelectorAll(".content"); 
-    unitLabel           = document.querySelector(".input_label_unit");
+    unitLabel           = document.querySelectorAll(".input_label_unit");
     chainswitcher_switchrow = document.querySelector(".chainswitcher_switchrow");
 
     divSamplesEth       = document.querySelector(".samples_eth");
@@ -172,7 +190,9 @@ document.addEventListener("DOMContentLoaded", function(event)
             // change
             if (current_chain == "eth")   
             {
-                unitLabel.innerText = "Ethereum";
+                unitLabel.forEach(element => {
+                    element.innerText = "Ethereum";
+                });
                 document.querySelector(".eth_gas_box").style.display = "block";
                 if (window.ethereum) btn_metamask.style.display = "inline-block";
                 //change sample addresses
@@ -182,7 +202,9 @@ document.addEventListener("DOMContentLoaded", function(event)
             }
             if (current_chain == "bsc")   
             {
-                unitLabel.innerText = "Binance Smart Chain";
+                unitLabel.forEach(element => {
+                    element.innerText = "Binance Smart Chain";
+                });
                 document.querySelector(".eth_gas_box").style.display = "none";
                 btn_metamask.style.display = "none";
                 //change sample addresses
@@ -192,7 +214,9 @@ document.addEventListener("DOMContentLoaded", function(event)
             }
             if (current_chain == "matic")
             {
-                unitLabel.innerText = "Polygon Matic";
+                unitLabel.forEach(element => {
+                    element.innerText = "Polygon Matic";
+                });
                 document.querySelector(".eth_gas_box").style.display = "none";
                 btn_metamask.style.display = "none";
                 //change sample addresses
@@ -214,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function(event)
 
 async function fillInGasPrices()
 {
-    let gasdata = await fetchJson("https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ");
+    let gasdata = await fetchJson(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_APIKEY}`);
     document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.result.SafeGasPrice;
     document.querySelector(".modgas .gas").innerHTML = ""+gasdata.result.ProposeGasPrice;
     document.querySelector(".fastgas .gas").innerHTML = ""+gasdata.result.FastGasPrice;
