@@ -30,8 +30,12 @@ let current_chain = "eth";
 const DEFAULT_SAMPLE_ADDR = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
 
+const ANUBIS_VERSION_NUM = "0.0.122";
+
 document.addEventListener("DOMContentLoaded", function(event)
 {
+    console.log("ANUBIS VERSION " + ANUBIS_VERSION_NUM);
+
     content_eth         = document.querySelector('.content_eth');
     content_bsc         = document.querySelector('.content_bsc');
     content_matic       = document.querySelector('.content_matic');
