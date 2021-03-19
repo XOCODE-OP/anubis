@@ -86,7 +86,8 @@ document.addEventListener("DOMContentLoaded", function(event)
     {
         console.log("defaulting save state");
         let defaultData = {};
-        defaultData.lastAddr = DEFAULT_SAMPLE_ADDR;
+        defaultData.lastAddrs = [];
+        defaultData.lastAddrs.push(DEFAULT_SAMPLE_ADDR);
         console.log("writing to storage:");
         console.log(defaultData);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
