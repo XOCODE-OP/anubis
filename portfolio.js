@@ -124,14 +124,14 @@ document.addEventListener("DOMContentLoaded", function(event)
     {
         if (!checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
         {
-            refreshPortfolio([inputbarElem.value]);
+            refreshPortfolio([inputbarElem.value], ""+current_chain);
             return;
         }
     });
 
     checkButton.addEventListener("click", function (event)
     {
-        refreshPortfolio([inputbarElem.value]);
+        refreshPortfolio([inputbarElem.value], ""+current_chain);
     });
 
     let sampleLinks = document.querySelectorAll(".sample_addrs a");
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function(event)
         let _addr = sampleLinks[i].dataset.addr;
         sampleLinks[i].addEventListener("click", function (event)
         {
-            refreshPortfolio([_addr]);
+            refreshPortfolio([_addr], ""+current_chain);
         });
     }
 
@@ -253,7 +253,7 @@ function handleAccountsChanged(accounts)
     }
     else
     {
-        refreshPortfolio([accounts[0]]);
+        refreshPortfolio([accounts[0]], ""+current_chain);
     }
 }
 
@@ -296,7 +296,7 @@ async function getMetamaskAccounts()
     }
 }
 
-async function refreshPortfolio(addrs) //addr is now an array
+async function refreshPortfolio(addrs, chain) //addr is now an array
 {
     let storeData = {};
     storeData.lastAddrs = addrs;
@@ -509,15 +509,15 @@ async function refreshPortfolio(addrs) //addr is now an array
 
     chainswitcher_switchrow.style.display = "block";
     
-    ui_sortTokenDivs();
+    ui_sortTokenDivs(chain);
 }
 
-function ui_sortTokenDivs()
+function ui_sortTokenDivs(chain)
 {
     let contentBase;
-    if (current_chain == "eth")   contentBase = content_eth;
-    if (current_chain == "bsc")   contentBase = content_bsc;
-    if (current_chain == "matic") contentBase = content_matic;
+    if (chain == "eth")   contentBase = content_eth;
+    if (chain == "bsc")   contentBase = content_bsc;
+    if (chain == "matic") contentBase = content_matic;
 
     let tokenDivEntries = contentBase.querySelectorAll('.tokenp');
     let orderedList = [];
@@ -535,9 +535,9 @@ function ui_sortTokenDivs()
     });
 
     let myvalElem;
-    if (current_chain == "eth")   myvalElem = totalValElem_eth;
-    if (current_chain == "bsc")   myvalElem = totalValElem_bsc;
-    if (current_chain == "matic") myvalElem = totalValElem_matic;
+    if (chain == "eth")   myvalElem = totalValElem_eth;
+    if (chain == "bsc")   myvalElem = totalValElem_bsc;
+    if (chain == "matic") myvalElem = totalValElem_matic;
 
     //resinsert divs sorted
     //also calc percentages
@@ -555,9 +555,9 @@ function ui_sortTokenDivs()
 
         e.classList.remove("animate__animated");
         
-        if (current_chain == "eth")   whichaddressElem_eth.after(e);
-        if (current_chain == "bsc")   whichaddressElem_bsc.after(e);
-        if (current_chain == "matic") whichaddressElem_matic.after(e);
+        if (chain == "eth")   whichaddressElem_eth.after(e);
+        if (chain == "bsc")   whichaddressElem_bsc.after(e);
+        if (chain == "matic") whichaddressElem_matic.after(e);
     }
 }
 
