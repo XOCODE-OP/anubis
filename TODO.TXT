@@ -1,12 +1,12 @@
 //TODO:
 
 > multiple addresses
-> add percentage changes 24h
-> chain switcher
 > add matic
 > add binance
-> design
 > redownload refresh json files
+> clearly label ui functions and objects
+> consolidate refactor into structs
+> 
 
 Poll markets from coingecko
 https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=decentralized_finance_defi&order=market_cap_desc&per_page=200&page=1&sparkline=false

@@ -55,6 +55,7 @@ body
     margin: 0;
     display: flex;
     /* padding: 20px; */
+    min-height: 100vh;
 }
 
 .pageloader
@@ -69,6 +70,13 @@ body
     z-index: 999;
     width: 100vw;
     height: 100vh;
+}
+
+.content
+{
+    max-width: 900px;
+    margin: auto;
+    margin-top: 40px;
 }
 
 .title
@@ -96,7 +104,7 @@ body
 .maincolumn
 {
     position: relative;
-    width: 60%;
+    width: 100%;
     background-color: rgb(21, 21, 26);
     border: 1px solid rgb(75, 77, 52);
     border-radius: 6px;
@@ -261,11 +269,18 @@ body
 
 .chainbutton_eth, .chainbutton_bsc, .chainbutton_matic
 {
-    background-color: #111;
-    border: 1px solid #111;
+    background-color: #000;
+    border: 1px solid #000;
+    border-bottom-color: #333;
     margin: 0;
     width: 33.333%;
     text-align: center;
+}
+
+.chainbutton_bsc
+{
+    border-left-color: #333;
+    border-right-color: #333;
 }
 
 .chainbutton_eth:hover, .chainbutton_bsc:hover, .chainbutton_matic:hover
@@ -300,6 +315,16 @@ body
     color: white;
     padding: 2px 4px;
     font-size: 12px;
+}
+
+.usdchange
+{
+    display: inline-block;
+    margin: 0 14px;
+    background-color: black;
+    color: rgb(0, 255, 0);
+    padding: 2px 4px;
+    font-size: 14px;
 }
 
 .totaldiv
@@ -412,6 +437,8 @@ body
     display: block;
     text-align: center;
     margin-bottom: 30px;
+    background-color: black;
+    padding: 4px 0;
 }
 
 .inputarea
@@ -434,9 +461,10 @@ body
     cursor: pointer;
     font-family: 'lato';
     display: inline-block;
-    padding: 10px 80px;
-    margin-top: 18px;
+    padding: 10px 0;
     vertical-align: middle;
+    margin: 10px auto;
+    width: 200px;
 }
 
 .inputarea button:disabled, #btn_metamask:disabled

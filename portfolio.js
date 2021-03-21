@@ -19,6 +19,7 @@ let symbolBlackList = ["MNE"];
 const erc20ABI = abi();
 const STORAGE_KEY = "coineyedata";
 let web3 = new Web3(rpcURLmainnet);
+const regexETH = new RegExp('^0x[a-fA-F0-9]{40}$');
 let metamaskweb3 = null;
 let baseTokenElement, nowloadingElem, refresherbuttonElem, 
 btn_metamask, inputbarElem, inputArea, checkButton, mainPlaceholderLabel, 
@@ -67,7 +68,6 @@ document.addEventListener("DOMContentLoaded", function(event)
         }, 20);
 
     }, 360); 
-
 
     baseTokenElement    = document.querySelector('.tokenp');
     nowloadingElem      = document.querySelector(".nowloading");
@@ -124,23 +124,23 @@ document.addEventListener("DOMContentLoaded", function(event)
     {
         if (!checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
         {
-            refreshPortfolio([inputbarElem.value], ""+current_chain);
+            buildPortfolio();
             return;
         }
     });
 
     checkButton.addEventListener("click", function (event)
     {
-        refreshPortfolio([inputbarElem.value], ""+current_chain);
+        buildPortfolio();
     });
 
     let sampleLinks = document.querySelectorAll(".sample_addrs a");
     for (let i = 0; i < sampleLinks.length; i++)
     {
-        let _addr = sampleLinks[i].dataset.addr;
         sampleLinks[i].addEventListener("click", function (event)
         {
-            refreshPortfolio([_addr], ""+current_chain);
+            document.querySelectorAll(".address_div")[0].querySelector("input").value = sampleLinks[i].dataset.addr;
+            buildPortfolio();
         });
     }
 
@@ -158,6 +158,10 @@ document.addEventListener("DOMContentLoaded", function(event)
         //add address box
         let _clone = baseAddressElement.cloneNode(true);
         _clone.querySelector(".minus_address_icon").style.visibility = "visible";
+        _clone.querySelector(".minus_address_icon").addEventListener("click", function(event){
+            _clone.parentNode.removeChild(_clone);
+        });
+
         _clone.className += " cloned";
 
         newaddresslink.before(_clone);
@@ -253,7 +257,8 @@ function handleAccountsChanged(accounts)
     }
     else
     {
-        refreshPortfolio([accounts[0]], ""+current_chain);
+        //buildPortfolio([accounts[0]], ""+current_chain);
+        //fille first input with account addr
     }
 }
 
@@ -296,8 +301,11 @@ async function getMetamaskAccounts()
     }
 }
 
-async function refreshPortfolio(addrs, chain) //addr is now an array
+async function buildPortfolio() //addr is now an array
 {
+    let addrs = getAllInputAddresses();
+    let chain = ""+current_chain;
+
     let storeData = {};
     storeData.lastAddrs = addrs;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
@@ -306,11 +314,9 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
 
     chainswitcher_switchrow.style.display = "none";
 
-    //current_chain
-
-    if (current_chain == "eth") totalDivElem_eth.style.display = "none";
-    if (current_chain == "bsc") totalDivElem_bsc.style.display = "none";
-    if (current_chain == "matic") totalDivElem_matic.style.display = "none";
+    if (chain == "eth") totalDivElem_eth.style.display = "none";
+    else if (chain == "bsc") totalDivElem_bsc.style.display = "none";
+    else if (chain == "matic") totalDivElem_matic.style.display = "none";
     
     nowloadingElem.style.display = "block";
     mainPlaceholderLabel.style.display = "none";
@@ -323,21 +329,23 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
 
     inputbarElem.value = addr;
     checkButton.disabled = true;
+
     checkButton.innerText = "please wait";
-    if (current_chain == "eth") 
+    
+    if (chain == "eth") 
     {
         whichaddressElem_eth.style.display = "block";
-        whichaddressElem_eth.innerText = addr;
+        whichaddressElem_eth.innerHTML = addrs.join("<br />");
     }
-    if (current_chain == "bsc") 
+    else if (chain == "bsc") 
     {
         whichaddressElem_bsc.style.display = "block";
-        whichaddressElem_bsc.innerText = addr;
+        whichaddressElem_bsc.innerHTML = addrs.join("<br />");
     }
-    if (current_chain == "matic") 
+    else if (chain == "matic") 
     {
         whichaddressElem_matic.style.display = "block";
-        whichaddressElem_matic.innerText = addr;
+        whichaddressElem_matic.innerHTML = addrs.join("<br />");
     }
     
     nowloadingElem.style.display = "block";
@@ -371,7 +379,7 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
         query_coins_part = query_coins_part + token.coingecko_id;
         if (i < uniswapTokenList.length - 1) query_coins_part = query_coins_part + "%2C";
     }
-    query_coins_part = query_coins_part + "&vs_currencies=usd,eth,btc"; //added eth and btc prices
+    query_coins_part = query_coins_part + "&vs_currencies=usd,eth,btc&include_24hr_change=true"; //added eth and btc prices
     let coingeckoPrices = await fetchJson(query_coins_part);
 
     for (let i = 0; i < uniswapTokenList.length; i++)
@@ -384,11 +392,14 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
             token.injected_current_price.usd = 0;
             token.injected_current_price.eth = 0;
             token.injected_current_price.btc = 0;
+            token.injected_current_price.usd_24h_change = 0;
             console.log(`Error: Symbol ${token.symbol} is not supported.`);
             notsupported = true;
         }
         else
+        {
             token.injected_current_price = coingeckoPrices[token.coingecko_id];
+        }
             
         token.contract = new web3.eth.Contract(erc20ABI, token.address);
         
@@ -400,7 +411,7 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
 
             if (token.balance > 0)
             {
-                div_elem = ui_addTokenDiv(token.name, token.symbol, token.balance, token.logoURI);
+                div_elem = ui_addTokenDiv(chain, token.name, token.symbol, token.balance, token.logoURI);
                 if (!token.tokenprice) token.tokenprice = {};
                 if (!token.injected_current_price)
                 {
@@ -412,6 +423,7 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
                 token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
                 token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
                 token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
+                token.change24h_usd  = parseFloat(token.injected_current_price.usd_24h_change).toFixed(2);
                 token.total_usd = parseFloat(parseFloat(token.tokenprice_usd) * parseFloat(token.balance)); 
                 token.total_eth = parseFloat(parseFloat(token.tokenprice_eth) * parseFloat(token.balance)); 
                 token.total_btc = parseFloat(parseFloat(token.tokenprice_btc) * parseFloat(token.balance)); 
@@ -419,9 +431,21 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
                 div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
                 div_elem.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(token.total_btc.toFixed(2))}`;
                 div_elem.querySelector('.btc_value').dataset.val = token.total_btc;
-                div_elem.querySelector('.usd_value').innerText  = "$" + numberWithCommas(token.total_usd.toFixed(2));
-                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
+                div_elem.querySelector('.usd_value').innerText  = "$ " + numberWithCommas(token.total_usd.toFixed(2));
+                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $ ${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
                 div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
+                if (!token.injected_current_price.usd_24h_change)
+                {
+                    div_elem.querySelector('.usdchange').style.display = "none";
+                    div_elem.querySelector('.usdchange').dataset.val = 0;
+                }
+                else
+                {
+                    div_elem.querySelector('.usdchange').innerText  = (token.change24h_usd > 0) ? ("+"+token.change24h_usd+"%") : (token.change24h_usd+"%");
+                    if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "red";
+                    div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
+                }
+
                 if (notsupported)
                 {
                     div_elem.classList.add("notsupported");
@@ -440,7 +464,8 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
     let eth_raw_balance = await web3.eth.getBalance(addr); //string
     let eth_decimal_balance = parseFloat(web3.utils.fromWei(eth_raw_balance, 'ether'));
     let ethprice = coingeckoPrices["ethereum"];
-    let ethDiv = ui_addTokenDiv("Ethereum", "ETH", eth_decimal_balance, "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880");
+    let ethChange24 = parseFloat(ethprice.usd_24h_change).toFixed(2);
+    let ethDiv = ui_addTokenDiv(chain, "Ethereum", "ETH", eth_decimal_balance, "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880");
     let eth_total_usd = (ethprice.usd*eth_decimal_balance);
     let eth_total_btc = (ethprice.btc*eth_decimal_balance);
     
@@ -451,6 +476,10 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
     ethDiv.querySelector('.usd_value').innerText  = "$" + numberWithCommas(eth_total_usd.toFixed(2));
     ethDiv.querySelector('.usd_value').dataset.val = eth_total_usd;
     ethDiv.querySelector('.tokendetails').innerText  = `ETH - $${numberWithCommas(parseFloat(ethprice.usd).toFixed(2))}`;
+
+    ethDiv.querySelector('.usdchange').innerText  = (ethChange24 > 0) ? ("+"+ethChange24+"%") : (ethChange24+"%");
+    if (ethChange24 < 0) ethDiv.querySelector('.usdchange').style.color = "red";
+    ethDiv.querySelector('.usdchange').dataset.val = ethChange24;
 
     let listUsdValues = document.querySelectorAll('.usd_value');
     let ethValues = document.querySelectorAll('.eth_value');
@@ -477,21 +506,21 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
         total_btc = total_btc + part_btc;
     }
 
-    if (current_chain == "eth")
+    if (chain == "eth")
     {
-        totalValElem_eth.innerText = `$${numberWithCommas(total_usd.toFixed(2))}`;
+        totalValElem_eth.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
         totalValElem_eth.dataset.val = total_usd;
         totalDivElem_eth.style.display = "flex";
     }
-    if (current_chain == "bsc")
+    else if (chain == "bsc")
     {
-        totalValElem_bsc.innerText = `$${numberWithCommas(total_usd.toFixed(2))}`;
+        totalValElem_bsc.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
         totalValElem_bsc.dataset.val = total_usd;
         totalDivElem_bsc.style.display = "flex";
     }
-    if (current_chain == "matic")
+    else if (chain == "matic")
     {
-        totalValElem_matic.innerText = `$${numberWithCommas(total_usd.toFixed(2))}`;
+        totalValElem_matic.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
         totalValElem_matic.dataset.val = total_usd;
         totalDivElem_matic.style.display = "flex";
     }
@@ -507,7 +536,7 @@ async function refreshPortfolio(addrs, chain) //addr is now an array
     btn_metamask.disabled = false;
     checkButton.innerText = "Check";
 
-    chainswitcher_switchrow.style.display = "block";
+    chainswitcher_switchrow.style.display = "flex";
     
     ui_sortTokenDivs(chain);
 }
@@ -561,9 +590,22 @@ function ui_sortTokenDivs(chain)
     }
 }
 
+function getAllInputAddresses()
+{
+    let divs = document.querySelectorAll(".address_div");
+    let all = [];
+    for (let i = 0; i < divs.length; i++)
+    {
+        const e = divs[i];
+        let val = e.querySelector("input").value;
+        if (!regexETH.test(val)) e.querySelector("input").value = "WRONG FORMAT";
+        else all.push(val);
+    }
+    return all;
+}
+//regexETH.test(DEFAULT_SAMPLE_ADDR)
 
-
-function ui_addTokenDiv(_name, _symbol, _token_total, _icon)
+function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain to ensure multi polling
 {
     let clone = baseTokenElement.cloneNode(true);
     //clone.id = 'elem2';
@@ -574,12 +616,9 @@ function ui_addTokenDiv(_name, _symbol, _token_total, _icon)
     clone.querySelector('img').src = _icon;
     clone.style.display = "flex";
 
-    let chainsTotalDiv;
-    if (current_chain == "eth")   chainsTotalDiv = totalDivElem_eth;
-    if (current_chain == "bsc")   chainsTotalDiv = totalDivElem_bsc;
-    if (current_chain == "matic") chainsTotalDiv = totalDivElem_matic;
-
-    chainsTotalDiv.after(clone);
+    if (chain == "eth")   whichaddressElem_eth.after(clone);
+    if (chain == "bsc")   whichaddressElem_bsc.after(clone);
+    if (chain == "matic") whichaddressElem_matic.after(clone);
 
     return clone;
 }
