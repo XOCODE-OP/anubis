@@ -322,7 +322,7 @@ async function buildPortfolio() //addr is now an array
     storeData.lastAddrs = addrs;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
 
-    let addr = addrs[0];
+    //let addr = addrs[0];
 
     uiCache.chainswitcher_switchrow.style.display = "none";
 
@@ -339,9 +339,7 @@ async function buildPortfolio() //addr is now an array
         listofdivs[i].parentNode.removeChild(listofdivs[i]);
     }
 
-    uiCache.inputbarElem.value = addr;
     uiCache.checkButton.disabled = true;
-
     uiCache.checkButton.innerText = "please wait";
     
     if (chain == "eth") 
@@ -363,7 +361,15 @@ async function buildPortfolio() //addr is now an array
     uiCache.nowloadingElem.style.display = "block";
 
     relevantContractAddresses = [];
-    relevantContractAddresses = await getRelevantContractAddresses(addr);
+    for (let i = 0; i < addrs.length; i++)
+    {
+        let _list = await getRelevantContractAddresses(addrs[i]);
+        for (let b = 0; b < _list.length; b++)
+        {
+            relevantContractAddresses.push(_list[b]);
+        }
+    }
+    relevantContractAddresses = relevantContractAddresses.filter(onlyUnique);
 
     coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
 
@@ -414,67 +420,76 @@ async function buildPortfolio() //addr is now an array
         }
             
         token.contract = new web3.eth.Contract(erc20ABI, token.address);
-        
-        await token.contract.methods.balanceOf(addr).call().then(function (bal)
+
+        for (let x = 0; x < addrs.length; x++)
         {
-            let balance_raw = bal;
-            token.balance = balance_raw / Math.pow(10, token.decimals);
-            let div_elem;
-
-            if (token.balance > 0)
+            console.log(`ADDRESS: ${addrs[x]} TOKEN: ${token.name} - ${token.address}`);
+            await token.contract.methods.balanceOf(addrs[x]).call().then(function (bal)
             {
-                div_elem = ui_addTokenDiv(chain, token.name, token.symbol, token.balance, token.logoURI);
-                if (!token.tokenprice) token.tokenprice = {};
-                if (!token.injected_current_price)
-                {
-                    token.tokenprice.usd = 0;
-                    token.tokenprice.eth = 0;
-                    token.tokenprice.btc = 0;
-                    console.log("There was no injected price for " + token.symbol);
-                }
-                token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
-                token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
-                token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
-                token.change24h_usd  = parseFloat(token.injected_current_price.usd_24h_change).toFixed(2);
-                token.total_usd = parseFloat(parseFloat(token.tokenprice_usd) * parseFloat(token.balance)); 
-                token.total_eth = parseFloat(parseFloat(token.tokenprice_eth) * parseFloat(token.balance)); 
-                token.total_btc = parseFloat(parseFloat(token.tokenprice_btc) * parseFloat(token.balance)); 
-                div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(token.total_eth.toFixed(2))}`;
-                div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
-                div_elem.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(token.total_btc.toFixed(2))}`;
-                div_elem.querySelector('.btc_value').dataset.val = token.total_btc;
-                div_elem.querySelector('.usd_value').innerText  = "$ " + numberWithCommas(token.total_usd.toFixed(2));
-                div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $ ${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
-                div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
-                if (!token.injected_current_price.usd_24h_change)
-                {
-                    div_elem.querySelector('.usdchange').style.display = "none";
-                    div_elem.querySelector('.usdchange').dataset.val = 0;
-                }
-                else
-                {
-                    div_elem.querySelector('.usdchange').innerText  = (token.change24h_usd > 0) ? ("+"+token.change24h_usd+"%") : (token.change24h_usd+"%");
-                    if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "red";
-                    div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
-                }
+                let balance_raw = bal;
+                token.balance = balance_raw / Math.pow(10, token.decimals);
+                let div_elem;
 
-                if (notsupported)
+                if (token.balance > 0)
                 {
-                    div_elem.classList.add("notsupported");
-                    div_elem.querySelector('.eth_value').classList.add("notsupported");
-                    div_elem.querySelector('.btc_value').classList.add("notsupported");
-                    div_elem.querySelector('.usd_value').classList.add("notsupported");
-                    div_elem.querySelector('.tokendetails').classList.add("notsupported");
-                    div_elem.querySelector('.token_total').classList.add("notsupported");
-                    div_elem.querySelector('.tokenname').classList.add("notsupported");
-                    div_elem.querySelector('.tokenname').innerHTML += "<br />[NOT SUPPORTED]";
+                    div_elem = ui_addTokenDiv(chain, token.name, token.symbol, token.balance, token.logoURI);
+                    if (!token.tokenprice) token.tokenprice = {};
+                    if (!token.injected_current_price)
+                    {
+                        token.tokenprice.usd = 0;
+                        token.tokenprice.eth = 0;
+                        token.tokenprice.btc = 0;
+                        console.log("There was no injected price for " + token.symbol);
+                    }
+                    token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
+                    token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
+                    token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
+                    token.change24h_usd  = parseFloat(token.injected_current_price.usd_24h_change).toFixed(2);
+                    token.total_usd = parseFloat(parseFloat(token.tokenprice_usd) * parseFloat(token.balance)); 
+                    token.total_eth = parseFloat(parseFloat(token.tokenprice_eth) * parseFloat(token.balance)); 
+                    token.total_btc = parseFloat(parseFloat(token.tokenprice_btc) * parseFloat(token.balance)); 
+                    div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(token.total_eth.toFixed(2))}`;
+                    div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
+                    div_elem.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(token.total_btc.toFixed(2))}`;
+                    div_elem.querySelector('.btc_value').dataset.val = token.total_btc;
+                    div_elem.querySelector('.usd_value').innerText  = "$ " + numberWithCommas(token.total_usd.toFixed(2));
+                    div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $ ${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
+                    div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
+                    if (!token.injected_current_price.usd_24h_change)
+                    {
+                        div_elem.querySelector('.usdchange').style.display = "none";
+                        div_elem.querySelector('.usdchange').dataset.val = 0;
+                    }
+                    else
+                    {
+                        div_elem.querySelector('.usdchange').innerText  = (token.change24h_usd > 0) ? ("+"+token.change24h_usd+"%") : (token.change24h_usd+"%");
+                        if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "red";
+                        div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
+                    }
+
+                    if (notsupported)
+                    {
+                        div_elem.classList.add("notsupported");
+                        div_elem.querySelector('.eth_value').classList.add("notsupported");
+                        div_elem.querySelector('.btc_value').classList.add("notsupported");
+                        div_elem.querySelector('.usd_value').classList.add("notsupported");
+                        div_elem.querySelector('.tokendetails').classList.add("notsupported");
+                        div_elem.querySelector('.token_total').classList.add("notsupported");
+                        div_elem.querySelector('.tokenname').classList.add("notsupported");
+                        div_elem.querySelector('.tokenname').innerHTML += "<br />[NOT SUPPORTED]";
+                    }
                 }
-            }
-        });
+            });
+        }
+        
     }
 
-    let eth_raw_balance = await web3.eth.getBalance(addr); //string
-    let eth_decimal_balance = parseFloat(web3.utils.fromWei(eth_raw_balance, 'ether'));
+    let eth_decimal_balance = 0.0;
+    for (let i = 0; i < addrs.length; i++)
+    {
+        const bal = await web3.eth.getBalance(addrs[i]); //string
+        eth_decimal_balance = eth_decimal_balance + parseFloat(web3.utils.fromWei(bal, 'ether'));
+    }
     let ethprice = coingeckoPrices["ethereum"];
     let ethChange24 = parseFloat(ethprice.usd_24h_change).toFixed(2);
     let ethDiv = ui_addTokenDiv(chain, "Ethereum", "ETH", eth_decimal_balance, "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880");
@@ -651,6 +666,9 @@ async function testmatic(maticaddr)
     uiCache.content_matic.innerText = JSON.stringify(resp.data.items, null, 4);
 }
 
+//filter helper
+function onlyUnique(value, index, self) { return self.indexOf(value) === index; }
+
 async function getRelevantContractAddresses(in_addr)
 {
     let tokens = await getTokenEventsFromEtherscan(in_addr);
@@ -659,9 +677,6 @@ async function getRelevantContractAddresses(in_addr)
     {
         llist.push(tokens.result[i].contractAddress);
     }
-    
-    //filter helper
-    function onlyUnique(value, index, self) { return self.indexOf(value) === index; }
     
     return llist.filter(onlyUnique);
 }
