@@ -28,7 +28,7 @@ let current_chain = "eth";
 const DEFAULT_SAMPLE_ADDR = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
 
-const ANUBIS_VERSION_NUM = "0.0.122";
+const ANUBIS_VERSION_NUM = "0.0.154";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     uiCache.inputArea           = document.querySelector(".inputarea");
     uiCache.inputbarElem        = document.querySelector(".inpaddress");
     uiCache.checkButton         = document.querySelector("#btn_main_check");
+    uiCache.maincolumn          = document.querySelector(".maincolumn");
     uiCache.mainPlaceholderLabel= document.querySelector(".maincolumn h1");
     uiCache.divTotalBTCvalue    = document.querySelector(".tot_btcv");
     uiCache.divTotalETHvalue    = document.querySelector(".tot_ethv"); 
@@ -200,6 +201,10 @@ document.addEventListener("DOMContentLoaded", function(event)
                 uiCache.divSamplesEth.style.display = "block";
                 uiCache.divSamplesBsc.style.display = "none";
                 uiCache.divSamplesMatic.style.display = "none";
+
+                uiCache.maincolumn.classList.add("eth_gradient");
+                uiCache.maincolumn.classList.remove("bsc_gradient");
+                uiCache.maincolumn.classList.remove("matic_gradient");
             }
             if (current_chain == "bsc")   
             {
@@ -213,6 +218,10 @@ document.addEventListener("DOMContentLoaded", function(event)
                 uiCache.divSamplesEth.style.display = "none";
                 uiCache.divSamplesBsc.style.display = "block";
                 uiCache.divSamplesMatic.style.display = "none";
+
+                uiCache.maincolumn.classList.remove("eth_gradient");
+                uiCache.maincolumn.classList.add("bsc_gradient");
+                uiCache.maincolumn.classList.remove("matic_gradient");
             }
             if (current_chain == "matic")
             {
@@ -226,6 +235,10 @@ document.addEventListener("DOMContentLoaded", function(event)
                 uiCache.divSamplesEth.style.display = "none";
                 uiCache.divSamplesBsc.style.display = "none";
                 uiCache.divSamplesMatic.style.display = "block";
+
+                uiCache.maincolumn.classList.remove("eth_gradient");
+                uiCache.maincolumn.classList.remove("bsc_gradient");
+                uiCache.maincolumn.classList.add("matic_gradient");
             }
             
 

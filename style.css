@@ -99,6 +99,8 @@ body
 {
     text-align: left;
     width: 440px;
+    min-width: 440px;
+    max-width: 440px;
 }
 
 .maincolumn
@@ -109,6 +111,22 @@ body
     border: 1px solid rgb(75, 77, 52);
     border-radius: 6px;
     min-height: 200px;
+
+}
+
+.eth_gradient
+{
+    background: linear-gradient(to right, #0a151a, #162429, #1b2e36); 
+}
+
+.bsc_gradient
+{
+    background: linear-gradient(to right, #1c1711,#221608, #16120f); 
+}
+
+.matic_gradient
+{
+    background: linear-gradient(to right, #14080c, #1d0f0f, #100b18);
 }
 
 .inputarea, .sample_addrs, .special_nopadding
@@ -392,6 +410,7 @@ body
     width: 32px;
     height: 32px;
     margin-right: 10px;
+    border-radius: 100%;
 }
 
 .minus_address_icon
@@ -538,7 +557,7 @@ body
     font-size: 32px;
     text-align: center;
     vertical-align: middle;
-    color: rgb(151, 151, 151);
+    color: rgb(191, 191, 151);
     margin-bottom: 20px;
 }
 

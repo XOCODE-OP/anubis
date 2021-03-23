@@ -4,9 +4,10 @@
 > add matic
 > add binance
 > redownload refresh json files
-> clearly label ui functions and objects
+> rename refactor
 > consolidate refactor into structs
 > CLEAN, simplify
+> mobile design
 
 Poll markets from coingecko
 https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=decentralized_finance_defi&order=market_cap_desc&per_page=200&page=1&sparkline=false
