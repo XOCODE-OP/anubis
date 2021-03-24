@@ -14,9 +14,10 @@ const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e1193
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
 //let coingecko_markets; //https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false
 let coingecko_ids; //https://api.coingecko.com/api/v3/coins/list?include_platform=false
-let uniswapTokenList = [];
-let relevantContractAddresses = [];
-let symbolBlackList = ["MNE"];
+//let uniswapTokenList = [];
+//let relevantContractAddresses = [];
+let addressBlacklist = ["0xc92e74b131d7b1d46e60e07f3fae5d8877dd03f0", "0x426ca1ea2406c07d75db9585f22781c096e3d0e0"]; // MINEREUM
+
 const erc20ABI = abi();
 const STORAGE_KEY = "coineyedata";
 let web3 = new Web3(rpcURLmainnet);
@@ -114,6 +115,11 @@ document.addEventListener("DOMContentLoaded", function(event)
         console.log("loaded:");
         console.log(savedData);
     }
+    else
+    {
+        console.log("savestate:");
+        console.log(savedData);
+    }
     uiCache.inputbarElem.value = savedData.lastAddrs[0];
     uiCache.whichaddressElem_eth.innerText = savedData.lastAddrs[0];
 
@@ -157,6 +163,14 @@ document.addEventListener("DOMContentLoaded", function(event)
         _clone.querySelector(".minus_address_icon").style.visibility = "visible";
         _clone.querySelector(".minus_address_icon").addEventListener("click", function(event){
             _clone.parentNode.removeChild(_clone);
+        });
+        _clone.querySelector("input").addEventListener("keyup", function(event)
+        {
+            if (!uiCache.checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
+            {
+                buildPortfolio();
+                return;
+            }
         });
 
         _clone.className += " cloned";
@@ -360,71 +374,145 @@ async function buildPortfolio() //addr is now an array
     
     uiCache.nowloadingElem.style.display = "block";
 
-    relevantContractAddresses = [];
+    //keys are the eth input address, values are token contract addrs
+    let tokenAddressesOfAccounts = {};
     for (let i = 0; i < addrs.length; i++)
     {
-        let _list = await getRelevantContractAddresses(addrs[i]);
+        const a = addrs[i];
+        tokenAddressesOfAccounts[a] = [];
+    }
+    
+    for (let i = 0; i < addrs.length; i++)
+    {
+        let _list = await getTokenAddressesOfAccount(addrs[i]);
         for (let b = 0; b < _list.length; b++)
         {
-            relevantContractAddresses.push(_list[b]);
+            tokenAddressesOfAccounts[addrs[i]].push(_list[b]);
         }
     }
-    relevantContractAddresses = relevantContractAddresses.filter(onlyUnique);
 
     coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
 
-    uniswapTokenList = await fetchUniswapTokenList();
-    //uniswapTokenList is filtered by relevant contract addresses
+    let relevantUniswapTokens = [];
+    relevantUniswapTokens = await fetchRelevantUniswapTokens(tokenAddressesOfAccounts);
 
-    for (let i = 0; i < uniswapTokenList.length; i++)
+    for (let i = 0; i < relevantUniswapTokens.length; i++)
     {
-        const token = uniswapTokenList[i];
+        const token = relevantUniswapTokens[i];
         
+        let match = false;
         for (let cin = 0; cin < coingecko_ids.length; cin++) //takes 1-2ms
         {
             const cide = coingecko_ids[cin];
-            if (cide.symbol.toUpperCase() == token.symbol)
+            //if (cide.symbol.toUpperCase() == token.symbol) // breaks when tokens have the same symbol
+            if (cide.name.toUpperCase() == token.name.toUpperCase()) 
             {
                 token.coingecko_id = cide.id;
+                match = true;
+                break;
             }
         }
+        if (!match) 
+        {
+            for (let cin = 0; cin < coingecko_ids.length; cin++) //takes 1-2ms
+            {
+                const cide = coingecko_ids[cin];
+                if (cide.symbol.toUpperCase() == token.symbol) // breaks when tokens have the same symbol
+                {
+                    token.coingecko_id = cide.id;
+                    match = true;
+                    break;
+                }
+            }
+        }
+        if (!match)  console.log(`no match for ${token.name}`);
     }
 
     let query_coins_part = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2C";
-    for (let i = 0; i < uniswapTokenList.length; i++)
+    for (let i = 0; i < relevantUniswapTokens.length; i++)
     {
-        const token = uniswapTokenList[i];
+        const token = relevantUniswapTokens[i];
         query_coins_part = query_coins_part + token.coingecko_id;
-        if (i < uniswapTokenList.length - 1) query_coins_part = query_coins_part + "%2C";
+        //console.log(`adding for price query: ${token.coingecko_id}`);
+        if (i < relevantUniswapTokens.length - 1) query_coins_part = query_coins_part + "%2C";
     }
     query_coins_part = query_coins_part + "&vs_currencies=usd,eth,btc&include_24hr_change=true"; //added eth and btc prices
+    console.log(query_coins_part);
     let coingeckoPrices = await fetchJson(query_coins_part);
 
-    for (let i = 0; i < uniswapTokenList.length; i++)
+    //prepare tokens
+    for (let i = 0; i < relevantUniswapTokens.length; i++)
     {
-        const token = uniswapTokenList[i];
-        let notsupported = false;
+        const token = relevantUniswapTokens[i];
+        // console.log(`token:`);
+        // console.log(token);
+        token.tokenprice = {};
+        token.tokenprice.usd = 0;
+        token.tokenprice.eth = 0;
+        token.tokenprice.btc = 0;
+        token.injected_current_price = {};
+        token.injected_current_price.usd = 0;
+        token.injected_current_price.eth = 0;
+        token.injected_current_price.btc = 0;
+        token.injected_current_price.usd_24h_change = 0;
+        token.notsupported = false;
+
         if (!token.coingecko_id || !coingeckoPrices[token.coingecko_id] || !coingeckoPrices[token.coingecko_id].usd)
         {
-            token.injected_current_price = {};
-            token.injected_current_price.usd = 0;
-            token.injected_current_price.eth = 0;
-            token.injected_current_price.btc = 0;
-            token.injected_current_price.usd_24h_change = 0;
             console.log(`Error: Symbol ${token.symbol} is not supported.`);
-            notsupported = true;
+            token.notsupported = true;
         }
         else
         {
             token.injected_current_price = coingeckoPrices[token.coingecko_id];
         }
-            
         token.contract = new web3.eth.Contract(erc20ABI, token.address);
+    }
 
-        for (let x = 0; x < addrs.length; x++)
+    for (const [ethaddr, tokenaddrs] of Object.entries(tokenAddressesOfAccounts))
+    {
+        //console.log(`ethaddr: ${ethaddr}`);
+        //console.log(`tokenaddrs.length: ${tokenaddrs.length}`);
+        for (let yy = 0; yy < tokenaddrs.length; yy++)
         {
-            console.log(`ADDRESS: ${addrs[x]} TOKEN: ${token.name} - ${token.address}`);
-            await token.contract.methods.balanceOf(addrs[x]).call().then(function (bal)
+            const tokenaddr = tokenaddrs[yy];
+            //console.log(`attempting tokenaddr ${tokenaddr}`);
+            let skip = false;
+            for (let bb = 0; bb < addressBlacklist.length; bb++) //blacklist
+            {
+                if (addressBlacklist[bb] == tokenaddr)
+                {
+                    //console.log(`SKIPPING ${tokenaddr} IN getting balances`);
+                    skip = true;
+                    break; //found, break out of blacklist
+                }
+            }
+            if (skip) continue; // next token
+
+
+            let token = null;
+            
+            for (let n = 0; n < relevantUniswapTokens.length; n++)
+            {
+                if (tokenaddr == relevantUniswapTokens[n].address)
+                {
+                    token = relevantUniswapTokens[n];
+                }
+            }
+            if (token == null)
+            {
+                console.log(`CANNOT FIND TOKEN ${tokenaddr}`);
+                continue;
+            }
+
+            if (token.name.toLowerCase() == "uniswap")
+            {
+                console.log(`uniswap: `);
+                console.log(token);
+            }
+
+            //console.log(`Polling TOKEN: ${token.name} - ${token.address} FOR ADDRESS: ${ethaddr}`);
+            await token.contract.methods.balanceOf(ethaddr).call().then(function (bal)
             {
                 let balance_raw = bal;
                 token.balance = balance_raw / Math.pow(10, token.decimals);
@@ -433,12 +521,8 @@ async function buildPortfolio() //addr is now an array
                 if (token.balance > 0)
                 {
                     div_elem = ui_addTokenDiv(chain, token.name, token.symbol, token.balance, token.logoURI);
-                    if (!token.tokenprice) token.tokenprice = {};
                     if (!token.injected_current_price)
                     {
-                        token.tokenprice.usd = 0;
-                        token.tokenprice.eth = 0;
-                        token.tokenprice.btc = 0;
                         console.log("There was no injected price for " + token.symbol);
                     }
                     token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
@@ -453,7 +537,7 @@ async function buildPortfolio() //addr is now an array
                     div_elem.querySelector('.btc_value').innerText  = `BTC ${numberWithCommas(token.total_btc.toFixed(2))}`;
                     div_elem.querySelector('.btc_value').dataset.val = token.total_btc;
                     div_elem.querySelector('.usd_value').innerText  = "$ " + numberWithCommas(token.total_usd.toFixed(2));
-                    div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} - $ ${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
+                    div_elem.querySelector('.tokendetails').innerText  = `${token.symbol} : $ ${numberWithCommas(token.tokenprice_usd.toFixed(2))}`;
                     div_elem.querySelector('.usd_value').dataset.val = token.total_usd;
                     if (!token.injected_current_price.usd_24h_change)
                     {
@@ -467,7 +551,7 @@ async function buildPortfolio() //addr is now an array
                         div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
                     }
 
-                    if (notsupported)
+                    if (token.notsupported)
                     {
                         div_elem.classList.add("notsupported");
                         div_elem.querySelector('.eth_value').classList.add("notsupported");
@@ -483,6 +567,8 @@ async function buildPortfolio() //addr is now an array
         }
         
     }
+
+    //-------------------------------------------------------------
 
     let eth_decimal_balance = 0.0;
     for (let i = 0; i < addrs.length; i++)
@@ -628,6 +714,7 @@ function getAllInputAddresses()
         if (!regexETH.test(val)) e.querySelector("input").value = "WRONG FORMAT";
         else all.push(val);
     }
+    all = all.filter(onlyUnique);
     return all;
 }
 //regexETH.test(DEFAULT_SAMPLE_ADDR)
@@ -669,13 +756,25 @@ async function testmatic(maticaddr)
 //filter helper
 function onlyUnique(value, index, self) { return self.indexOf(value) === index; }
 
-async function getRelevantContractAddresses(in_addr)
+async function getTokenAddressesOfAccount(in_addr)
 {
     let tokens = await getTokenEventsFromEtherscan(in_addr);
     let llist = [];
     for (let i = 0; i < tokens.result.length; i++)
     {
-        llist.push(tokens.result[i].contractAddress);
+        const addr = tokens.result[i].contractAddress;
+
+        let skip = false;
+        for (let bb = 0; bb < addressBlacklist.length; bb++) //blacklist
+        {
+            if (addressBlacklist[bb] == addr)
+            {
+                //console.log(`SKIPPING ${addr} IN getTokenAddressesOfAccount`);
+                skip = true;
+                break; //found, break out of blacklist
+            }
+        }
+        if (!skip) llist.push(addr);
     }
     
     return llist.filter(onlyUnique);
@@ -696,8 +795,22 @@ async function getTokenEventsFromEtherscan(in_addr)
     else return null;
 }
 
-async function fetchUniswapTokenList()
+async function fetchRelevantUniswapTokens(tokenAddressesOfAccounts)
 {
+    console.log("_relevantContractAddresses");
+    console.log(tokenAddressesOfAccounts);
+
+    let relevantTokAddrs = [];
+    for (const [addr, tokenaddr] of Object.entries(tokenAddressesOfAccounts))
+    {
+        for (let x = 0; x < tokenaddr.length; x++)
+        {
+            relevantTokAddrs.push(tokenaddr[x]);
+        }
+    }
+    relevantTokAddrs = relevantTokAddrs.filter(onlyUnique);
+
+    console.log("call o fetchUniswapTokenList");
     let list = [];
     let response = await fetch("./uniswap_list.json");
     // https://tokens.coingecko.com/uniswap/all.json
@@ -708,23 +821,24 @@ async function fetchUniswapTokenList()
 
         for (let i = 0; i < json.tokens.length; i++)
         {
-            const token = json.tokens[i];
+            const uniswapJsonToken = json.tokens[i];
             let skip = false;
-            for (let bb = 0; bb < symbolBlackList.length; bb++)
+            for (let bb = 0; bb < addressBlacklist.length; bb++)
             {
-                if (symbolBlackList[bb] == token.symbol)
+                if (addressBlacklist[bb] == uniswapJsonToken.address)
                 {
+                    //console.log(`SKIPPING ${uniswapJsonToken.address} IN fetchUniswapTokenList`);
                     skip = true;
                     break;
                 }
             }
             if (!skip)
             {
-                for (let w = 0; w < relevantContractAddresses.length; w++)
+                for (let w = 0; w < relevantTokAddrs.length; w++)
                 {
-                    if (relevantContractAddresses[w] == token.address)
+                    if (relevantTokAddrs[w] == uniswapJsonToken.address)
                     {
-                        list.push(token);
+                        list.push(uniswapJsonToken);
                     }
                 }
             }
