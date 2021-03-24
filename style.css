@@ -58,7 +58,7 @@ body
     min-height: 100vh;
 }
 
-.pageloader
+.splashscreen
 {
     background-color: #212121;
     background-image: url(./logoa1.png);
@@ -199,6 +199,11 @@ body
     color: rgb(255, 81, 81) !important;
 }
 
+span.input_label_unit
+{
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
 .maincolumn h1
 {
@@ -333,16 +338,18 @@ body
     color: white;
     padding: 2px 4px;
     font-size: 12px;
+    border-radius: 6px;
 }
 
 .usdchange
 {
     display: inline-block;
-    margin: 0 14px;
-    background-color: black;
+    margin: 0 10px;
+    /* background-color: black; */
     color: rgb(0, 255, 0);
     padding: 2px 4px;
     font-size: 14px;
+    width: 50px;
 }
 
 .totaldiv
@@ -450,9 +457,9 @@ body
 
 .whichaddress
 {
-    color: rgb(151, 151, 151);
-    font-size: 16px;
-    font-family: 'lato';
+    color: rgb(154, 185, 194);
+    font-size: 14px;
+    font-family: monospace;
     display: block;
     text-align: center;
     margin-bottom: 30px;
@@ -537,8 +544,9 @@ body
     color: white;
     font-size: 18px;
     padding: 2px 2px;
-    background-color: #111;
+    /* background-color: #111; */
     margin-left: 10px;
+    text-shadow: 3px 3px 2px rgb(0,0,0);
 }
 
 .tokenp_right

@@ -26,10 +26,10 @@ let metamaskweb3 = null;
 let baseTokenElement;
 let uiCache = {};
 let current_chain = "eth";
-const DEFAULT_SAMPLE_ADDR = "0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
+const DISABLE_METAMASK = true;
 
-const ANUBIS_VERSION_NUM = "0.0.154";
+const ANUBIS_VERSION_NUM = "0.0.163";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     uiCache.totalDivElem_matic.style.display = "none";
     uiCache.content_bsc.style.display = "none";
     uiCache.content_matic.style.display = "none";
+    
     uiCache.splashscreen          = document.querySelector('.splashscreen');
     uiCache.splashscreen.style.opacity = "1.0";
     setTimeout(function()
@@ -62,7 +63,6 @@ document.addEventListener("DOMContentLoaded", function(event)
                 uiCache.splashscreen.parentNode.removeChild(uiCache.splashscreen);
             }
         }, 20);
-
     }, 360); 
 
     uiCache.nowloadingElem           = document.querySelector(".nowloading");
@@ -98,30 +98,9 @@ document.addEventListener("DOMContentLoaded", function(event)
     uiCache.nowloadingElem.style.display = "none";
     baseTokenElement.style.display = "none";
 
-    if (!window.ethereum) uiCache.btn_metamask.parentNode.removeChild(uiCache.btn_metamask);
+    if (!window.ethereum || DISABLE_METAMASK) uiCache.btn_metamask.parentNode.removeChild(uiCache.btn_metamask);
 
-    let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    //console.log(savedData);
-    if (!savedData && savedData == null || !savedData.lastAddrs)
-    {
-        console.log("defaulting save state");
-        let defaultData = {};
-        defaultData.lastAddrs = [];
-        defaultData.lastAddrs.push(DEFAULT_SAMPLE_ADDR);
-        console.log("writing to storage:");
-        console.log(defaultData);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
-        savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));    
-        console.log("loaded:");
-        console.log(savedData);
-    }
-    else
-    {
-        console.log("savestate:");
-        console.log(savedData);
-    }
-    uiCache.inputbarElem.value = savedData.lastAddrs[0];
-    uiCache.whichaddressElem_eth.innerText = savedData.lastAddrs[0];
+    loadDataFromLocalStorage();
 
     uiCache.inputbarElem.addEventListener("keyup", function(event)
     {
@@ -159,23 +138,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     uiCache.newaddresslink.addEventListener("click", function (event)
     {
         //add address box
-        let _clone = uiCache.baseAddressElement.cloneNode(true);
-        _clone.querySelector(".minus_address_icon").style.visibility = "visible";
-        _clone.querySelector(".minus_address_icon").addEventListener("click", function(event){
-            _clone.parentNode.removeChild(_clone);
-        });
-        _clone.querySelector("input").addEventListener("keyup", function(event)
-        {
-            if (!uiCache.checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
-            {
-                buildPortfolio();
-                return;
-            }
-        });
-
-        _clone.className += " cloned";
-
-        uiCache.newaddresslink.before(_clone);
+        uiAddAddressBox("");
     });
 
     let chainSelectors = document.querySelectorAll(".chainbutton");
@@ -184,87 +147,90 @@ document.addEventListener("DOMContentLoaded", function(event)
         const e = chainSelectors[i];
         e.addEventListener("click", function (event) //CHANGING CHAIN
         {
-            for (let g = 0; g < chainSelectors.length; g++)
-            {
-                chainSelectors[g].classList.remove("chosen_chain");
-            }
-            e.classList.add("chosen_chain");
-            current_chain = e.dataset.chain;
-
-            for (let d = 0; d < uiCache.contents.length; d++)
-            {
-                const cont = uiCache.contents[d];
-                cont.style.display = "none";
-                if (cont.dataset.chain == e.dataset.chain)
-                {
-                    cont.style.display = "block";
-                }
-            }
-
-            // TODO:
-            // change
-            if (current_chain == "eth")   
-            {
-                uiCache.unitLabel.forEach(function(element)
-                {
-                    element.innerText = "Ethereum";
-                });
-                document.querySelector(".eth_gas_box").style.display = "block";
-                if (window.ethereum) uiCache.btn_metamask.style.display = "inline-block";
-                //change sample addresses
-                uiCache.divSamplesEth.style.display = "block";
-                uiCache.divSamplesBsc.style.display = "none";
-                uiCache.divSamplesMatic.style.display = "none";
-
-                uiCache.maincolumn.classList.add("eth_gradient");
-                uiCache.maincolumn.classList.remove("bsc_gradient");
-                uiCache.maincolumn.classList.remove("matic_gradient");
-            }
-            if (current_chain == "bsc")   
-            {
-                uiCache.unitLabel.forEach(function(element)
-                {
-                    element.innerText = "Binance Smart Chain";
-                });
-                document.querySelector(".eth_gas_box").style.display = "none";
-                uiCache.btn_metamask.style.display = "none";
-                //change sample addresses
-                uiCache.divSamplesEth.style.display = "none";
-                uiCache.divSamplesBsc.style.display = "block";
-                uiCache.divSamplesMatic.style.display = "none";
-
-                uiCache.maincolumn.classList.remove("eth_gradient");
-                uiCache.maincolumn.classList.add("bsc_gradient");
-                uiCache.maincolumn.classList.remove("matic_gradient");
-            }
-            if (current_chain == "matic")
-            {
-                uiCache.unitLabel.forEach(function(element)
-                {
-                    element.innerText = "Polygon Matic";
-                });
-                document.querySelector(".eth_gas_box").style.display = "none";
-                uiCache.btn_metamask.style.display = "none";
-                //change sample addresses
-                uiCache.divSamplesEth.style.display = "none";
-                uiCache.divSamplesBsc.style.display = "none";
-                uiCache.divSamplesMatic.style.display = "block";
-
-                uiCache.maincolumn.classList.remove("eth_gradient");
-                uiCache.maincolumn.classList.remove("bsc_gradient");
-                uiCache.maincolumn.classList.add("matic_gradient");
-            }
-            
-
+            switchChain(e.dataset.chain);
         });
     }
 
-    console.log("LETS DOWNLOAD THE UNISWAP JSON WHILE WAITING FOR USER INPUT. AND OVERRIDE THE LOCAL ONE");
-    console.log("download uniswap coingecko");
-    console.log("download coingecko ID list");
+    console.log("TODO: download uniswap coingecko WHILE WAITING before inputs");
+    console.log("TODO: download coingecko ID list WHILE WAITING before inputs");
     //download these if 24h have passed or something
 
 });
+
+function switchChain(_chain)
+{
+    let chainSelectors = document.querySelectorAll(".chainbutton");
+    for (let g = 0; g < chainSelectors.length; g++)
+    {
+        chainSelectors[g].classList.remove("chosen_chain");
+        if (chainSelectors[g].dataset.chain == _chain) chainSelectors[g].classList.add("chosen_chain");
+    }
+    
+    current_chain = _chain;
+
+    for (let d = 0; d < uiCache.contents.length; d++)
+    {
+        const cont = uiCache.contents[d];
+        cont.style.display = "none";
+        if (cont.dataset.chain == _chain)
+        {
+            cont.style.display = "block";
+        }
+    }
+
+    if (current_chain == "eth")   
+    {
+        uiCache.unitLabel.forEach(function(element)
+        {
+            element.innerText = "Ethereum";
+        });
+        document.querySelector(".eth_gas_box").style.display = "block";
+        if (window.ethereum) uiCache.btn_metamask.style.display = "inline-block";
+        //change sample addresses
+        uiCache.divSamplesEth.style.display = "block";
+        uiCache.divSamplesBsc.style.display = "none";
+        uiCache.divSamplesMatic.style.display = "none";
+
+        uiCache.maincolumn.classList.add("eth_gradient");
+        uiCache.maincolumn.classList.remove("bsc_gradient");
+        uiCache.maincolumn.classList.remove("matic_gradient");
+    }
+    if (current_chain == "bsc")   
+    {
+        uiCache.unitLabel.forEach(function(element)
+        {
+            element.innerText = "Binance Smart Chain";
+        });
+        document.querySelector(".eth_gas_box").style.display = "none";
+        uiCache.btn_metamask.style.display = "none";
+        //change sample addresses
+        uiCache.divSamplesEth.style.display = "none";
+        uiCache.divSamplesBsc.style.display = "block";
+        uiCache.divSamplesMatic.style.display = "none";
+
+        uiCache.maincolumn.classList.remove("eth_gradient");
+        uiCache.maincolumn.classList.add("bsc_gradient");
+        uiCache.maincolumn.classList.remove("matic_gradient");
+    }
+    if (current_chain == "matic")
+    {
+        uiCache.unitLabel.forEach(function(element)
+        {
+            element.innerText = "Polygon Matic";
+        });
+        document.querySelector(".eth_gas_box").style.display = "none";
+        uiCache.btn_metamask.style.display = "none";
+        //change sample addresses
+        uiCache.divSamplesEth.style.display = "none";
+        uiCache.divSamplesBsc.style.display = "none";
+        uiCache.divSamplesMatic.style.display = "block";
+
+        uiCache.maincolumn.classList.remove("eth_gradient");
+        uiCache.maincolumn.classList.remove("bsc_gradient");
+        uiCache.maincolumn.classList.add("matic_gradient");
+    }
+    saveDataToLocalStorage();
+}
 
 async function fillInGasPrices()
 {
@@ -305,7 +271,7 @@ async function getMetamaskAccounts()
             {
                 // EIP-1193 userRejectedRequest error
                 // If this happens, the user rejected the connection request.
-                console.log('Please connect to MetaMask.');
+                console.log('MetaMask user rejection');
             } else {
                 console.error(err);
             }
@@ -327,14 +293,51 @@ async function getMetamaskAccounts()
     }
 }
 
+function loadDataFromLocalStorage()
+{
+    let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    //console.log(savedData);
+    if (!savedData && savedData == null || !savedData.lastAddrs)
+    {
+        let defaultData = {};
+        defaultData.lastAddrs = [];
+        defaultData.chain = "eth";
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
+        savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));    
+        // console.log("loaded:");
+        // console.log(savedData);
+    }
+    else
+    {
+        // console.log("savestate:");
+        // console.log(savedData);
+
+        //build address boxes
+        for (let i = 0; i < savedData.lastAddrs.length; i++)
+        {
+            if (i == 0)     uiCache.inputbarElem.value = savedData.lastAddrs[0];
+            else            uiAddAddressBox(""+savedData.lastAddrs[i]);
+        }
+        switchChain(savedData.chain);
+    }
+
+}
+
+function saveDataToLocalStorage()
+{
+    let addrs = getAllInputAddresses();
+    let storeData = {};
+    storeData.lastAddrs = addrs;
+    storeData.chain = ""+current_chain;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
+}
+
 async function buildPortfolio() //addr is now an array
 {
     let addrs = getAllInputAddresses();
     let chain = ""+current_chain;
-
-    let storeData = {};
-    storeData.lastAddrs = addrs;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
+    
+    saveDataToLocalStorage();
 
     //let addr = addrs[0];
 
@@ -391,7 +394,8 @@ async function buildPortfolio() //addr is now an array
         }
     }
 
-    coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
+    //coingecko_ids = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
+    coingecko_ids = await fetchJson("./coingecko_id_list.json");
 
     let relevantUniswapTokens = [];
     relevantUniswapTokens = await fetchRelevantUniswapTokens(tokenAddressesOfAccounts);
@@ -425,7 +429,7 @@ async function buildPortfolio() //addr is now an array
                 }
             }
         }
-        if (!match)  console.log(`no match for ${token.name}`);
+        //if (!match)  console.log(`no match for ${token.name}`);
     }
 
     let query_coins_part = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2C";
@@ -437,7 +441,7 @@ async function buildPortfolio() //addr is now an array
         if (i < relevantUniswapTokens.length - 1) query_coins_part = query_coins_part + "%2C";
     }
     query_coins_part = query_coins_part + "&vs_currencies=usd,eth,btc&include_24hr_change=true"; //added eth and btc prices
-    console.log(query_coins_part);
+    //console.log(query_coins_part);
     let coingeckoPrices = await fetchJson(query_coins_part);
 
     //prepare tokens
@@ -459,7 +463,7 @@ async function buildPortfolio() //addr is now an array
 
         if (!token.coingecko_id || !coingeckoPrices[token.coingecko_id] || !coingeckoPrices[token.coingecko_id].usd)
         {
-            console.log(`Error: Symbol ${token.symbol} is not supported.`);
+            //console.log(`Error: Symbol ${token.symbol} is not supported.`);
             token.notsupported = true;
         }
         else
@@ -501,14 +505,8 @@ async function buildPortfolio() //addr is now an array
             }
             if (token == null)
             {
-                console.log(`CANNOT FIND TOKEN ${tokenaddr}`);
+                //console.log(`CANNOT FIND TOKEN ${tokenaddr}`);
                 continue;
-            }
-
-            if (token.name.toLowerCase() == "uniswap")
-            {
-                console.log(`uniswap: `);
-                console.log(token);
             }
 
             //console.log(`Polling TOKEN: ${token.name} - ${token.address} FOR ADDRESS: ${ethaddr}`);
@@ -521,10 +519,7 @@ async function buildPortfolio() //addr is now an array
                 if (token.balance > 0)
                 {
                     div_elem = ui_addTokenDiv(chain, token.name, token.symbol, token.balance, token.logoURI);
-                    if (!token.injected_current_price)
-                    {
-                        console.log("There was no injected price for " + token.symbol);
-                    }
+                    //if (!token.injected_current_price)  console.log("No price for " + token.symbol);
                     token.tokenprice_usd = parseFloat(token.injected_current_price.usd);
                     token.tokenprice_eth = parseFloat(token.injected_current_price.eth);
                     token.tokenprice_btc = parseFloat(token.injected_current_price.btc);
@@ -547,7 +542,7 @@ async function buildPortfolio() //addr is now an array
                     else
                     {
                         div_elem.querySelector('.usdchange').innerText  = (token.change24h_usd > 0) ? ("+"+token.change24h_usd+"%") : (token.change24h_usd+"%");
-                        if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "red";
+                        if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "#FF5555";
                         div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
                     }
 
@@ -654,6 +649,26 @@ async function buildPortfolio() //addr is now an array
     ui_sortTokenDivs(chain);
 }
 
+function uiAddAddressBox(_inp)
+{
+    let _clone = uiCache.baseAddressElement.cloneNode(true);
+    _clone.querySelector(".minus_address_icon").style.visibility = "visible";
+    _clone.querySelector(".minus_address_icon").addEventListener("click", function(event){
+        _clone.parentNode.removeChild(_clone);
+    });
+    _clone.querySelector("input").value = _inp;
+    _clone.querySelector("input").addEventListener("keyup", function(event)
+    {
+        if (!uiCache.checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
+        {
+            buildPortfolio();
+            return;
+        }
+    });
+    _clone.className += " cloned";
+    uiCache.newaddresslink.before(_clone);
+}
+
 function ui_sortTokenDivs(chain)
 {
     let contentBase;
@@ -694,6 +709,7 @@ function ui_sortTokenDivs(chain)
         percdiv.dataset.val = perc;
         e.dataset.percval = perc;
         percdiv.innerText = perc.toFixed(1) + "%";
+        percdiv.title = `${perc.toFixed(1)}% of your portfolio's USD value`;
 
         e.classList.remove("animate__animated");
         
@@ -797,8 +813,8 @@ async function getTokenEventsFromEtherscan(in_addr)
 
 async function fetchRelevantUniswapTokens(tokenAddressesOfAccounts)
 {
-    console.log("_relevantContractAddresses");
-    console.log(tokenAddressesOfAccounts);
+//     console.log("_relevantContractAddresses");
+//     console.log(tokenAddressesOfAccounts);
 
     let relevantTokAddrs = [];
     for (const [addr, tokenaddr] of Object.entries(tokenAddressesOfAccounts))
@@ -810,7 +826,6 @@ async function fetchRelevantUniswapTokens(tokenAddressesOfAccounts)
     }
     relevantTokAddrs = relevantTokAddrs.filter(onlyUnique);
 
-    console.log("call o fetchUniswapTokenList");
     let list = [];
     let response = await fetch("./uniswap_list.json");
     // https://tokens.coingecko.com/uniswap/all.json
