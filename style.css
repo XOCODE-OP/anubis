@@ -261,6 +261,11 @@ span.input_label_unit
     text-align: left;
 }
 
+.losses
+{
+    color: #FF5555 !important;
+}
+
 .chainbutton
 {
     display: inline-block;

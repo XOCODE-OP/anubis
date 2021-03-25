@@ -1,6 +1,6 @@
 //TODO:
 
-> multiple addresses
+
 > add matic
 > add binance
 > redownload refresh json files
@@ -8,15 +8,6 @@
 > consolidate refactor into structs
 > CLEAN, simplify
 > mobile design
-
-> PROBLEMS:
-uniswap broken?
-uniswap token is broken, it takes universe whatever prie. reason is that the UNI symbol exists many times on the coingecko id list.
-also, we poll every token contra addr from every eth addr. we dont distinquish which token came in from with eth addr.
-so we are wasting time and juice.
->rebuild input divs from savestate
-
-> ALL ARE DOUBLE
 
 Poll markets from coingecko
 https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=decentralized_finance_defi&order=market_cap_desc&per_page=200&page=1&sparkline=false

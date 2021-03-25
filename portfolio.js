@@ -100,8 +100,6 @@ document.addEventListener("DOMContentLoaded", function(event)
 
     if (!window.ethereum || DISABLE_METAMASK) uiCache.btn_metamask.parentNode.removeChild(uiCache.btn_metamask);
 
-    loadDataFromLocalStorage();
-
     uiCache.inputbarElem.addEventListener("keyup", function(event)
     {
         if (!uiCache.checkButton.disabled && (event.key == "Enter" || event.keyCode === 13))
@@ -154,6 +152,12 @@ document.addEventListener("DOMContentLoaded", function(event)
     console.log("TODO: download uniswap coingecko WHILE WAITING before inputs");
     console.log("TODO: download coingecko ID list WHILE WAITING before inputs");
     //download these if 24h have passed or something
+
+    const success = loadDataFromLocalStorage();
+    if (success)
+    {
+        buildPortfolio();
+    }
 
 });
 
@@ -293,7 +297,7 @@ async function getMetamaskAccounts()
     }
 }
 
-function loadDataFromLocalStorage()
+function loadDataFromLocalStorage()// returns whether it had to default
 {
     let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));
     //console.log(savedData);
@@ -306,6 +310,7 @@ function loadDataFromLocalStorage()
         savedData = JSON.parse(localStorage.getItem(STORAGE_KEY));    
         // console.log("loaded:");
         // console.log(savedData);
+        return false;
     }
     else
     {
@@ -319,6 +324,7 @@ function loadDataFromLocalStorage()
             else            uiAddAddressBox(""+savedData.lastAddrs[i]);
         }
         switchChain(savedData.chain);
+        return true;
     }
 
 }
@@ -542,7 +548,10 @@ async function buildPortfolio() //addr is now an array
                     else
                     {
                         div_elem.querySelector('.usdchange').innerText  = (token.change24h_usd > 0) ? ("+"+token.change24h_usd+"%") : (token.change24h_usd+"%");
-                        if (token.change24h_usd < 0) div_elem.querySelector('.usdchange').style.color = "#FF5555";
+                        if (token.change24h_usd < 0)
+                        {
+                            div_elem.querySelector('.usdchange').classList.add("losses");
+                        }
                         div_elem.querySelector('.usdchange').dataset.val = token.change24h_usd;
                     }
 
@@ -586,7 +595,7 @@ async function buildPortfolio() //addr is now an array
     ethDiv.querySelector('.tokendetails').innerText  = `ETH - $${numberWithCommas(parseFloat(ethprice.usd).toFixed(2))}`;
 
     ethDiv.querySelector('.usdchange').innerText  = (ethChange24 > 0) ? ("+"+ethChange24+"%") : (ethChange24+"%");
-    if (ethChange24 < 0) ethDiv.querySelector('.usdchange').style.color = "red";
+    if (ethChange24 < 0) ethDiv.querySelector('.usdchange').classList.add("losses");
     ethDiv.querySelector('.usdchange').dataset.val = ethChange24;
 
     let listUsdValues = document.querySelectorAll('.usd_value');
@@ -755,10 +764,12 @@ function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain 
 
 async function testbsc(bscaddr)
 {
-    bscaddr = "0x6093A0b32C9FB18F61198a5Fe869d3EF9549f61a";
+    bscaddr = "0x7B6Dd7246DED32265abFc7813d76e5c5da554129";
     let resp = await fetchJson(`http://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
     //console.log(resp.data.items);
-    uiCache.content_bsc.innerText = JSON.stringify(resp.data.items, null, 4);
+    uiCache.content_bsc.innerText = JSON.stringify(resp.data.items, null, 2);
+    uiCache.content_bsc.style.fontFamily = "monospace";
+    uiCache.content_bsc.style.fontSize = "10px";
 }
 
 async function testmatic(maticaddr)
@@ -766,7 +777,11 @@ async function testmatic(maticaddr)
     maticaddr = "0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716";
     let resp = await fetchJson(`http://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
     //console.log(resp.data.items);
-    uiCache.content_matic.innerText = JSON.stringify(resp.data.items, null, 4);
+    uiCache.content_matic.innerText = JSON.stringify(resp.data.items, null, 2);
+    uiCache.content_matic.style.fontFamily = "monospace";
+    uiCache.content_matic.style.fontSize = "10px";
+    uiCache.content_matic.style.textAlign = "left";
+    uiCache.content_matic.style.paddingLeft = "40px";
 }
 
 //filter helper
