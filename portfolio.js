@@ -29,7 +29,7 @@ let current_chain = "eth";
 const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
 const DISABLE_METAMASK = true;
 
-const ANUBIS_VERSION_NUM = "0.0.163";
+const ANUBIS_VERSION_NUM = "0.0.164";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function(event)
     const success = loadDataFromLocalStorage();
     if (success)
     {
-        buildPortfolio();
+        //buildPortfolio();
     }
 
 });
@@ -338,12 +338,24 @@ function saveDataToLocalStorage()
     localStorage.setItem(STORAGE_KEY, JSON.stringify(storeData));
 }
 
+function decimalsToFraction(raw, decimalAmount)
+{
+    console.log(`${raw} / ${decimalAmount} ${Math.pow(10, decimalAmount)}`);
+    return (raw / Math.pow(10, decimalAmount));
+}
+
 async function buildPortfolio() //addr is now an array
 {
     let addrs = getAllInputAddresses();
     let chain = ""+current_chain;
     
     saveDataToLocalStorage();
+
+    // pollBSC(addrs[0], function()
+    // {
+    //     pollMatic(addrs[0]);
+    // });
+    
 
     //let addr = addrs[0];
 
@@ -519,7 +531,8 @@ async function buildPortfolio() //addr is now an array
             await token.contract.methods.balanceOf(ethaddr).call().then(function (bal)
             {
                 let balance_raw = bal;
-                token.balance = balance_raw / Math.pow(10, token.decimals);
+                //token.balance = balance_raw / Math.pow(10, token.decimals);
+                token.balance = decimalsToFraction(balance_raw, token.decimals);
                 let div_elem;
 
                 if (token.balance > 0)
@@ -762,26 +775,57 @@ function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain 
     return clone;
 }
 
-async function testbsc(bscaddr)
+async function testbsc()
 {
-    bscaddr = "0x7B6Dd7246DED32265abFc7813d76e5c5da554129";
-    let resp = await fetchJson(`http://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
-    //console.log(resp.data.items);
-    uiCache.content_bsc.innerText = JSON.stringify(resp.data.items, null, 2);
-    uiCache.content_bsc.style.fontFamily = "monospace";
-    uiCache.content_bsc.style.fontSize = "10px";
+    console.log(`testbsc`);
+    let addrs = getAllInputAddresses();
+    //await pollBSC(addrs[0], function(){});
+    
+    await pollBSC("0x7B6Dd7246DED32265abFc7813d76e5c5da554129", function(){});
 }
 
-async function testmatic(maticaddr)
+async function pollBSC(bscaddr, callback)
 {
-    maticaddr = "0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716";
+    console.log(`pollBSC ${bscaddr}`);
+    let resp = await fetchJson(`http://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
+    //console.log(resp.data.items);
+
+    let coins = resp.data.items;
+
+    for (let i = 0; i < coins.length; i++)
+    {
+        const c = coins[i];
+        if (c.type == "dust") continue;
+        c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
+
+        uiCache.content_bsc.innerHTML += "<div style='margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid grey'>";
+        uiCache.content_bsc.innerHTML += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
+        uiCache.content_bsc.innerHTML += `<p>${c.contract_address}</p>`;
+        uiCache.content_bsc.innerHTML += `<p>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</p>`;
+        uiCache.content_bsc.innerHTML += "</div>";
+    }
+
+    // uiCache.content_bsc.innerText = JSON.stringify(resp.data.items, null, 2);
+     uiCache.content_bsc.style.fontFamily = "monospace";
+     uiCache.content_bsc.style.fontSize = "14px";
+     uiCache.content_bsc.style.textAlign = "left";
+     uiCache.content_bsc.style.paddingLeft = "40px";
+
+    callback();
+}
+
+async function pollMatic(maticaddr, callback)
+{
     let resp = await fetchJson(`http://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
     //console.log(resp.data.items);
     uiCache.content_matic.innerText = JSON.stringify(resp.data.items, null, 2);
+
     uiCache.content_matic.style.fontFamily = "monospace";
     uiCache.content_matic.style.fontSize = "10px";
     uiCache.content_matic.style.textAlign = "left";
     uiCache.content_matic.style.paddingLeft = "40px";
+
+    callback();
 }
 
 //filter helper
