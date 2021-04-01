@@ -119,7 +119,12 @@ document.addEventListener("DOMContentLoaded", function(event)
     {
         sampleLinks[i].addEventListener("click", function (event)
         {
-            document.querySelectorAll(".address_div")[0].querySelector("input").value = sampleLinks[i].dataset.addr;
+            let allAddrDivs = uiCache.divAddress_list.querySelectorAll(".address_div");
+            for (let i = 1; i < allAddrDivs.length; i++)//skip first
+            {
+                allAddrDivs[i].parentNode.removeChild(allAddrDivs[i]);
+            }
+            uiCache.baseAddressElement.querySelector("input").value = sampleLinks[i].dataset.addr;
             buildPortfolio();
         });
     }
@@ -191,9 +196,9 @@ function switchChain(_chain)
         document.querySelector(".eth_gas_box").style.display = "block";
         if (window.ethereum) uiCache.btn_metamask.style.display = "inline-block";
         //change sample addresses
-        uiCache.divSamplesEth.style.display = "block";
-        uiCache.divSamplesBsc.style.display = "none";
-        uiCache.divSamplesMatic.style.display = "none";
+        // uiCache.divSamplesEth.style.display = "block";
+        // uiCache.divSamplesBsc.style.display = "none";
+        // uiCache.divSamplesMatic.style.display = "none";
 
         uiCache.maincolumn.classList.add("eth_gradient");
         uiCache.maincolumn.classList.remove("bsc_gradient");
@@ -208,9 +213,9 @@ function switchChain(_chain)
         document.querySelector(".eth_gas_box").style.display = "none";
         uiCache.btn_metamask.style.display = "none";
         //change sample addresses
-        uiCache.divSamplesEth.style.display = "none";
-        uiCache.divSamplesBsc.style.display = "block";
-        uiCache.divSamplesMatic.style.display = "none";
+        // uiCache.divSamplesEth.style.display = "none";
+        // uiCache.divSamplesBsc.style.display = "block";
+        // uiCache.divSamplesMatic.style.display = "none";
 
         uiCache.maincolumn.classList.remove("eth_gradient");
         uiCache.maincolumn.classList.add("bsc_gradient");
@@ -225,9 +230,9 @@ function switchChain(_chain)
         document.querySelector(".eth_gas_box").style.display = "none";
         uiCache.btn_metamask.style.display = "none";
         //change sample addresses
-        uiCache.divSamplesEth.style.display = "none";
-        uiCache.divSamplesBsc.style.display = "none";
-        uiCache.divSamplesMatic.style.display = "block";
+        // uiCache.divSamplesEth.style.display = "none";
+        // uiCache.divSamplesBsc.style.display = "none";
+        // uiCache.divSamplesMatic.style.display = "block";
 
         uiCache.maincolumn.classList.remove("eth_gradient");
         uiCache.maincolumn.classList.remove("bsc_gradient");
@@ -340,12 +345,13 @@ function saveDataToLocalStorage()
 
 function decimalsToFraction(raw, decimalAmount)
 {
-    console.log(`${raw} / ${decimalAmount} ${Math.pow(10, decimalAmount)}`);
+    // console.log(`${raw} / ${decimalAmount} ${Math.pow(10, decimalAmount)}`);
     return (raw / Math.pow(10, decimalAmount));
 }
 
 async function buildPortfolio() //addr is now an array
 {
+    switchChain("eth");
     let addrs = getAllInputAddresses();
     let chain = ""+current_chain;
     
@@ -368,7 +374,7 @@ async function buildPortfolio() //addr is now an array
     uiCache.nowloadingElem.style.display = "block";
     uiCache.mainPlaceholderLabel.style.display = "none";
     
-    let listofdivs = document.querySelectorAll('.tokenp');
+    let listofdivs = document.querySelectorAll('.tokenp, .token_o');
     for (let i = 0; i < listofdivs.length; i++)
     {
         listofdivs[i].parentNode.removeChild(listofdivs[i]);
@@ -669,6 +675,17 @@ async function buildPortfolio() //addr is now an array
     uiCache.chainswitcher_switchrow.style.display = "flex";
     
     ui_sortTokenDivs(chain);
+
+    // async function pollOthers()
+    // {
+
+    // }();
+
+    await pollBSC(addrs[0], async function(){
+        await pollMatic(addrs[0], function(){
+        
+        });
+    });
 }
 
 function uiAddAddressBox(_inp)
@@ -787,27 +804,28 @@ async function testbsc()
 async function pollBSC(bscaddr, callback)
 {
     console.log(`pollBSC ${bscaddr}`);
+    uiCache.mainPlaceholderLabel.style.display = "none";
     let resp = await fetchJson(`http://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
     //console.log(resp.data.items);
 
     let coins = resp.data.items;
-
+    let strhtml = "";
     for (let i = 0; i < coins.length; i++)
     {
         const c = coins[i];
         if (c.type == "dust") continue;
         c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
 
-        uiCache.content_bsc.innerHTML += "<div style='margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid grey'>";
-        uiCache.content_bsc.innerHTML += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
-        uiCache.content_bsc.innerHTML += `<p>${c.contract_address}</p>`;
-        uiCache.content_bsc.innerHTML += `<p>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</p>`;
-        uiCache.content_bsc.innerHTML += "</div>";
+        strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid grey'>`;
+        strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
+        strhtml += `<p>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</p>`;
+        strhtml += "</div>";
     }
+    uiCache.content_bsc.innerHTML += strhtml;
 
     // uiCache.content_bsc.innerText = JSON.stringify(resp.data.items, null, 2);
      uiCache.content_bsc.style.fontFamily = "monospace";
-     uiCache.content_bsc.style.fontSize = "14px";
+     uiCache.content_bsc.style.fontSize = "18px";
      uiCache.content_bsc.style.textAlign = "left";
      uiCache.content_bsc.style.paddingLeft = "40px";
 
@@ -816,12 +834,27 @@ async function pollBSC(bscaddr, callback)
 
 async function pollMatic(maticaddr, callback)
 {
+    uiCache.mainPlaceholderLabel.style.display = "none";
     let resp = await fetchJson(`http://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
     //console.log(resp.data.items);
-    uiCache.content_matic.innerText = JSON.stringify(resp.data.items, null, 2);
+    
+    let coins = resp.data.items;
+    let strhtml = "";
+    for (let i = 0; i < coins.length; i++)
+    {
+        const c = coins[i];
+        if (c.type == "dust") continue;
+        c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
+
+        strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid grey'>`;
+        strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
+        strhtml += `<p>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</p>`;
+        strhtml += "</div>";
+    }
+    uiCache.content_matic.innerHTML += strhtml;
 
     uiCache.content_matic.style.fontFamily = "monospace";
-    uiCache.content_matic.style.fontSize = "10px";
+    uiCache.content_matic.style.fontSize = "18px";
     uiCache.content_matic.style.textAlign = "left";
     uiCache.content_matic.style.paddingLeft = "40px";
 

@@ -266,6 +266,35 @@ span.input_label_unit
     color: #FF5555 !important;
 }
 
+.experimental
+{
+    font-family: monospace;
+    font-size: 14px;
+    position: absolute;
+    right: 10px;
+    top: 46px;
+}
+
+.samples_header
+{
+    background-image: url(https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880);
+
+    padding-left: 35px;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    background-position: 5px center;
+}
+
+.samples_header_bsc
+{
+    background-image: url(https://logos.covalenthq.com/tokens/0xb8c77482e45f1f44de1745f52c74426c631bdd52.png);
+}
+
+.samples_header_matic
+{
+    background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
+}
+
 .chainbutton
 {
     display: inline-block;
@@ -282,7 +311,7 @@ span.input_label_unit
 
 .chainbutton_eth
 {
-    background-image: url(https://logos.covalenthq.com/tokens/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png);
+    background-image: url(https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880);
 }
 
 .chainbutton_bsc
