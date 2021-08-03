@@ -8,9 +8,13 @@
 
         async function dodo()
         {
-            let result = await fetch("https://anubisapikeys.herokuapp.com/keything");
-            let rr = await result.text();
-            console.log(rr);
+            let result = await fetch("https://anubisapikeys.herokuapp.com/etherscan");
+            let rr1 = await result.text();
+            console.log("etherscan:", rr1);
+
+            let result2 = await fetch("https://anubisapikeys.herokuapp.com/infuraethurl");
+            let rr2 = await result2.text();
+            console.log("infura eth url:", rr2);
         }
         dodo();
 
