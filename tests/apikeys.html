@@ -15,6 +15,10 @@
             let result2 = await fetch("https://anubisapikeys.herokuapp.com/infuraethurl");
             let rr2 = await result2.text();
             console.log("infura eth url:", rr2);
+
+            let result3 = await fetch("https://anubisapikeys.herokuapp.com/infuraethrinkebyurl");
+            let rr3 = await result3.text();
+            console.log("infura eth rinkeby url:", rr3);
         }
         dodo();
 
