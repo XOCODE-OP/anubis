@@ -1,0 +1,49 @@
+/* @font-face {
+    font-family: 'lato';
+    src: url('Lato-Regular.ttf') format('opentype');
+}  */
+
+
+
+body
+{
+    font-size: 14px;
+    font-family: 'Work Sans', sans-serif;
+    background-color: rgb(18,18,18);
+    color: rgb(196, 196, 196);
+}
+
+.inlineblock
+{
+    display: inline-block;
+}
+
+.titlemode
+{
+    text-align: center;
+    background-color: black;
+    color: wheat;
+    font-size: 24px;
+    border-left: 1px solid wheat;
+    border-right: 1px solid wheat;
+}
+
+.tilebutton
+{
+    text-transform: uppercase;
+    text-align: center;
+    display: inline-block;
+    font-size: 42px;
+    padding: 42px 42px;
+    cursor: pointer;
+    user-select: none;
+    color: rgb(203, 211, 211);
+    background-color: rgb(20, 63, 78);
+}
+
+.tilebutton:hover
+{
+    /* filter: invert(); */
+    /* filter: contrast(2.1); */
+    filter: brightness(2.0);
+}

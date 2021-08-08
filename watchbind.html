@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFT boys</title>
+    <script>
+        let d = document;
+
+        let something = {};
+        something.val = 7;
+
+        let fieldBox;
+
+        function watchBind(element, variable, interval = 100) // could add a label instead of ID to stop
+        {
+            //every interval update source with variable
+            let intervalPID = setInterval(function ()
+            {
+                element.innerHTML = variable.val;
+            }, interval);
+            return intervalPID;
+        }
+
+        document.addEventListener('DOMContentLoaded', function()
+        {
+            
+            fieldBox = d.querySelector("#muhfield");
+
+            watchBind(fieldBox, something);
+        });
+    </script>
+</head>
+<body>
+    
+    <div id='muhfield'>loading</div>
+    
+    <button onclick='(function(){something.val = Math.random()*9999;})();'>Randomize</button>
+
+</body>
+</html>

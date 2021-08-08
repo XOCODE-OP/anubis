@@ -1,0 +1,73 @@
+// web3.eth.getBalance(addr, function(err, wei)
+// {
+//     let balance = web3.utils.fromWei(wei, 'ether');
+//     console.log(balance + " ETH");
+// });
+
+//let token_pols = web3.eth.contract(_abi).at(contractAddr_POLS);
+
+// let tokenContractPols = new web3.eth.Contract(erc20ABI, contractAddr_POLS);
+
+
+// tokenContractPols.methods.name().call(function(err, name)
+// {
+//   if(err) { console.log(err); }
+//   if(name) { console.log('The token name is: ' + name); }
+// });
+
+
+// async function getCoingeckoIDs()
+// {
+//     let _response = await fetch("./coingecko_markets.json"); 
+//     if (_response.ok) return await _response.json();
+//     else return null;
+// }
+
+async function getCoinPriceInUSD(_coingecko_token_id)
+{
+    let _query = `https://api.coingecko.com/api/v3/simple/price?ids=${_coingecko_token_id}&vs_currencies=usd`;
+    let _response = await fetch(_query); 
+    if (_response.ok) return await _response.json();
+    else return null;
+}
+
+// tokenContractPols.methods.symbol().call(function(err, symbol)
+// {
+//   if(err) { console.log(err); }
+//   if(symbol) { console.log('The token symbol is: ' + symbol); }
+// });
+
+// tokenContractPols.methods.symbol().call(function(err, decimals)
+// {
+//   if(err) { console.log(err); }
+//   if(decimals) { console.log('The token decimals are: ' + decimals); }
+// });
+
+// tokenContractPols.methods.balanceOf(addr).call(function(err, balance)
+// {
+//     if(err) { console.log(err); }
+//   //console.log('The balance is: ' + balance.toString(10));
+//   let bal = web3.utils.fromWei(balance, 'ether');
+//   console.log('The balance is: ' + bal + " POLS");
+// });
+
+//web3.eth.getGasPrice([callback])
+
+
+// async function main()
+// {
+//     let wei_total = await web3.eth.getBalance(addr);
+//     let eth_total = web3.utils.fromWei(wei_total, 'ether');
+//     console.log( "Balance of " + addr + ":" );
+//     console.log(wei_total + " wei");
+//     console.log(eth_total + " ETH");
+// }
+// main();
+
+// Object.prototype.originalValueOf = Object.prototype.valueOf;
+// Object.prototype.valueOf = function() {
+//   if (typeof this !== 'number') {
+//     throw new Error('Object is not a Number');
+//   }
+//   return this.originalValueOf();
+// }
