@@ -392,7 +392,7 @@ function decimalsToFraction(raw, decimalAmount)
 
 async function buildPortfolio() //addr is now an array
 {
-    // switchChain("eth");
+    switchChain("eth");
     let addrs = getAllInputAddresses();
     let chain = ""+current_chain;
     
