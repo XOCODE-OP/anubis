@@ -395,7 +395,7 @@ function decimalsToFraction(raw, decimalAmount)
 
 async function buildPortfolio() //addr is now an array
 {
-    switchChain("eth");
+    // switchChain("eth");
     let addrs = getAllInputAddresses();
     let chain = ""+current_chain;
     
@@ -846,7 +846,7 @@ async function pollBSC(bscaddr, callback)
 {
     console.log(`pollBSC ${bscaddr}`);
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let resp = await fetchJson(`http://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
+    let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
     //console.log(resp.data.items);
 
     let coins = resp.data.items;
@@ -876,7 +876,7 @@ async function pollBSC(bscaddr, callback)
 async function pollMatic(maticaddr, callback)
 {
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let resp = await fetchJson(`http://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
+    let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
     //console.log(resp.data.items);
     
     let coins = resp.data.items;
