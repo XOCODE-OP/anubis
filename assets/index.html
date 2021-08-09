@@ -13,14 +13,26 @@
     <meta name="theme-color" content="#000000">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="portfolio.css">
     <link rel="stylesheet" href="mobile.css">
     <title>ANUBIS LINK</title>
     <script src='../web3.min.js'></script>
     <!-- <script src='./o.js'></script> -->
 	<script src='./portfolio.js'></script>
+    <link href="../cross_nav.css" rel="stylesheet"  />
 </head>
 <body>
+
+    <div class='crossnav'>
+        <img class='crossnav_icon' src='../img/nav_icon.png' />
+        <a href='../' class='crossnav_button'>Start</a>
+        <a href='../assets/' class='crossnav_button crossnav_button_chosen' data-link='assets'>Assets</a>
+        <a href='../nft/' class='crossnav_button' data-link='nft'>NFT</a>
+        <a href='../ipfs/' class='crossnav_button' data-link='ipfs'>IPFS</a>
+        <a href='../coin/' class='crossnav_button' data-link='coin'>Coin</a>
+        <a href='../game/' class='crossnav_button' data-link='game'>Game</a>
+        <img class='crossnav_title' src='../img/nav_title.png' />
+    </div><br/>
 
     <div class='leftcol'  >
 
@@ -42,7 +54,7 @@
         </div>
 
         <div class='special_nopadding eth_gas_box'>
-            <div class="gasheader">Current Ethereum Gas Prices</div>
+            <div class="gasheader">Current ETH Mainnet Gas Prices</div>
             <!-- yo remove this url from the freaking html -->
             <div class='gasrow' data-ss='https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ'>
                 <div class='cheapgas'>
@@ -58,7 +70,7 @@
         </div>
 
         <div class='sample_addrs'>
-            <h4 class='samples_header'>Sample Ethereum Addresses</h4>
+            <h4 class='samples_header'>Sample ETH Mainnet Addresses</h4>
             
             <div class='samples_eth'>
                 <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
@@ -86,12 +98,11 @@
 
     </div>
 
-
     <div class='maincolumn eth_gradient'>
 
         <div class='chainswitcher_switchrow'>
-            <div data-chain='eth' class="chainbutton chainbutton_eth chosen_chain">ETHEREUM</div>
-            <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART</div>
+            <div data-chain='eth' class="chainbutton chainbutton_eth chosen_chain">ETHEREUM MAINNET</div>
+            <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART CHAIN</div>
             <div data-chain='matic' class="chainbutton chainbutton_matic">POLYGON MATIC</div>
         </div>
 
@@ -183,6 +194,7 @@
         </div>
         
     </div>
+
 
 
     <div class='splashscreen'>

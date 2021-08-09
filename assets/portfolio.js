@@ -71,7 +71,10 @@ document.addEventListener("DOMContentLoaded", function(event)
             if (uiCache.splashscreen.style.opacity <= 0.0)
             {
                 clearInterval(interval);
-                uiCache.splashscreen.parentNode.removeChild(uiCache.splashscreen);
+                //uiCache.splashscreen.parent
+                //uiCache.splashscreen.parentElement.removeChild(uiCache.splashscreen);
+                uiCache.splashscreen.remove();
+                // uiCache.splashscreen.style.display = "none";
             }
         }, 20);
     }, 360); 

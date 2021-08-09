@@ -5,8 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="../cross_nav.css" rel="stylesheet"  />
+    <style>
+        body
+        {
+            padding: 0;
+            margin: 0;
+            background-color: rgb(16, 16, 16);
+        }
+    </style>
 </head>
 <body>
+
+    <div class='crossnav'>
+        <img class='crossnav_icon' src='../img/nav_icon.png' />
+        <a href='../' class='crossnav_button'>Start</a>
+        <a href='../assets/' class='crossnav_button' data-link='assets'>Assets</a>
+        <a href='../nft/' class='crossnav_button' data-link='nft'>NFT</a>
+        <a href='../ipfs/' class='crossnav_button' data-link='ipfs'>IPFS</a>
+        <a href='../coin/' class='crossnav_button' data-link='coin'>Coin</a>
+        <a href='../game/' class='crossnav_button crossnav_button_chosen' data-link='game'>Game</a>
+        <img class='crossnav_title' src='../img/nav_title.png' />
+    </div>
     
     <pre style='visibility: hidden;'>
         loop hero

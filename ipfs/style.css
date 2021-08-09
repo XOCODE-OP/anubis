@@ -11,6 +11,8 @@ body
     font-family: 'Work Sans', sans-serif;
     background-color: rgb(18,18,18);
     color: rgb(196, 196, 196);
+    padding: 0;
+    margin: 0;
 }
 
 .inlineblock

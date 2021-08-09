@@ -1,0 +1,59 @@
+@font-face {
+    font-family: 'lato';
+    src: url('Lato-Regular.ttf') format('opentype');
+} 
+
+.crossnav
+{
+    background-color: #0b151f;
+    height: 45px;
+    margin: 0;
+    padding: 5px;
+    border-bottom: 1px solid rgb(255, 255, 255);
+    position: relative;
+    display: flex;
+}
+
+.crossnav_button
+{
+    display: inline-block;
+    margin: auto;
+    margin-left: 6px;
+    margin-right: 6px;
+    padding: 6px 22px;
+    text-decoration: none;
+    font-size: 20px;
+    font-family: "lato";
+    /* border: 1px solid rgb(12, 12, 12); */
+    color: rgb(191, 191, 191);
+    vertical-align: middle;
+    /* text-transform: uppercase; */
+    font-weight: 100;
+    border-radius: 10px;
+}
+
+.crossnav_button:hover, .crossnav_button_chosen
+{
+    /* border: 1px solid yellow; */
+    color: white;
+    background-color: rgb(39, 39, 39);
+}
+
+
+.crossnav_icon
+{
+    display: inline-block;
+    height: 45px;
+    width: auto;
+    margin-right: 30px;
+}
+
+.crossnav_title
+{
+    display: inline-block;
+    height: 45px;
+    width: auto;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFT boys</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap" rel="stylesheet"> -->
+    <style>
+
+        @keyframes loader_spin
+        {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @font-face {
+            font-family: 'lato';
+            src: url('Lato-Light.ttf') format('opentype');
+        } 
+
+        body
+        {
+            /* background: linear-gradient(90deg, rgba(94,61,116,1) 0%, rgba(96,14,122,1) 50%, rgba(18,55,91,1) 100%); */
+            background: linear-gradient(90deg, rgb(67, 43, 83) 0%, rgb(55, 8, 70) 50%, rgb(11, 34, 58) 100%);
+            color: rgb(221, 221, 188);
+            font-family: 'lato';
+            font-weight: 100;
+            padding: 0;
+            margin: 0;
+        }
+
+        .content_inner
+        {
+            padding: 10px;
+        }
+
+        .loader
+        {
+            justify-content: center;
+            align-items: center;
+            display: flex;
+
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0, 0.6);
+            width: 100%;
+            height: 100%;
+        }
+        .loader-gfx
+        {
+            border: 16px solid rgba(255,255,255,0.2); 
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 3rem;
+            aspect-ratio: 1.0;
+            animation: loader_spin 1200ms linear infinite;
+        }
+
+        .box
+        {
+            vertical-align: top;
+
+            text-align: center;
+            min-width: 200px;
+            margin: 20px;
+            display: inline-block;
+            padding: 6px;
+            border: 1px solid rgba(226, 226, 198, 0.788);
+            position: relative;
+        }
+
+        button
+        {
+            font-size: 22px;
+        }
+
+        .box-title
+        {
+            font-family: 'lato';
+            font-weight: 500;
+            font-size: 32px;
+        }
+
+        .nftlist_entries
+        {
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .nftlist_item
+        {
+            margin: 2px 0;
+            padding: 4px 10px;
+            background-color: rgba(10,10,10, 0.3);
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .error
+        {
+            color: rgb(243, 135, 85);
+        }
+
+        .tilebutton
+        {
+            text-transform: uppercase;
+            text-align: center;
+            display: block;
+            font-size: 22px;
+            padding: 36px 42px;
+            margin: 5px 0;
+            cursor: pointer;
+            user-select: none;
+            color: rgb(203, 211, 211);
+            background-color: rgb(20, 63, 78);
+        }
+
+        .tilebutton:hover
+        {
+            /* filter: invert(); */
+            /* filter: contrast(2.1); */
+            filter: brightness(2.0);
+        }
+
+        .tilebutton.smalltilebutton:hover
+        {
+            background-color: wheat;
+            color: black;
+        }
+
+        .logo
+        {
+            
+        }
+
+    </style>
+    <script src='../web3.min.js'></script>
+    <!-- <script src='./erc20abi.js'></script> -->
+    <script>
+
+        let d = document;
+
+        let ui = {}; //uicache
+
+
+        //const erc20ABI = abi();
+
+        let accountAddress;
+        let nftcontractJson;
+        let contractAddress;
+        let contractABI;
+        let contract;
+
+        let totalSupply;
+        let chainData = [];
+
+        async function init()
+        {
+            const nftcontractJsonFILE = await fetch('./abis/MyNFTContract.json'); 
+            nftcontractJson = await nftcontractJsonFILE.json();
+
+            window.ethereum.on('accountsChanged', function (accounts) {
+                console.log(" window.ethereum.on('accountsChanged': ", accounts[0]);
+            })
+
+            await this.loadWeb3();
+            let r = await this.initContract();
+            if (r != -1) await this.loadChainData();
+            if (r != -1) buildUI();
+        }
+
+        d.addEventListener('DOMContentLoaded', function()
+        {
+            ui.signbox = d.querySelector(".signbox");
+
+            //d.querySelector("#muhfield").innerHTML = "yello";
+            init();
+        });
+
+        async function loadWeb3() // this will popup the connect metamask window for confirm
+        {
+            if (window.ethereum) 
+            {
+                window.web3 = new Web3(window.ethereum);
+                await window.ethereum.enable();
+            }
+            else if (window.web3) 
+            {
+                window.web3 = new Web3(window.web3.currentProvider);
+            }
+            else
+            {
+                console.log("ERROR: no web3 provider");
+            }
+            let accounts = await window.web3.eth.getAccounts();
+            accountAddress = accounts[0];
+            d.querySelector(".walletbox .walletaddress").innerHTML = accountAddress;
+            // d.querySelector(".walletbox .loader").style.display = "none";
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
+
+            console.log('NETWORK ID:', window.ethereum.networkVersion);
+        }
+
+        async function initContract()
+        {
+            //which network. ganache has a network ID, and so does mainnet ETH etc
+            const providerNetworkId = await window.web3.eth.net.getId();
+            const contractNetworkData = nftcontractJson.networks[providerNetworkId];
+            if (!contractNetworkData)
+            {
+                console.log("NO contractNetworkData. Not deployed.");
+                return -1;
+            }
+            contractAddress = contractNetworkData.address; 
+            contractABI = nftcontractJson.abi;
+            contract = new window.web3.eth.Contract(contractABI, contractAddress);
+        }
+
+        async function loadChainData()
+        {
+            totalSupply = 0;
+            totalSupply = await contract.methods.totalSupply().call();
+            d.querySelector(".contractbox .loader").style.visibility = "hidden";
+
+            chainData = [];
+
+            for (let i = 0; i < totalSupply; i++)
+            {
+                const r = await contract.methods.someData(i).call();
+                chainData.push(r);
+            }
+        }
+
+        function buildUI()
+        {
+            d.querySelector(".totalsupply").innerHTML = totalSupply;
+            d.querySelector(".contractaddress").innerHTML = contractAddress;
+            
+            d.querySelector(".nftlist_entries").innerHTML = "";
+            let entriesHTML = "";
+            for (let i = 0; i < totalSupply; i++)
+            {
+                entriesHTML+=`<div class='nftlist_item'>${chainData[i]}</div>`;
+            }
+            d.querySelector(".nftlist_entries").innerHTML = entriesHTML;
+
+            d.querySelector(".tokendatabox .loader").style.visibility = "hidden";
+        }
+
+        async function mint(_data, _fromAddress)
+        {
+            let receipt = await contract.methods.mint(_data).send({ from: _fromAddress });
+            console.log("receipt", receipt);
+            await this.loadChainData();
+            buildUI();
+        }
+
+        async function sign(_data)
+        {
+            //in the rest of of the dapp, you already check here, if the account here mismatches the account polled earlier and WARN
+            let accounts = await web3.eth.getAccounts();
+            let msg = _data;
+            let sig = await web3.eth.personal.sign(msg, accounts[0], "for unlocked metamask this password field is not relevant");
+            let whoSigned = await web3.eth.accounts.recover(msg, sig);
+            return (whoSigned == accounts[0]);
+        }
+
+        async function signProcess()
+        {
+            let accounts = await web3.eth.getAccounts();
+            if (accounts[0] != accountAddress)
+            {
+                ui.signbox.querySelector(".error").innerHTML = "Wrong account selected.";
+                return;
+            }
+
+            let message = "I hereby whatever";
+
+            let result = await sign(message);
+            console.log(result);
+            if (result) ui.signbox.innerHTML = "Signature Success";
+            else        ui.signbox.querySelector(".error").innerHTML = "SIGNATURE FAILURE";
+            
+        }
+
+    </script>
+    <link href="../cross_nav.css" rel="stylesheet"  />
+</head>
+<body>
+
+    <div class='crossnav'>
+        <img class='crossnav_icon' src='../img/nav_icon.png' />
+        <a href='../' class='crossnav_button'>Start</a>
+        <a href='../assets/' class='crossnav_button' data-link='assets'>Assets</a>
+        <a href='../nft/' class='crossnav_button crossnav_button_chosen' data-link='nft'>NFT</a>
+        <a href='../ipfs/' class='crossnav_button' data-link='ipfs'>IPFS</a>
+        <a href='../coin/' class='crossnav_button' data-link='coin'>Coin</a>
+        <a href='../game/' class='crossnav_button' data-link='game'>Game</a>
+        <img class='crossnav_title' src='../img/nav_title.png' />
+    </div>
+
+    <div class="content_inner">
+
+        <!-- <div class='inlineblock'>
+            <div><img src='../img/logoa2.png' /></div>
+        </div> -->
+    
+        <div style='width: auto; display: inline-block;'>
+            <div class='tilebutton'>Lock</div>
+            <div class='tilebutton'>Unlock</div>
+            <div class='tilebutton'>mint</div>
+            <div class='tilebutton'>burn</div>
+            <div class='tilebutton'>sign</div>
+        </div>
+    
+        <article class='box walletbox'>
+            <h3 class='box-title'>Wallet Address</h3>
+            <div class='walletaddress'></div>
+            <div class="loader"><div class="loader-gfx"></div></div>
+        </article>
+    
+        <article class='box contractbox'>
+            <h3 class='box-title'>Contract</h3>
+            <div>Total Supply: <span class='totalsupply'></span></div>
+            <div>Address: <span class='contractaddress'></span></div>
+            <div class="loader"><div class="loader-gfx"></div></div>
+        </article>
+        
+        <article class='box tokendatabox'>
+            <h3 class='box-title'>List of Tokens</h3>
+            <div class='nftlist_entries'></div>
+            <div class="loader"><div class="loader-gfx"></div></div>
+        </article>
+    
+        <article class='box'>
+            <h3 class='box-title'>Mint new Token</h3>
+            <input type='text' placeholder="data" id='field_tokendata' />
+            <button onclick='mint( d.querySelector("#field_tokendata").value , accountAddress);'>Mint</button>
+        </article>
+    
+        <article class='box signbox'>
+            <h3 class='box-title'>Sign to prove ownership</h3>
+            <button onclick='signProcess();'>Sign</button>
+            <div class='error'></div>
+        </article>
+    
+        <article class='box'>
+            <pre style='text-align: left;'>
+    NFT use cases
+    
+    add ipfs support
+    add time stamp
+    
+    card games
+    car property asset titles
+    let to unlock hidden content
+    ticket to event
+    proof/key to consume content
+    Precious metals
+    Art
+    Funds — Providing liquidity, participation
+    Corporate debt
+    Corporate equity
+    Loans
+    Collectibles — Physical & Digital
+    Collectible cars
+    Real estate — commercial, residential, etc
+    Intellectual property — patents, licenses
+    Commodities — oil, coffee beans, etc.
+    Sports teams, athletes, celebrities
+    Licenses
+    Certificates
+    Gift cards
+    Music — when a customer “buys” a song from iTunes, 
+        they’re not acquiring ownership of the song, however, 
+        they’re purchasing the right, a license, 
+        to listen to the music under certain conditions
+    Domains
+    In-game assets
+    Digital asset bundles — gaming and non-gaming
+    Asset bundles
+    Energy
+    Fractional ownership
+    Loyalty/Reward points
+    Investment options
+    Identity
+    Keys or passes
+    Estate planning
+    Supply chain
+    Wine
+    Luxury goods
+            </pre>
+        </article>
+
+        <!-- <div style='width: 200px; height: 200px; display: inline-block; border: 1px solid white; position: relative;'>
+            <div class="loader"><div class="loader-gfx"></div></div>
+        </div> -->
+
+    </div>
+
+</body>
+</html>
