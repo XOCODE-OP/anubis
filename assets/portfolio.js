@@ -878,12 +878,10 @@ async function pollBSC(bscaddr, callback)
 
 async function pollMatic(maticaddr, callback)
 {
-    console.log("matic1");
     uiCache.mainPlaceholderLabel.style.display = "none";
     let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
     let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/?key=${covakey}`);
     //console.log(resp.data.items);
-    console.log("matic2");
     if ( resp == null || resp.data == null)
     {
         console.log("COVALENT ERROR");

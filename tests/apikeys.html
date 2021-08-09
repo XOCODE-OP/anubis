@@ -23,6 +23,10 @@
             let result4 = await fetch("https://anubisapikeys.herokuapp.com/covalent");
             let rr4 = await result4.text();
             console.log("cova key:", rr4);
+
+            let result5 = await fetch("https://anubisapikeys.herokuapp.com/ext");
+            let rr5 = await result5.text();
+            console.log("ext:", rr5);
         }
         dodo();
 
