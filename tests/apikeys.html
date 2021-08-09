@@ -19,6 +19,10 @@
             let result3 = await fetch("https://anubisapikeys.herokuapp.com/infuraethrinkebyurl");
             let rr3 = await result3.text();
             console.log("infura eth rinkeby url:", rr3);
+
+            let result4 = await fetch("https://anubisapikeys.herokuapp.com/covalent");
+            let rr4 = await result4.text();
+            console.log("cova key:", rr3);
         }
         dodo();
 

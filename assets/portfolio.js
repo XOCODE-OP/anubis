@@ -10,7 +10,6 @@
 
 //coingecko uniswap list https://tokens.coingecko.com/uniswap/all.json
 
-const rpcURLmainnet = "https://mainnet.infura.io/v3/daa5a2696b2a47a4b969df8e11931282";
 //const addr = "0x187f899fcBd0cb2C23Fc68d6339f766814D9dDeb";
 //let coingecko_markets; //https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false
 let coingecko_ids; //https://api.coingecko.com/api/v3/coins/list?include_platform=false
@@ -26,7 +25,6 @@ const regexETH = new RegExp('^0x[a-fA-F0-9]{40}$');
 let baseTokenElement;
 let uiCache = {};
 let current_chain = "eth";
-const ETHERSCAN_APIKEY = "7AQ3713SDIIEK2TMI5ZS9W4IB6YFBFF1QZ";
 const DISABLE_METAMASK = false;
 
 const ANUBIS_VERSION_NUM = "0.0.183";
@@ -34,16 +32,14 @@ const ANUBIS_VERSION_NUM = "0.0.183";
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("ANUBIS VERSION " + ANUBIS_VERSION_NUM);
-    //initMetamask();
 
-    //infura
-    window.web3 = new Web3(rpcURLmainnet);
-
-    (async function fetchFiles()
+    (async function fetchAsyncs()
     {
         coingecko_ids    = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
         erc20ABI         = await fetchJson("../erc20abi.json");
         allUniswapTokens = await fetchJson("https://tokens.coingecko.com/uniswap/all.json");
+        const rpcURLmainnet = await (await fetch("https://anubisapikeys.herokuapp.com/infuraethurl")).text();
+        window.web3 = new Web3(rpcURLmainnet);
     })();
 
     uiCache.content_eth         = document.querySelector('.content_eth');
@@ -257,6 +253,7 @@ function switchChain(_chain)
 
 async function fillInGasPrices()
 {
+    const ETHERSCAN_APIKEY = await (await fetch("https://anubisapikeys.herokuapp.com/etherscan")).text();
     let gasdata = await fetchJson(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_APIKEY}`);
     document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.result.SafeGasPrice;
     document.querySelector(".modgas .gas").innerHTML = ""+gasdata.result.ProposeGasPrice;
@@ -846,7 +843,8 @@ async function pollBSC(bscaddr, callback)
 {
     console.log(`pollBSC ${bscaddr}`);
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/`);
+    let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/?key=${covakey}`);
     //console.log(resp.data.items);
     if ( resp == null || resp.data == null)
     {
@@ -882,7 +880,8 @@ async function pollMatic(maticaddr, callback)
 {
     console.log("matic1");
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/`);
+    let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/?key=${covakey}`);
     //console.log(resp.data.items);
     console.log("matic2");
     if ( resp == null || resp.data == null)
@@ -951,6 +950,7 @@ async function fetchJson(query)
 
 async function getTokenEventsFromEtherscan(in_addr)
 {
+    const ETHERSCAN_APIKEY = await (await fetch("https://anubisapikeys.herokuapp.com/etherscan")).text();
     let query = `https://api.etherscan.io/api?module=account&action=tokentx&address=${in_addr}&startblock=0&endblock=999999999&sort=asc&apikey=${ETHERSCAN_APIKEY}`;
     let _response = await fetch(query); 
     if (_response.ok) return await _response.json();
