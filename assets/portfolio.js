@@ -879,8 +879,10 @@ async function pollBSC(bscaddr, callback)
 async function pollMatic(maticaddr, callback)
 {
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
-    let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/?key=${covakey}`);
+    //let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    //let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/?key=${covakey}`);
+    let resp = await fetchJson(`https://anubisapikeys.herokuapp.com/cova_matic?addr=${maticaddr}`);
+    
     //console.log(resp.data.items);
     if ( resp == null || resp.data == null)
     {
