@@ -1,6 +1,6 @@
 @font-face {
-    font-family: 'titillium';
-    src: url('TitilliumWeb-Regular.ttf') format('opentype');
+    font-family: 'lato';
+    src: url('../Lato-Regular.ttf') format('opentype');
 } 
 
 @keyframes ldio-v3xoc9chw0a {
@@ -48,10 +48,10 @@ body
     /* background-color: #212121; */
     background-color: rgb(8, 8, 8);
     color: #ccc39d;
-    font-family: 'titillium';
-    font-weight: 100;
+    font-family: 'lato';
     font-size: 22px;
     text-align: center;
+    font-weight: 500;
     display: flex;
     /* padding: 20px; */
     min-height: 100vh;
@@ -476,8 +476,7 @@ span.input_label_unit
 {
     border: 1px solid rgb(79, 79, 79);
     font-size: 14px;
-    font-family: 'titillium';
-    font-weight: 100;
+    font-family: 'lato';
     width: 77%;
     display: inline-block;
     margin: auto;
@@ -522,8 +521,7 @@ span.input_label_unit
     border: 1px solid wheat;
     background-color: transparent;
     cursor: pointer;
-    font-family: 'titillium';
-    font-weight: 100;
+    font-family: 'lato';
     display: inline-block;
     padding: 10px 0;
     vertical-align: middle;

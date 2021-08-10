@@ -843,8 +843,9 @@ async function pollBSC(bscaddr, callback)
 {
     console.log(`pollBSC ${bscaddr}`);
     uiCache.mainPlaceholderLabel.style.display = "none";
-    let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
-    let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/?key=${covakey}`);
+    // let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    // let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/?key=${covakey}`);
+    let resp = await fetchJson(`https://anubisapikeys.herokuapp.com/cova_bsc?addr=${bscaddr}`);
     //console.log(resp.data.items);
     if ( resp == null || resp.data == null)
     {
