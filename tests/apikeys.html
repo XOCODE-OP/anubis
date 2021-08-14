@@ -8,23 +8,23 @@
 
         async function dodo()
         {
-            let result = await fetch("https://anubisapikeys.herokuapp.com/etherscan");
+            let result = await fetch("https://templeosiris.herokuapp.com/etherscan");
             let rr1 = await result.text();
             console.log("etherscan:", rr1);
 
-            let result2 = await fetch("https://anubisapikeys.herokuapp.com/infuraethurl");
+            let result2 = await fetch("https://templeosiris.herokuapp.com/infuraethurl");
             let rr2 = await result2.text();
             console.log("infura eth url:", rr2);
 
-            let result3 = await fetch("https://anubisapikeys.herokuapp.com/infuraethrinkebyurl");
+            let result3 = await fetch("https://templeosiris.herokuapp.com/infuraethrinkebyurl");
             let rr3 = await result3.text();
             console.log("infura eth rinkeby url:", rr3);
 
-            let result4 = await fetch("https://anubisapikeys.herokuapp.com/covalent");
+            let result4 = await fetch("https://templeosiris.herokuapp.com/covalent");
             let rr4 = await result4.text();
             console.log("cova key:", rr4);
 
-            let result5 = await fetch("https://anubisapikeys.herokuapp.com/ext");
+            let result5 = await fetch("https://templeosiris.herokuapp.com/ext");
             let rr5 = await result5.text();
             console.log("ext:", rr5);
         }

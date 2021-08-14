@@ -108,7 +108,7 @@
             text-align: center;
             display: block;
             font-size: 22px;
-            padding: 36px 42px;
+            padding: 16px 30px;
             margin: 5px 0;
             cursor: pointer;
             user-select: none;
@@ -138,12 +138,11 @@
     <script src='../web3.min.js'></script>
     <!-- <script src='./erc20abi.js'></script> -->
     <script>
+        const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5});
+        const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
 
         let d = document;
-
         let ui = {}; //uicache
-
-
         //const erc20ABI = abi();
 
         let accountAddress;
@@ -155,18 +154,40 @@
         let totalSupply;
         let chainData = [];
 
+        function networkIDToString(_id)
+        {
+            _id = parseInt(_id);
+            switch (_id) 
+            {
+                case ETH_NETWORK_IDS.MAINNET:
+                    return "Mainnet";
+                    break;
+                case ETH_NETWORK_IDS.ROPSTEN:
+                    return "Ropsten";
+                    break;
+                case ETH_NETWORK_IDS.KOVAN:
+                    return "Kovan";
+                    break;
+                case ETH_NETWORK_IDS.RINKEBY:
+                    return "Rinkeby";
+                    break;
+                case ETH_NETWORK_IDS.GOERLI:
+                    return "Goerli";
+                    break;
+                default:
+                    return "unknown network ID: " + _id
+            }
+            return "unknown network ID: " + _id;
+        }
+
         async function init()
         {
             const nftcontractJsonFILE = await fetch('./abis/MyNFTContract.json'); 
             nftcontractJson = await nftcontractJsonFILE.json();
 
-            window.ethereum.on('accountsChanged', function (accounts) {
-                console.log(" window.ethereum.on('accountsChanged': ", accounts[0]);
-            })
-
-            await this.loadWeb3();
-            let r = await this.initContract();
-            if (r != -1) await this.loadChainData();
+            await loadWeb3();
+            let r = await initContract();
+            if (r != -1) await loadChainData();
             if (r != -1) buildUI();
         }
 
@@ -178,12 +199,30 @@
             init();
         });
 
+        function wrongNetwork(networkID)
+        {
+            //TODO: push network error message to ui
+            console.log("wrong current network", networkIDToString(networkID));
+        }
+
         async function loadWeb3() // this will popup the connect metamask window for confirm
         {
             if (window.ethereum) 
             {
                 window.web3 = new Web3(window.ethereum);
                 await window.ethereum.enable();
+
+                window.ethereum.on('accountsChanged', function (accounts) 
+                {
+                    console.log('accountsChanges', accounts);
+                });
+
+                window.ethereum.on('networkChanged', function(networkId)
+                {
+                    console.log('networkChanged', networkId);
+                    if (networkId != DEPLOYED_NETWORK) wrongNetwork(networkId);
+                });
+                console.log('NETWORK:', networkIDToString(window.ethereum.networkVersion));
             }
             else if (window.web3) 
             {
@@ -198,14 +237,17 @@
             d.querySelector(".walletbox .walletaddress").innerHTML = accountAddress;
             // d.querySelector(".walletbox .loader").style.display = "none";
             d.querySelector(".walletbox .loader").style.visibility = "hidden";
-
-            console.log('NETWORK ID:', window.ethereum.networkVersion);
         }
 
         async function initContract()
         {
-            //which network. ganache has a network ID, and so does mainnet ETH etc
             const providerNetworkId = await window.web3.eth.net.getId();
+            if (providerNetworkId != DEPLOYED_NETWORK)
+            {
+                wrongNetwork(providerNetworkId);
+                return -1;
+            }
+            //which network. ganache has a network ID, and so does mainnet ETH etc
             const contractNetworkData = nftcontractJson.networks[providerNetworkId];
             if (!contractNetworkData)
             {
@@ -281,7 +323,6 @@
             console.log(result);
             if (result) ui.signbox.innerHTML = "Signature Success";
             else        ui.signbox.querySelector(".error").innerHTML = "SIGNATURE FAILURE";
-            
         }
 
     </script>
@@ -305,6 +346,13 @@
         <!-- <div class='inlineblock'>
             <div><img src='../img/logoa2.png' /></div>
         </div> -->
+
+        <article class='box signbox'>
+            <h3 class='box-title'>Network: Rinkeby</h3>
+            <p>Ethereum has gotten very expensive, gas price wise. Therefore, this smart contract has been deployed on Rinkeby, since it is just a showcase. To obtain Rinkeby Ether, in order to interact with this frontend and smart contract, use this link <a href='https://faucet.rinkeby.io'>https://faucet.rinkeby.io</a></p>
+            <p>The code used here would have zero changes as opposed to Mainnet, except for the network ID.</p>
+            <div class="loader"><div class="loader-gfx"></div></div>
+        </article>
     
         <div style='width: auto; display: inline-block;'>
             <div class='tilebutton'>Lock</div>
@@ -344,6 +392,7 @@
             <button onclick='signProcess();'>Sign</button>
             <div class='error'></div>
         </article>
+
     
         <article class='box'>
             <pre style='text-align: left;'>

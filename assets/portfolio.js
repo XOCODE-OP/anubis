@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function(event)
         coingecko_ids    = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
         erc20ABI         = await fetchJson("../erc20abi.json");
         allUniswapTokens = await fetchJson("https://tokens.coingecko.com/uniswap/all.json");
-        const rpcURLmainnet = await (await fetch("https://anubisapikeys.herokuapp.com/infuraethurl")).text();
+        const rpcURLmainnet = await (await fetch("https://templeosiris.herokuapp.com/infuraethurl")).text();
         window.web3 = new Web3(rpcURLmainnet);
     })();
 
@@ -253,7 +253,7 @@ function switchChain(_chain)
 
 async function fillInGasPrices()
 {
-    const ETHERSCAN_APIKEY = await (await fetch("https://anubisapikeys.herokuapp.com/etherscan")).text();
+    const ETHERSCAN_APIKEY = await (await fetch("https://templeosiris.herokuapp.com/etherscan")).text();
     let gasdata = await fetchJson(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_APIKEY}`);
     document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.result.SafeGasPrice;
     document.querySelector(".modgas .gas").innerHTML = ""+gasdata.result.ProposeGasPrice;
@@ -843,9 +843,9 @@ async function pollBSC(bscaddr, callback)
 {
     console.log(`pollBSC ${bscaddr}`);
     uiCache.mainPlaceholderLabel.style.display = "none";
-    // let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    // let covakey = await (await fetch("https://templeosiris.herokuapp.com/covalent")).text();
     // let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/?key=${covakey}`);
-    let resp = await fetchJson(`https://anubisapikeys.herokuapp.com/cova_bsc?addr=${bscaddr}`);
+    let resp = await fetchJson(`https://templeosiris.herokuapp.com/cova_bsc?addr=${bscaddr}`);
     //console.log(resp.data.items);
     if ( resp == null || resp.data == null)
     {
@@ -880,9 +880,9 @@ async function pollBSC(bscaddr, callback)
 async function pollMatic(maticaddr, callback)
 {
     uiCache.mainPlaceholderLabel.style.display = "none";
-    //let covakey = await (await fetch("https://anubisapikeys.herokuapp.com/covalent")).text();
+    //let covakey = await (await fetch("https://templeosiris.herokuapp.com/covalent")).text();
     //let resp = await fetchJson(`https://api.covalenthq.com/v1/137/address/${maticaddr}/balances_v2/?key=${covakey}`);
-    let resp = await fetchJson(`https://anubisapikeys.herokuapp.com/cova_matic?addr=${maticaddr}`);
+    let resp = await fetchJson(`https://templeosiris.herokuapp.com/cova_matic?addr=${maticaddr}`);
     
     //console.log(resp.data.items);
     if ( resp == null || resp.data == null)
@@ -951,7 +951,7 @@ async function fetchJson(query)
 
 async function getTokenEventsFromEtherscan(in_addr)
 {
-    const ETHERSCAN_APIKEY = await (await fetch("https://anubisapikeys.herokuapp.com/etherscan")).text();
+    const ETHERSCAN_APIKEY = await (await fetch("https://templeosiris.herokuapp.com/etherscan")).text();
     let query = `https://api.etherscan.io/api?module=account&action=tokentx&address=${in_addr}&startblock=0&endblock=999999999&sort=asc&apikey=${ETHERSCAN_APIKEY}`;
     let _response = await fetch(query); 
     if (_response.ok) return await _response.json();

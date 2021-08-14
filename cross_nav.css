@@ -57,3 +57,41 @@
     top: 5px;
     right: 5px;
 }
+
+.crossnav_bigimg
+{
+    visibility: visible;
+    transition: none;
+}
+
+.crossnav_smallimg
+{
+    visibility: hidden;
+    transition: none;
+}
+
+@media (max-width: 1040px)
+{
+    .crossnav_bigimg
+    {
+        visibility: hidden;
+    }
+
+    .crossnav_smallimg
+    {
+        visibility: visible;
+    }
+
+    .crossnav_icon
+    {
+        margin-right: 10px;
+    }
+
+    .crossnav_button
+    {
+        margin-left: 2px;
+        margin-right: 2px;
+        padding: 6px 10px;
+    }
+
+}
