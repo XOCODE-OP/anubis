@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.188";
+const ANUBIS_VERSION_NUM = "0.0.189";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
