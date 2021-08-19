@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.189";
+const ANUBIS_VERSION_NUM = "0.0.1900";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -856,7 +856,7 @@ async function pollBSC(bscaddr, callback)
     for (let i = 0; i < coins.length; i++)
     {
         const c = coins[i];
-        if (!c.logo_url) c.logo_url = `https://token-icons.s3.amazonaws.com/${c.contract_address.toLower()}.png`;
+        if (!c.logo_url) c.logo_url = `https://token-icons.s3.amazonaws.com/${c.contract_address.toLowerCase()}.png`;
         if (c.type == "dust") continue;
         c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
 
