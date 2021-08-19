@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.1900";
+const ANUBIS_VERSION_NUM = "0.0.1901";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -856,13 +856,16 @@ async function pollBSC(bscaddr, callback)
     for (let i = 0; i < coins.length; i++)
     {
         const c = coins[i];
-        if (!c.logo_url) c.logo_url = `https://token-icons.s3.amazonaws.com/${c.contract_address.toLowerCase()}.png`;
+        //if (!c.logo_url) c.logo_url = `https://token-icons.s3.amazonaws.com/${c.contract_address.toLowerCase()}.png`;
+        //https://etherscan.io/token/images/hex_32.png
         if (c.type == "dust") continue;
         c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
 
-        strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid grey'>`;
-        strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
-        strhtml += `<p>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</p>`;
+        strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 8px; padding-bottom: 8px; >`;
+        //strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
+        strhtml += `<div>${c.contract_name}</div>`;
+        strhtml += `<div>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</div>`;
+        strhtml += `<div><a href='https://bscscan.com/token/${c.contract_address.toLowerCase()}' target='_blank'>BSC SCAN <img src='../img/link.svg' /></a></div>`;
         strhtml += "</div>";
     }
     uiCache.content_bsc.innerHTML += strhtml;
