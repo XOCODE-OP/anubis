@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.1902";
+const ANUBIS_VERSION_NUM = "0.0.1903";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -861,6 +861,8 @@ async function pollBSC(bscaddr, callback)
     {
         const c = coins[i];
         //if (!c.logo_url) c.logo_url = `https://token-icons.s3.amazonaws.com/${c.contract_address.toLowerCase()}.png`;
+        if (!c.logo_url) c.logo_url = `https://logos.covalenthq.com/tokens/${c.contract_address.toLowerCase()}.png`;
+        
         //https://etherscan.io/token/images/hex_32.png
         if (c.type == "dust") continue;
         c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
