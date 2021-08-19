@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.183";
+const ANUBIS_VERSION_NUM = "0.0.188";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -164,8 +164,6 @@ document.addEventListener("DOMContentLoaded", function(event)
         });
     }
 
-    console.log("TODO: download uniswap coingecko WHILE WAITING before inputs");
-    console.log("TODO: download coingecko ID list WHILE WAITING before inputs");
     //download these if 24h have passed or something
 
     const success = loadDataFromLocalStorage();
@@ -841,7 +839,7 @@ async function testbsc()
 
 async function pollBSC(bscaddr, callback)
 {
-    console.log(`pollBSC ${bscaddr}`);
+    // console.log(`pollBSC ${bscaddr}`);
     uiCache.mainPlaceholderLabel.style.display = "none";
     // let covakey = await (await fetch("https://templeosiris.herokuapp.com/covalent")).text();
     // let resp = await fetchJson(`https://api.covalenthq.com/v1/56/address/${bscaddr}/balances_v2/?key=${covakey}`);
