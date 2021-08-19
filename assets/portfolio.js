@@ -27,7 +27,7 @@ let uiCache = {};
 let current_chain = "eth";
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.0.1901";
+const ANUBIS_VERSION_NUM = "0.0.1902";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -865,7 +865,7 @@ async function pollBSC(bscaddr, callback)
         //strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
         strhtml += `<div>${c.contract_name}</div>`;
         strhtml += `<div>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</div>`;
-        strhtml += `<div><a href='https://bscscan.com/token/${c.contract_address.toLowerCase()}' target='_blank'>BSC SCAN <img src='../img/link.svg' /></a></div>`;
+        strhtml += `<div><a href='https://bscscan.com/token/${c.contract_address.toLowerCase()}' target='_blank'>BSC SCAN <img height="11" src='../img/link.svg' /></a></div>`;
         strhtml += "</div>";
     }
     uiCache.content_bsc.innerHTML += strhtml;

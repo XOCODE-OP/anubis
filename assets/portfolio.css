@@ -672,3 +672,8 @@ span.input_label_unit
     top: 0;
     width: calc(100% - 10px);
 }
+
+.token_o
+{
+    font-size: 11px;
+}
