@@ -675,5 +675,16 @@ span.input_label_unit
 
 .token_o
 {
-    font-size: 11px;
+    font-size: 14px;
+    color: #CCC;
+}
+
+.token_o a
+{
+    color: rgb(150, 195, 255);
+}
+
+#btn_main_check
+{
+
 }

@@ -33,6 +33,9 @@ document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("ANUBIS VERSION " + ANUBIS_VERSION_NUM);
 
+    uiCache.checkButton         = document.querySelector("#btn_main_check");
+    uiCache.checkButton.disabled = true;
+
     (async function fetchAsyncs()
     {
         coingecko_ids    = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
@@ -40,6 +43,8 @@ document.addEventListener("DOMContentLoaded", function(event)
         allUniswapTokens = await fetchJson("https://tokens.coingecko.com/uniswap/all.json");
         const rpcURLmainnet = await (await fetch("https://templeosiris.herokuapp.com/infuraethurl")).text();
         window.web3 = new Web3(rpcURLmainnet);
+        uiCache.checkButton.innerText = "Check";
+        uiCache.checkButton.disabled = false;
     })();
 
     uiCache.content_eth         = document.querySelector('.content_eth');
@@ -82,7 +87,6 @@ document.addEventListener("DOMContentLoaded", function(event)
     uiCache.refresherbuttonElem = document.querySelector(".refresherbutton");
     uiCache.inputArea           = document.querySelector(".inputarea");
     uiCache.inputbarElem        = document.querySelector(".inpaddress");
-    uiCache.checkButton         = document.querySelector("#btn_main_check");
     uiCache.maincolumn          = document.querySelector(".maincolumn");
     uiCache.mainPlaceholderLabel= document.querySelector(".maincolumn h1");
     uiCache.divTotalBTCvalue    = document.querySelector(".tot_btcv");
@@ -865,7 +869,7 @@ async function pollBSC(bscaddr, callback)
         //strhtml += `<p><img src='${c.logo_url}' width='20' height='20' /> ${c.contract_name}</p>`;
         strhtml += `<div>${c.contract_name}</div>`;
         strhtml += `<div>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</div>`;
-        strhtml += `<div><a href='https://bscscan.com/token/${c.contract_address.toLowerCase()}' target='_blank'>BSC SCAN <img height="11" src='../img/link.svg' /></a></div>`;
+        strhtml += `<div><a href='https://bscscan.com/token/${c.contract_address.toLowerCase()}' target='_blank'>BSC SCAN <img height="14" src='../img/link.svg' /></a></div>`;
         strhtml += "</div>";
     }
     uiCache.content_bsc.innerHTML += strhtml;
@@ -977,6 +981,7 @@ async function fetchRelevantUniswapTokens(tokenAddressesOfAccounts)
 
     let list = [];
     let json = allUniswapTokens;
+    if (!json) console.err("COULD NOT FETCH UNISWAP TOKENS");
     for (let i = 0; i < json.tokens.length; i++)
     {
         const uniswapJsonToken = json.tokens[i];
