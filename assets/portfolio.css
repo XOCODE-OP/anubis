@@ -75,9 +75,24 @@ body
 
 .content
 {
-    max-width: 900px;
-    margin: auto;
+    min-width: 300px;
+    margin: 20px;
     margin-top: 40px;
+    min-height: 200px;
+    border: 1px solid grey;
+    flex: 1;
+    position: relative;
+}
+
+.token_container
+{
+    text-align: center;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: stretch;
+    padding: 0 8%;
 }
 
 .title
@@ -99,9 +114,7 @@ body
 .leftcol
 {
     text-align: left;
-    width: 440px;
-    min-width: 440px;
-    max-width: 440px;
+    width: 370px;
     margin-top: 56px;
 }
 
@@ -181,6 +194,7 @@ body
 .eth_gas_box
 {
     /* outline: 30px solid black; */
+    position: relative;
 }
 
 .btc_value
@@ -235,6 +249,7 @@ span.input_label_unit
     background-position: left center;
     cursor: pointer;
     display: inline;
+
 }
 
 .newaddresslink:hover
@@ -256,12 +271,12 @@ span.input_label_unit
     text-align: left;
 }
 
-.chainswitcher_switchrow
+/* .chainswitcher_switchrow
 {
     display: flex;
     flex-direction: row;
     text-align: left;
-}
+} */
 
 .losses
 {
@@ -305,10 +320,15 @@ span.input_label_unit
     padding: 4px 8px;
     font-size: 16px;
     font-family: monospace;
-    padding-left: 40px;
     background-repeat: no-repeat;
     background-size: auto 80%;
     background-position: 5% center;
+    background-color: #000;
+    border: 1px solid #000;
+    border-bottom-color: #333;
+    margin: 0;
+    display: block;
+    text-align: center;
 }
 
 .chainbutton_eth
@@ -326,33 +346,13 @@ span.input_label_unit
     background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
 }
 
-.chainbutton_eth, .chainbutton_bsc, .chainbutton_matic
-{
-    background-color: #000;
-    border: 1px solid #000;
-    border-bottom-color: #333;
-    margin: 0;
-    width: 33.333%;
-    text-align: center;
-}
 
-.chainbutton_bsc
-{
-    border-left-color: #333;
-    border-right-color: #333;
-}
-
-.chainbutton_eth:hover, .chainbutton_bsc:hover, .chainbutton_matic:hover
-{
-    border-color: wheat;
-}
-
-.chosen_chain
+/* .chosen_chain
 {
     background-color: wheat;
     border-color: wheat;
     color: black;
-}
+} */
 
 
 
@@ -375,6 +375,8 @@ span.input_label_unit
     padding: 2px 4px;
     font-size: 12px;
     border-radius: 6px;
+
+    display: none;
 }
 
 .usdchange
@@ -393,17 +395,23 @@ span.input_label_unit
     display: flex;
     flex-direction: row;
     margin-top: 10px;
-    margin-bottom: 30px;
-    font-size: 44px;
+    margin-bottom: 80px;
+    font-size: 30px;
     color: #ffffff;
     margin-left: 20px;
     margin-right: 20px;
+    justify-content: center;
 }
 
 .totaldiv-label
 {
     margin-right: auto;
     text-align: left;
+}
+
+.coin_vals
+{
+    font-size: 16px;
 }
 
 .totaldiv-val-container .coin_vals, .totaldiv-val-container .totaldiv-val
@@ -416,27 +424,24 @@ span.input_label_unit
 {
     color: orange;
     display: block;
-    font-size: 18px;
 }
 
 .tot_ethv
 {
     color: cyan;
     display: block;
-    font-size: 18px;
 }
 
 .totaldiv-val-container
 {
-    margin-left: auto;
-    text-align: right;
+
 }
 
 .tokenp
 {
     display: flex;
     flex-direction: row;
-    margin: 14px 20px;
+    margin: 20px;
     font-size: 16px;
 }
 
@@ -448,12 +453,26 @@ span.input_label_unit
     margin-right: auto;
 }
 
-.tokenp_left img
+.tokenicon
 {
     width: 32px;
     height: 32px;
     margin-right: 10px;
-    border-radius: 100%;
+    /* border-radius: 100%; */
+    background-color: #090b0c;
+    color: #999;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 32px 32px;
+
+    vertical-align: middle;
+    font-size: 12px;
+    font-family: monospace;
+    text-align: center;
+    line-height: 32px;
+
+    /* background-image: url('https://tokens.pancakeswap.finance/images/0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82.png'); */
+
 }
 
 .minus_address_icon
@@ -494,13 +513,12 @@ span.input_label_unit
 .whichaddress
 {
     color: rgb(154, 185, 194);
-    font-size: 14px;
+    font-size: 16px;
     font-family: monospace;
     display: block;
     text-align: center;
-    margin-bottom: 30px;
-    background-color: black;
-    padding: 4px 0;
+    /* background-color: black; */
+    padding: 8px 0;
 }
 
 .inputarea
@@ -594,6 +612,7 @@ span.input_label_unit
 .tokendetails, .token_total
 {
     color: rgb(151, 151, 151);
+    font-size: 14px;
 }
 
 .nowloading
@@ -664,6 +683,26 @@ span.input_label_unit
     background-position: right center;
     background-repeat: no-repeat;
     padding-right: 26px;
+    padding-left: 5px;
+}
+
+.uniswapcost
+{
+    background-color: #000;
+    display: block;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    color: #EEE;
+    width: 100%;
+    text-align: center;
+    padding: 4px 0;
+}
+
+.uniswapcost .gas
+{
+    background-image: none;
+    padding-right: 5px;
 }
 
 .crossnav
@@ -687,4 +726,52 @@ span.input_label_unit
 #btn_main_check
 {
 
+}
+
+.explorer_link
+{
+    font-size: 12px;
+    text-decoration: none;
+    color: white;
+}
+
+.explorer_link:hover
+{
+    color: orange;
+}
+
+.explorer_icon
+{
+    height: 12px;
+    width: auto;
+    margin-left: 10px;
+}
+
+@keyframes loader_spin
+{
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg);  }
+}
+
+.loader
+{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0, 0.6);
+    width: 100%;
+    height: 100%;
+}
+.loader-gfx
+{
+    border: 16px solid rgba(255,255,255,0.2); 
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 3rem;
+    aspect-ratio: 1.0;
+    animation: loader_spin 2000ms linear infinite;
 }
