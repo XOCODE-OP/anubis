@@ -77,7 +77,6 @@ body
 {
     min-width: 300px;
     margin: 20px;
-    margin-top: 40px;
     min-height: 200px;
     border: 1px solid grey;
     flex: 1;
@@ -92,7 +91,15 @@ body
     flex-direction: row;
     justify-content: space-evenly;
     align-items: stretch;
-    padding: 0 8%;
+    /* padding: 0 8%; */
+}
+
+.swap_container
+{
+    background-image: url(../img/logoa2.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 80% auto;
 }
 
 .title
@@ -124,7 +131,6 @@ body
     width: 100%;
     background-color: rgb(21, 21, 26);
     border: 1px solid rgb(75, 77, 52);
-    border-radius: 6px;
     min-height: 200px;
     margin-top: 56px;
 }
@@ -139,14 +145,15 @@ body
     background: linear-gradient(to right, #1c1711,#221608, #16120f); 
 }
 
-.matic_gradient
+.polygon_gradient
 {
     background: linear-gradient(to right, #14080c, #1d0f0f, #100b18);
 }
 
-.inputarea, .sample_addrs, .special_nopadding
+.inputarea, .sample_addrs, .special_nopadding, .swap_container
 {
     margin: 30px auto;
+    margin-top: 0px;
     background-color: rgb(21, 21, 26);
     border: 1px solid rgb(75, 77, 52);
     border-left: 0;
@@ -232,6 +239,14 @@ span.input_label_unit
     margin-top: 12px;
 }
 
+.address_div
+{
+    display: flex;
+    align-items: center;
+    height: 36px;
+    margin: 0 16px;
+}
+
 .address_list
 {
     text-align: center;
@@ -249,7 +264,7 @@ span.input_label_unit
     background-position: left center;
     cursor: pointer;
     display: inline;
-
+    display: none;
 }
 
 .newaddresslink:hover
@@ -294,28 +309,26 @@ span.input_label_unit
 
 .samples_header
 {
-    background-image: url(https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880);
-
-    padding-left: 35px;
+    padding-left: 20px;
     background-repeat: no-repeat;
     background-size: auto 100%;
     background-position: 5px center;
 }
 
-.samples_header_bsc
+/* .samples_header_bsc
 {
     background-image: url(https://logos.covalenthq.com/tokens/0xb8c77482e45f1f44de1745f52c74426c631bdd52.png);
 }
 
-.samples_header_matic
+.samples_header_polygon
 {
     background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
-}
+} */
 
 .chainbutton
 {
     display: inline-block;
-    cursor: pointer;
+    cursor: default;
     margin: 0;
     padding: 4px 8px;
     font-size: 16px;
@@ -341,7 +354,7 @@ span.input_label_unit
     background-image: url(https://logos.covalenthq.com/tokens/0xb8c77482e45f1f44de1745f52c74426c631bdd52.png);
 }
 
-.chainbutton_matic
+.chainbutton_polygon
 {
     background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
 }
@@ -441,7 +454,7 @@ span.input_label_unit
 {
     display: flex;
     flex-direction: row;
-    margin: 20px;
+    margin: 26px 18px;
     font-size: 16px;
 }
 
@@ -475,6 +488,29 @@ span.input_label_unit
 
 }
 
+.token_action_but
+{
+    /* display: inline-block; */
+    display: block;
+    background-color: rgb(27, 79, 250);
+    color: rgb(255, 255, 255);
+    font-weight: 100;
+    font-size: 11px;
+    border-radius: 10%;
+    margin-left: 8px;
+    padding: 3px 6px;
+    margin-top: 5px;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.token_action_but:hover
+{
+    color: rgb(225, 225, 115);
+    background-color: rgb(28, 28, 28);
+    border-color: rgb(75, 75, 75);
+}
+
 .minus_address_icon
 {
     background-image: url(../img/minus.png);
@@ -483,7 +519,6 @@ span.input_label_unit
     display: inline-block;
     margin-right: 6px;
     cursor: pointer;
-    margin-bottom: -4px;
 }
 
 .minus_address_icon:hover
@@ -496,13 +531,15 @@ span.input_label_unit
     border: 1px solid rgb(79, 79, 79);
     font-size: 14px;
     font-family: 'lato';
-    width: 77%;
+    width: auto;
     display: inline-block;
     margin: auto;
     background-color: black;
     color: #eee;
     padding: 5px 3px;
     margin: 2px 0;
+    height: 14px;
+    flex: 1;
 }
 
 .inpaddress:hover
@@ -512,13 +549,14 @@ span.input_label_unit
 
 .whichaddress
 {
-    color: rgb(154, 185, 194);
-    font-size: 16px;
-    font-family: monospace;
+    color: yellow;
+    font-size: 20px;
+    font-family: 'titillium';
     display: block;
     text-align: center;
-    /* background-color: black; */
+    background-color: rgba(0.3, 0.3, 0.3, 0.3);
     padding: 8px 0;
+    text-transform: uppercase;
 }
 
 .inputarea
@@ -547,34 +585,34 @@ span.input_label_unit
     width: 200px;
 }
 
-.inputarea button:disabled, #btn_metamask:disabled
+.inputarea button:disabled, .btn_metamask:disabled
 {
     cursor: default;
     color: rgb(151, 151, 151);
 }
 
-.inputarea button:hover:enabled, #btn_metamask:hover:enabled
+.inputarea button:hover:enabled, .btn_metamask:hover:enabled
 {
     
     color: #000;
     background-color: wheat;
 }
 
-.inputarea button:active:enabled, #btn_metamask:active:enabled
+.inputarea button:active:enabled, .btn_metamask:active:enabled
 {
     color: #ffff00;
     background-color: black
 }
 
-#btn_metamask
+.btn_metamask
 {
     background-image: url('../img/metamask.png');
     background-repeat: no-repeat;
-    background-size: cover;
-    padding: 6px;
-    width: 40px;
-    height: 40px;
-    margin-left: 20px;
+    background-size: 30px 30px;
+    padding: 2px;
+    width: 30px !important;
+    height: 30px;
+    margin-left: 20px !important;
 
 }
 
@@ -745,6 +783,15 @@ span.input_label_unit
     height: 12px;
     width: auto;
     margin-left: 10px;
+}
+
+#trade_iframe
+{
+    border: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 520px;
 }
 
 @keyframes loader_spin

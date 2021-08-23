@@ -38,20 +38,32 @@
 
     <div class='leftcol'  >
 
-        <div class='title' ></div>
+        <!-- <div class='title' ></div> -->
 
         <div class='inputarea'>
-            <p>Input addresses:</p>
+            <p>Input address:</p>
             <div class='address_list'>
                 <div class='address_div'>
                     <span class='minus_address_icon' style='visibility: hidden'></span>
                     <input type='text' placeholder="0x..." value="" class='inpaddress' onClick="this.setSelectionRange(0, this.value.length);"  />
+                    <button class='btn_metamask' ></button>
                 </div>
-                <div class='newaddresslink'>Add one more address</div>
+                <div class='newaddresslink'>Add address</div>
             </div>
             <div class="input_buttons">
                 <button id='btn_main_check' >Loading...</button>
-                <button id='btn_metamask' ></button>
+            </div>
+        </div>
+
+        <div class='sample_addrs'>
+            <h4 class='samples_header'>Sample Addresses</h4>
+            
+            <div class='samples'>
+                <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
+                <a href='#' data-addr="0x886F2e91d761BC072F661aCCC925f5180a63a01a">0x886F2e91d761BC072F661aCCC925f5180a63a01a</a>
+                <a href='#' data-addr="0x6003D144C99CC18125571D04853F455EA4E794EB">0x6003D144C99CC18125571D04853F455EA4E794EB</a>
+                <a href='#' data-addr="0x7B6Dd7246DED32265abFc7813d76e5c5da554129">0x7B6Dd7246DED32265abFc7813d76e5c5da554129</a>
+                <a href='#' data-addr="0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716">0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716</a>
             </div>
         </div>
 
@@ -75,31 +87,9 @@
             <div class="loader"><div class="loader-gfx"></div></div>
         </div>
 
-        <div class='sample_addrs'>
-            <h4 class='samples_header'>Sample ETH Mainnet Addresses</h4>
-            
-            <div class='samples_eth'>
-                <a href='#' data-addr="0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6">0x7eb11d64f15d1f20b833cb44c2b6c9c36ba63dc6</a>
-                <a href='#' data-addr="0x886F2e91d761BC072F661aCCC925f5180a63a01a">0x886F2e91d761BC072F661aCCC925f5180a63a01a</a>
-                <a href='#' data-addr="0x4d246bE90C2f36730bb853aD41d0a189061192d3">0x4d246bE90C2f36730bb853aD41d0a189061192d3</a>
-                <a href='#' data-addr="0x6003D144C99CC18125571D04853F455EA4E794EB">0x6003D144C99CC18125571D04853F455EA4E794EB</a>
-            </div>
-        </div>
-
-        <div class='sample_addrs'>
-            <h4 class='samples_header samples_header_bsc'>Sample BSC Addresses</h4>
-            
-            <div class='samples_bsc'>
-                <a href='#' data-addr="0x7B6Dd7246DED32265abFc7813d76e5c5da554129">0x7B6Dd7246DED32265abFc7813d76e5c5da554129</a>
-            </div>
-        </div>
-
-        <div class='sample_addrs'>
-            <h4 class='samples_header samples_header_matic'>Sample Matic Polygon Addresses</h4>
-            
-            <div class='samples_matic'>
-                <a href='#' data-addr="0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716">0xafF33b887aE8a2Ab0079D88EFC7a36eb61632716</a>
-            </div>
+        <div class='swap_container'>
+            <a name='trade'></a>
+            <iframe id='trade_iframe' src=""></iframe>
         </div>
 
     </div>
@@ -109,7 +99,7 @@
         <!-- <div class='chainswitcher_switchrow'>
             <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM MAINNET</div>
             <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART CHAIN</div>
-            <div data-chain='matic' class="chainbutton chainbutton_matic">POLYGON MATIC</div>
+            <div data-chain='polygon' class="chainbutton chainbutton_polygon">POLYGON POLYGON</div>
         </div> -->
 
         <div class='nowloading'>
@@ -123,7 +113,7 @@
         <div class='token_container'>
             <!-- <div > -->
                 <div class='content content_eth' data-chain='eth'>
-                    <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM MAINNET</div>
+                    <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM</div>
                     <h1>Tokens will appear here</h1>
                     <div class='totaldiv' data-chain='eth'>
                         <!-- <div class='totaldiv-label'></div> -->
@@ -157,13 +147,17 @@
                                 <div class='perc'>? %</div>
                             </div>
                         </div>
+                        <div class='token_action_bar'>
+                            <div class='token_action_but token_action_but_explorer'>Explorer</div>
+                            <div class='token_action_but token_action_but_swap'>Swap</div>
+                        </div>
                     </div>
                     <div class="loader"><div class="loader-gfx"></div></div>
                 </div>
             <!-- </div> -->
             <div >
                 <div class='content content_bsc' data-chain='bsc' >
-                    <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART CHAIN</div>
+                    <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE</div>
                     <div class='totaldiv' data-chain='bsc'>
                         <div class='totaldiv-label'>Total value</div>
                         <div class='totaldiv-val-container'>
@@ -176,9 +170,9 @@
                     </div>
                     <div class="loader"><div class="loader-gfx"></div></div>
                 </div>
-                <div class='content content_matic' data-chain='matic'>
-                    <div data-chain='matic' class="chainbutton chainbutton_matic">POLYGON MATIC</div>
-                    <div class='totaldiv' data-chain='matic'>
+                <div class='content content_polygon' data-chain='polygon'>
+                    <div data-chain='polygon' class="chainbutton chainbutton_polygon">POLYGON</div>
+                    <div class='totaldiv' data-chain='polygon'>
                         <div class='totaldiv-label'>Total value</div>
                         <div class='totaldiv-val-container'>
                             <div class='coin_vals'>

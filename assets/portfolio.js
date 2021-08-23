@@ -27,7 +27,7 @@ let ui = {};
 let gasdata = null;
 const DISABLE_METAMASK = false;
 
-const ANUBIS_VERSION_NUM = "0.2.0004";
+const ANUBIS_VERSION_NUM = "0.2.0021";
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
@@ -35,33 +35,23 @@ document.addEventListener("DOMContentLoaded", function(event)
 
     ui.checkButton         = document.querySelector("#btn_main_check");
     ui.checkButton.disabled = true;
-
-    (async function fetchAsyncs()
-    {
-        // coingecko_ids    = await fetchJson("https://api.coingecko.com/api/v3/coins/list?include_platform=false");
-        // erc20ABI         = await fetchJson("../erc20abi.json");
-        // allUniswapTokens = await fetchJson("https://tokens.coingecko.com/uniswap/all.json");
-        // const rpcURLmainnet = await (await fetch("https://templeosiris.herokuapp.com/infuraethurl")).text();
-        // window.web3 = new Web3(rpcURLmainnet);
-        ui.checkButton.innerText = "Check";
-        ui.checkButton.disabled = false;
-    })();
-
+    ui.checkButton.innerText = "Check";
+    ui.checkButton.disabled = false;
     ui.content_eth         = document.querySelector('.content_eth');
     ui.content_bsc         = document.querySelector('.content_bsc');
-    ui.content_matic       = document.querySelector('.content_matic');
+    ui.content_polygon       = document.querySelector('.content_polygon');
     ui.totalDivElem_eth    = ui.content_eth.querySelector('.totaldiv');
     ui.totalValElem_eth    = ui.content_eth.querySelector(".totaldiv-val");
     ui.totalDivElem_bsc    = ui.content_bsc.querySelector('.totaldiv');
     ui.totalValElem_bsc    = ui.content_bsc.querySelector(".totaldiv-val");
-    ui.totalDivElem_matic  = ui.content_matic.querySelector('.totaldiv');
-    ui.totalValElem_matic  = ui.content_matic.querySelector(".totaldiv-val");
+    ui.totalDivElem_polygon  = ui.content_polygon.querySelector('.totaldiv');
+    ui.totalValElem_polygon  = ui.content_polygon.querySelector(".totaldiv-val");
     ui.totalDivElem_eth.style.display = "none";
     ui.totalDivElem_bsc.style.display = "none";
-    ui.totalDivElem_matic.style.display = "none";
+    ui.totalDivElem_polygon.style.display = "none";
     document.querySelector(".content_eth .loader").style.display = "none";
     document.querySelector(".content_bsc .loader").style.display = "none";
-    document.querySelector(".content_matic .loader").style.display = "none";
+    document.querySelector(".content_polygon .loader").style.display = "none";
     
     ui.splashscreen          = document.querySelector('.splashscreen');
     ui.splashscreen.style.opacity = "1.0";
@@ -92,20 +82,18 @@ document.addEventListener("DOMContentLoaded", function(event)
     ui.mainPlaceholderLabel= document.querySelector(".maincolumn h1");
     ui.divTotalBTCvalue    = document.querySelector(".tot_btcv");
     ui.divTotalETHvalue    = document.querySelector(".tot_ethv"); 
-    ui.btn_metamask        = document.querySelector("#btn_metamask"); 
+    ui.btn_metamask        = document.querySelector(".btn_metamask"); 
     ui.divAddress_list     = document.querySelector(".address_list"); 
     ui.baseAddressElement  = document.querySelectorAll(".address_div")[0]; 
     ui.newaddresslink      = document.querySelector(".newaddresslink");
     ui.contents            = document.querySelectorAll(".content"); 
     ui.unitLabel           = document.querySelectorAll(".input_label_unit");
 
-    ui.divSamplesEth       = document.querySelector(".samples_eth");
-    ui.divSamplesBsc       = document.querySelector(".samples_bsc");
-    ui.divSamplesMatic     = document.querySelector(".samples_matic");
+    ui.divSamples          = document.querySelector(".samples");
 
     ui.chainbuttonETH      = document.querySelector(".chainbutton_eth");
     ui.chainbuttonBSC      = document.querySelector(".chainbutton_bsc");
-    ui.chainbuttonMATIC    = document.querySelector(".chainbutton_matic");
+    ui.chainbuttonPOLYGON    = document.querySelector(".chainbutton_polygon");
 
     ui.whichaddressElem    = document.querySelector(".whichaddress");
 
@@ -181,10 +169,20 @@ document.addEventListener("DOMContentLoaded", function(event)
 async function fillInGasPrices()
 {
     gasdata = await fetchJson(`https://templeosiris.herokuapp.com/gas`);
-    document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.SafeGasPrice;
-    document.querySelector(".modgas .gas").innerHTML = ""+gasdata.ProposeGasPrice;
-    document.querySelector(".fastgas .gas").innerHTML = ""+gasdata.FastGasPrice;
-    document.querySelector(".uniswapcost .gas").innerHTML = ""+gasdata.uniswapCostInUSD;
+    if (gasdata != null)
+    {
+        document.querySelector(".cheapgas .gas").innerHTML = ""+gasdata.SafeGasPrice;
+        document.querySelector(".modgas .gas").innerHTML = ""+gasdata.ProposeGasPrice;
+        document.querySelector(".fastgas .gas").innerHTML = ""+gasdata.FastGasPrice;
+        document.querySelector(".uniswapcost .gas").innerHTML = ""+gasdata.uniswapCostInUSD;
+    }
+    else
+    {
+        document.querySelector(".cheapgas .gas").innerHTML = "?";
+        document.querySelector(".modgas .gas").innerHTML = "?";
+        document.querySelector(".fastgas .gas").innerHTML = "?";
+        document.querySelector(".uniswapcost .gas").innerHTML = "?";
+    }
     document.querySelector(".eth_gas_box .loader").style.visibility = "hidden";
     
     //console.log(gasdata);
@@ -324,16 +322,16 @@ async function buildPortfolio() //addr is now an array
     let addrs = getAllInputAddresses();
     saveDataToLocalStorage(addrs);
 
-    ui.whichaddressElem.innerHTML = `Assets of address:<br />${addrs[0]}`;
+    ui.whichaddressElem.innerHTML = `ADDRESS: &nbsp; ${addrs[0]}`;
 
     // uiCache.chainswitcher_switchrow.style.visibility = "hidden";
 
     ui.totalDivElem_eth.style.display = "none";
     ui.totalDivElem_bsc.style.display = "none";
-    ui.totalDivElem_matic.style.display = "none";
+    ui.totalDivElem_polygon.style.display = "none";
     document.querySelector(".content_eth .loader").style.display = "flex";
     document.querySelector(".content_bsc .loader").style.display = "flex";
-    document.querySelector(".content_matic .loader").style.display = "flex";
+    document.querySelector(".content_polygon .loader").style.display = "flex";
     
     ui.mainPlaceholderLabel.style.display = "none";
     
@@ -360,10 +358,10 @@ async function buildPortfolio() //addr is now an array
 
     let resp = await fetchJson(`https://templeosiris.herokuapp.com/tokens?chain=ETH&addr=${addrs[0]}`);
 
-    if (!resp || !resp.items || !resp.items.length)
+    if (!resp || resp == null || !resp.items || !resp.items.length)
     {
         console.error(`Error: Problem with ETH chain poll`, resp);
-        ui.content_eth.innerHTML = "Network error, try again.";
+        ui.content_eth.innerHTML = "Address problem, try again.";
         
     }
     else 
@@ -386,7 +384,7 @@ async function buildPortfolio() //addr is now an array
             total_address_val_eth += parseFloat(token.eth_value_total);
             total_address_val_btc += parseFloat(token.btc_value_total);
 
-            div_elem = ui_addTokenDiv("ETH", token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, null); //token.anubislogo
+            div_elem = ui_addTokenDiv("ETH", token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
 
             div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(parseFloat(token.eth_value_total).toFixed(2))}`;
             div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
@@ -401,6 +399,22 @@ async function buildPortfolio() //addr is now an array
             // if (percent < 0)    div_elem.querySelector('.usdchange').classList.add("losses");
             // div_elem.querySelector('.usdchange').innerText  = (percent > 0) ? ("+"+percent+"%") : (percent+"%");
             // div_elem.querySelector('.usdchange').dataset.val = percent;
+
+            div_elem.querySelector('.token_action_but_explorer').addEventListener("click", function(event)
+            {
+                window.open(`https://etherscan.io/token/${token.contract_address}`, "_blank");
+                    
+            });
+            div_elem.querySelector('.token_action_but_swap').addEventListener("click", function(event)
+            {
+                location.hash = "#trade"; 
+                document.querySelector("#trade_iframe").src = "about:blank";
+                setTimeout(async function()
+                {
+                    document.querySelector("#trade_iframe").src = `https://app.uniswap.org/#/swap?inputCurrency=${token.contract_address}&outputCurrency=${token.contract_address}`;     
+                }, 300);
+            });
+            
             
             prevElement.after(div_elem);
             prevElement = div_elem;
@@ -410,7 +424,7 @@ async function buildPortfolio() //addr is now an array
     ui.totalValElem_eth.innerText = `$ ${numberWithCommas(parseFloat(total_address_val_usd).toFixed(2))}`;
     ui.totalValElem_eth.dataset.val = total_address_val_usd;
     //uiCache.totalValElem_bsc.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
-    //uiCache.totalValElem_matic.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
+    //uiCache.totalValElem_polygon.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
 
     ui.nowloadingElem.style.display = "none";
     
@@ -430,7 +444,7 @@ async function buildPortfolio() //addr is now an array
     // ui_sortTokenDivs(chain);
 
     await pollAddressTokens("BSC", addrs[0], async function(){
-        await pollAddressTokens("MATIC", addrs[0], function(){
+        await pollAddressTokens("POLYGON", addrs[0], function(){
         
         });
     });
@@ -461,7 +475,7 @@ function uiAddAddressBox(_inp)
 //     let contentBase;
 //     if (chain == "eth")   contentBase = uiCache.content_eth;
 //     if (chain == "bsc")   contentBase = uiCache.content_bsc;
-//     if (chain == "matic") contentBase = uiCache.content_matic;
+//     if (chain == "polygon") contentBase = uiCache.content_polygon;
 
 //     let tokenDivEntries = contentBase.querySelectorAll('.tokenp');
 //     let orderedList = [];
@@ -481,7 +495,7 @@ function uiAddAddressBox(_inp)
 //     let myvalElem;
 //     if (chain == "eth")   myvalElem = uiCache.totalValElem_eth;
 //     if (chain == "bsc")   myvalElem = uiCache.totalValElem_bsc;
-//     if (chain == "matic") myvalElem = uiCache.totalValElem_matic;
+//     if (chain == "polygon") myvalElem = uiCache.totalValElem_polygon;
 
 //     //resinsert divs sorted
 //     //also calc percentages
@@ -502,7 +516,7 @@ function uiAddAddressBox(_inp)
         
 //         if (chain == "eth")   uiCache.chainbuttonETH.after(e);
 //         if (chain == "bsc")   uiCache.chainbuttonBSC.after(e);
-//         if (chain == "matic") uiCache.chainbuttonMATIC.after(e);
+//         if (chain == "polygon") uiCache.chainbuttonPOLYGON.after(e);
 //     }
 // }
 
@@ -531,20 +545,27 @@ function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain 
     clone.querySelector('.token_total').innerText  = numberWithCommas(_token_total.toFixed(2)) + " " + _symbol;
     clone.querySelector('.tokenname').innerText  = _name;
     if (_icon)
-        clone.querySelector('.tokenicon').style.backgroundImage = `url('${ETHEREUM_ICON_BASE64}')`;
+    {
+        if (_icon != "ETHEREUM")
+        {
+            // console.log("Setting icon for ", _symbol, "to", _icon, clone.querySelector('.tokenicon').style.backgroundImage);
+            clone.querySelector('.tokenicon').style.backgroundImage = `url('${_icon}')`;   
+            clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
+        }
+        else
+        {
+            clone.querySelector('.tokenicon').style.backgroundImage = `url('${ETHEREUM_ICON_BASE64}')`;   
+        } 
+    }
     else
     {
-        if (_icon == "ETHEREUM")
-            clone.querySelector('.tokenicon').style.backgroundImage = `url('${_icon}')`;
-        else 
-            clone.querySelector('.tokenicon').innerText = `${_symbol.toUpperCase().substring(0, 3)}`;   
+        clone.querySelector('.tokenicon').innerText = `${_symbol.toUpperCase().substring(0, 3)}`;   
     }
     clone.style.visibility = "visible";
 
-
-    if (chain == "eth")   ui.chainbuttonETH.after(clone);
-    if (chain == "bsc")   ui.chainbuttonBSC.after(clone);
-    if (chain == "matic") ui.chainbuttonMATIC.after(clone);
+    if (chain == "ETH")   ui.chainbuttonETH.after(clone);
+    if (chain == "BSC")   ui.chainbuttonBSC.after(clone);
+    if (chain == "POLYGON") ui.chainbuttonPOLYGON.after(clone);
 
     return clone;
 }
@@ -568,10 +589,10 @@ async function pollAddressTokens(_chain, _address, callback)
         totalbox =  ui.totalDivElem_bsc;
         explorer = "bscscan";
     }
-    else if (_chain == "MATIC") 
+    else if (_chain == "POLYGON") 
     {
-        content_box = ui.content_matic;
-        totalbox =  ui.totalDivElem_matic;
+        content_box = ui.content_polygon;
+        totalbox =  ui.totalDivElem_polygon;
         explorer = "polygonscan";
     }
 
@@ -579,7 +600,7 @@ async function pollAddressTokens(_chain, _address, callback)
     let resp = await fetchJson(url);
     // console.log(resp);
 
-    if (!resp || !resp.items || !resp.items.length)
+    if (!resp || resp == null || !resp.items || !resp.items.length)
     {
         console.error(`Error: Problem with ${_chain} chain poll`, resp);
         ui.content_box.innerHTML = "Network error, try again.";
@@ -588,6 +609,7 @@ async function pollAddressTokens(_chain, _address, callback)
     {
         let coins = resp.items;
         let strhtml = "";
+        console.log(resp);
         for (let i = 0; i < coins.length; i++)
         {
             const c = coins[i];
@@ -597,7 +619,11 @@ async function pollAddressTokens(_chain, _address, callback)
             strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 8px; padding-bottom: 8px;' >`;
             strhtml += `<p><div class='tokenicon' >${c.contract_ticker_symbol.toUpperCase().substring(0, 3)}</div> ${c.contract_name}</p>`;
             strhtml += `<div>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</div>`;
-            strhtml += `<a class='explorer_link' href='https://${explorer}.com/token/${c.contract_address.toLowerCase()}' target='_blank'>${explorer.toUpperCase()} <img src='../img/link.svg' class='explorer_icon' /></a>`;
+            strhtml += `<div class='token_action_bar'>
+                <div class='token_action_but token_action_but_explorer'>Explorer</div>
+                <div class='token_action_but token_action_but_swap'>Swap</div>
+            </div>`;
+            //strhtml += `<a class='explorer_link' href='https://${explorer}.com/token/${c.contract_address.toLowerCase()}' target='_blank'>${explorer.toUpperCase()} <img src='../img/link.svg' class='explorer_icon' /></a>`;
             strhtml += "</div>";
         }
         content_box.innerHTML += strhtml;
@@ -606,7 +632,7 @@ async function pollAddressTokens(_chain, _address, callback)
 
     if (_chain == "ETH")            document.querySelector(".content_eth .loader").style.display = "none";
     else if (_chain == "BSC")       document.querySelector(".content_bsc .loader").style.display = "none";
-    else if (_chain == "MATIC")     document.querySelector(".content_matic .loader").style.display = "none";
+    else if (_chain == "POLYGON")     document.querySelector(".content_polygon .loader").style.display = "none";
 
     callback();
 
@@ -620,7 +646,16 @@ async function fetchJson(query)
     // let _response = await fetch(query); 
     // if (_response.ok) return await _response.json();
     // else return null;
-    return await (await fetch(query)).json();
+    let res = await fetch(query);
+    if (!res.ok) {
+        console.log("ERROR FETCHING ", res.status);
+        console.log(res);
+        return null;
+    }
+    else
+    {
+        return await (res).json();
+    }
 }
 
 function numberWithCommas(x) {

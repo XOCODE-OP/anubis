@@ -8,25 +8,48 @@
 
         async function dodo()
         {
-            let result = await fetch("https://templeosiris.herokuapp.com/etherscan");
-            let rr1 = await result.text();
-            console.log("etherscan:", rr1);
+            // let res = await fetch("api.covalenthq.com/v1/1/address/0x4d246bE90C2f36730bb853aD41d0a189061192d3/balances_v2/?key=ckey_28a87c5cf5eb40b282dbeb9778f").json();
+            // if (!res.ok) {
+            //             //throw new Error(); // Will take you to the `catch` below
+            //             console.log("ERROR ", res.status);
+            //             console.log(res);
+            //         }
 
-            let result2 = await fetch("https://templeosiris.herokuapp.com/infuraethurl");
-            let rr2 = await result2.text();
-            console.log("infura eth url:", rr2);
+            // let result = await fetch("api.covalenthq.com/v1/1/address/0x4d246bE90C2f36730bb853aD41d0a189061192d3/balances_v2/?key=ckey_28a87c5cf5eb40b282dbeb9778f");
+            // console.log(result);
+            // let rr1 = await result.text();
+            // console.log("r:", rr1);
 
-            let result3 = await fetch("https://templeosiris.herokuapp.com/infuraethrinkebyurl");
-            let rr3 = await result3.text();
-            console.log("infura eth rinkeby url:", rr3);
+            // const promise = fetch("api.covalenthq.com/v1/1/address/0x4d246bE90C2f36730bb853aD41d0a189061192d3/balances_v2/?key=ckey_28a87c5cf5eb40b282dbeb9778f")
+            //     .then(res => {
+            //         if (!res.ok) {
+            //             //throw new Error(); // Will take you to the `catch` below
+            //             console.log("ERROR ", res.status);
+            //             console.log(res);
+            //         }
+            //         return res.json();
+            //     })
+            //     .then(console.log)
+            //     .catch(error => {
+            //         // Do something useful with the error
+            //         console.error(error);
+            //     });
 
-            let result4 = await fetch("https://templeosiris.herokuapp.com/cova_bsc?addr=0x7B6Dd7246DED32265abFc7813d76e5c5da554129");
-            let rr4 = await result4.text();
-            console.log("cova key:", rr4);
+            // let result2 = await fetch("https://templeosiris.herokuapp.com/infuraethurl");
+            // let rr2 = await result2.text();
+            // console.log("infura eth url:", rr2);
 
-            let result5 = await fetch("https://templeosiris.herokuapp.com/ext");
-            let rr5 = await result5.text();
-            console.log("ext:", rr5);
+            // let result3 = await fetch("https://templeosiris.herokuapp.com/infuraethrinkebyurl");
+            // let rr3 = await result3.text();
+            // console.log("infura eth rinkeby url:", rr3);
+
+            // let result4 = await fetch("https://templeosiris.herokuapp.com/cova_bsc?addr=0x7B6Dd7246DED32265abFc7813d76e5c5da554129");
+            // let rr4 = await result4.text();
+            // console.log("cova key:", rr4);
+
+            // let result5 = await fetch("https://templeosiris.herokuapp.com/ext");
+            // let rr5 = await result5.text();
+            // console.log("ext:", rr5);
         }
         dodo();
 
