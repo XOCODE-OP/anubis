@@ -22,6 +22,7 @@ const STORAGE_KEY = "anubis_assets";
 // let web3 = new Web3(rpcURLmainnet);
 const regexETH = new RegExp('^0x[a-fA-F0-9]{40}$');
 let baseTokenElement;
+let baseSmallTokenElement;
 let ui = {};
 // let current_chain = "eth";
 let gasdata = null;
@@ -42,13 +43,11 @@ document.addEventListener("DOMContentLoaded", function(event)
     ui.content_polygon       = document.querySelector('.content_polygon');
     ui.totalDivElem_eth    = ui.content_eth.querySelector('.totaldiv');
     ui.totalValElem_eth    = ui.content_eth.querySelector(".totaldiv-val");
-    ui.totalDivElem_bsc    = ui.content_bsc.querySelector('.totaldiv');
-    ui.totalValElem_bsc    = ui.content_bsc.querySelector(".totaldiv-val");
-    ui.totalDivElem_polygon  = ui.content_polygon.querySelector('.totaldiv');
-    ui.totalValElem_polygon  = ui.content_polygon.querySelector(".totaldiv-val");
+    ui.totalDivElem_bsc    = ui.content_bsc.querySelector('.smalltotaldiv');
+    ui.totalDivElem_polygon  = ui.content_polygon.querySelector('.smalltotaldiv');
     ui.totalDivElem_eth.style.display = "none";
-    ui.totalDivElem_bsc.style.display = "none";
-    ui.totalDivElem_polygon.style.display = "none";
+    ui.totalDivElem_bsc.style.visibility = "hidden";
+    ui.totalDivElem_polygon.style.visibility = "hidden";
     document.querySelector(".content_eth .loader").style.display = "none";
     document.querySelector(".content_bsc .loader").style.display = "none";
     document.querySelector(".content_polygon .loader").style.display = "none";
@@ -74,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function(event)
     ui.nowloadingElem           = document.querySelector(".nowloading");
     // uiCache.chainswitcher_switchrow  = document.querySelector(".chainswitcher_switchrow");
 
-    baseTokenElement    = document.querySelector('.tokenp');
     ui.refresherbuttonElem = document.querySelector(".refresherbutton");
     ui.inputArea           = document.querySelector(".inputarea");
     ui.inputbarElem        = document.querySelector(".inpaddress");
@@ -98,9 +96,16 @@ document.addEventListener("DOMContentLoaded", function(event)
     ui.whichaddressElem    = document.querySelector(".whichaddress");
 
     ui.nowloadingElem.style.display = "none";
-    baseTokenElement.style.visibility = "hidden";
 
-    if (!window.ethereum || DISABLE_METAMASK) ui.btn_metamask.parentNode.removeChild(ui.btn_metamask);
+    let removerBaseToken   = document.querySelector('.tokenp');
+    baseTokenElement       = removerBaseToken.cloneNode(true);
+    removerBaseToken.remove();
+
+    let removerBaseSmallToken   = document.querySelector('.smalltoken');
+    baseSmallTokenElement       = removerBaseSmallToken.cloneNode(true);
+    removerBaseSmallToken.remove();
+
+    if (!window.ethereum || DISABLE_METAMASK) ui.btn_metamask.remove(ui.btn_metamask);
 
     ui.inputbarElem.addEventListener("keyup", function(event)
     {
@@ -130,8 +135,6 @@ document.addEventListener("DOMContentLoaded", function(event)
             buildPortfolio();
         });
     }
-
-    baseTokenElement.parentNode.removeChild(baseTokenElement);
 
     ui.btn_metamask.addEventListener("click", function (event)
     {
@@ -327,8 +330,8 @@ async function buildPortfolio() //addr is now an array
     // uiCache.chainswitcher_switchrow.style.visibility = "hidden";
 
     ui.totalDivElem_eth.style.display = "none";
-    ui.totalDivElem_bsc.style.display = "none";
-    ui.totalDivElem_polygon.style.display = "none";
+    ui.totalDivElem_bsc.style.visibility = "hidden";
+    ui.totalDivElem_polygon.style.visibility = "hidden";
     document.querySelector(".content_eth .loader").style.display = "flex";
     document.querySelector(".content_bsc .loader").style.display = "flex";
     document.querySelector(".content_polygon .loader").style.display = "flex";
@@ -384,7 +387,7 @@ async function buildPortfolio() //addr is now an array
             total_address_val_eth += parseFloat(token.eth_value_total);
             total_address_val_btc += parseFloat(token.btc_value_total);
 
-            div_elem = ui_addTokenDiv("ETH", token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
+            div_elem = addUITokenETH(token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
 
             div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(parseFloat(token.eth_value_total).toFixed(2))}`;
             div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
@@ -535,9 +538,8 @@ function getAllInputAddresses()
     return all;
 }
 
-function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain to ensure multi polling
+function addUITokenETH(_name, _symbol, _token_total, _icon) //add chain to ensure multi polling
 {
-    // console.log(`ui_addTokenDiv with ${chain} ${_name} ${_symbol} ${_token_total} ${_icon}`);
     let clone = baseTokenElement.cloneNode(true);
     //clone.id = 'elem2';
     clone.className += " cloned "+_symbol;
@@ -562,10 +564,7 @@ function ui_addTokenDiv(chain, _name, _symbol, _token_total, _icon) //add chain 
         clone.querySelector('.tokenicon').innerText = `${_symbol.toUpperCase().substring(0, 3)}`;   
     }
     clone.style.visibility = "visible";
-
-    if (chain == "ETH")   ui.chainbuttonETH.after(clone);
-    if (chain == "BSC")   ui.chainbuttonBSC.after(clone);
-    if (chain == "POLYGON") ui.chainbuttonPOLYGON.after(clone);
+    ui.chainbuttonETH.after(clone);
 
     return clone;
 }
@@ -575,25 +574,22 @@ async function pollAddressTokens(_chain, _address, callback)
     _chain = _chain.toUpperCase();
     let content_box;
     let totalbox;
+    let swapurl = "";
     let url = `https://templeosiris.herokuapp.com/tokens?chain=${_chain}&addr=${_address}`;
     let explorer;
-    if (_chain == "ETH")   
-    {
-        content_box = ui.content_eth;
-        totalbox =  ui.totalDivElem_eth;
-        explorer = "etherscan";
-    }
-    else if (_chain == "BSC")   
+    if (_chain == "BSC")   
     {
         content_box = ui.content_bsc;
         totalbox =  ui.totalDivElem_bsc;
         explorer = "bscscan";
+        swapurl = "https://pancakeswap.finance/swap#/swap";
     }
     else if (_chain == "POLYGON") 
     {
         content_box = ui.content_polygon;
         totalbox =  ui.totalDivElem_polygon;
         explorer = "polygonscan";
+        swapurl = "https://quickswap.exchange/#/swap";
     }
 
     ui.mainPlaceholderLabel.style.visibility = "hidden";
@@ -608,34 +604,55 @@ async function pollAddressTokens(_chain, _address, callback)
     else 
     {
         let coins = resp.items;
-        let strhtml = "";
         console.log(resp);
+        let subtotal = 0;
+        let subtotalETH = 0.0;
+        let subtotalBTC = 0.0;
         for (let i = 0; i < coins.length; i++)
         {
             const c = coins[i];
-            if (c.type == "dust") continue;
+            if (c == null || c.type == "dust") continue;
             c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
+            subtotal+=parseFloat(c.quote);
 
-            strhtml += `<div class='token_o' data-contraddr='${c.contract_address}' style='margin-bottom: 8px; padding-bottom: 8px;' >`;
-            strhtml += `<p><div class='tokenicon' >${c.contract_ticker_symbol.toUpperCase().substring(0, 3)}</div> ${c.contract_name}</p>`;
-            strhtml += `<div>${c.fraction_balance.toFixed(4)} ${c.contract_ticker_symbol}</div>`;
-            strhtml += `<div class='token_action_bar'>
-                <div class='token_action_but token_action_but_explorer'>Explorer</div>
-                <div class='token_action_but token_action_but_swap'>Swap</div>
-            </div>`;
-            //strhtml += `<a class='explorer_link' href='https://${explorer}.com/token/${c.contract_address.toLowerCase()}' target='_blank'>${explorer.toUpperCase()} <img src='../img/link.svg' class='explorer_icon' /></a>`;
-            strhtml += "</div>";
+            let clone = baseSmallTokenElement.cloneNode(true);
+            clone.className += " cloned "+c.contract_ticker_symbol.toUpperCase();
+            clone.dataset.contract = ``;
+            clone.dataset.usdval = ``;
+            clone.querySelector(".tokenicon").innerText = `${c.contract_ticker_symbol.toUpperCase().substring(0, 3)}`;
+            // console.log(clone);
+            clone.querySelector(".smalltoken-name").innerText = ` ${c.contract_name}`;
+            clone.querySelector(".smalltoken-usd").innerText = `$${numberWithCommas(parseFloat(c.quote).toFixed(2))}`;
+            clone.querySelector(".smalltoken-coins").innerText = ` [ ${numberWithCommas(c.fraction_balance.toFixed(2))}  ${c.contract_ticker_symbol.toUpperCase()}] `;
+            clone.querySelector('.token_action_but_explorer').addEventListener("click", function(event)
+            {
+                window.open(`https://${explorer}.com/token/${c.contract_address.toLowerCase()}`, "_blank");
+            });
+            clone.querySelector('.token_action_but_swap').addEventListener("click", function(event)
+            {
+                location.hash = "#trade"; 
+                document.querySelector("#trade_iframe").src = "about:blank";
+                setTimeout(async function()
+                {
+                    document.querySelector("#trade_iframe").src = `${swapurl}?inputCurrency=${c.contract_address}&outputCurrency=${c.contract_address}`;     
+                }, 300);
+            });
+            if (_chain == "BSC")            document.querySelector(".content_bsc .loader").before(clone);
+            else if (_chain == "POLYGON")   document.querySelector(".content_polygon .loader").before(clone);
         }
-        content_box.innerHTML += strhtml;
-        totalbox.style.display = "flex";
+        //totalbox.style.display = "flex";
+
+        totalbox.querySelector(".smallttot_btcv").innerText = `BTC ${numberWithCommas(subtotalBTC.toFixed(2))}`;
+        totalbox.querySelector(".smallttot_ethv").innerText = `ETH ${numberWithCommas(subtotalETH.toFixed(2))}`;
+        totalbox.querySelector(".smalltotaldiv-usdtotal").innerText = `$ ${numberWithCommas(subtotal.toFixed(2))}`;
+        totalbox.style.visibility = "visible";
+        
     }
 
-    if (_chain == "ETH")            document.querySelector(".content_eth .loader").style.display = "none";
-    else if (_chain == "BSC")       document.querySelector(".content_bsc .loader").style.display = "none";
-    else if (_chain == "POLYGON")     document.querySelector(".content_polygon .loader").style.display = "none";
+    if (_chain == "BSC")             document.querySelector(".content_bsc .loader").style.display = "none";
+    else if (_chain == "POLYGON")    document.querySelector(".content_polygon .loader").style.display = "none";
 
     callback();
-
 }
 
 //filter helper
