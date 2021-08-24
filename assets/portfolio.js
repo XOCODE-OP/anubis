@@ -338,7 +338,7 @@ async function buildPortfolio() //addr is now an array
     
     ui.mainPlaceholderLabel.style.display = "none";
     
-    let listofdivs = document.querySelectorAll('.tokenp, .token_o');
+    let listofdivs = document.querySelectorAll('.tokenp, .token_o, .smalltoken');
     for (let i = 0; i < listofdivs.length; i++)
     {
         listofdivs[i].parentNode.removeChild(listofdivs[i]);
@@ -353,12 +353,6 @@ async function buildPortfolio() //addr is now an array
 
     //keys are the eth input address, values are token contract addrs
 
-    let total_address_val_usd = 0;
-    let total_address_val_eth = 0;
-    let total_address_val_btc = 0;
-    let ethprice = null;
-    let btcprice = null;
-
     let resp = await fetchJson(`https://templeosiris.herokuapp.com/tokens?chain=ETH&addr=${addrs[0]}`);
 
     if (!resp || resp == null || !resp.items || !resp.items.length)
@@ -371,8 +365,6 @@ async function buildPortfolio() //addr is now an array
     {
         let coins = resp;
         // let strhtml = "";
-        ethprice = coins.ethprice;
-        btcprice = coins.btcprice;
         let prevElement = ui.totalDivElem_eth;
         for (let i = 0; i < coins.items.length; i++)
         {
@@ -382,10 +374,7 @@ async function buildPortfolio() //addr is now an array
             let div_elem;
             if (token.balance <= 0) continue;
 
-            total_address_val_usd += parseInt(token.usd_value_total);
             // console.log(`${token.contract_ticker_symbol}  adding ${parseFloat(token.eth_value_total)}  ${token.eth_value_total}`)
-            total_address_val_eth += parseFloat(token.eth_value_total);
-            total_address_val_btc += parseFloat(token.btc_value_total);
 
             div_elem = addUITokenETH(token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
 
@@ -422,19 +411,16 @@ async function buildPortfolio() //addr is now an array
             prevElement.after(div_elem);
             prevElement = div_elem;
         }
+        ui.totalValElem_eth.innerText = `$ ${numberWithCommas(parseFloat(coins.totalusd).toFixed(2))}`;
+        //uiCache.totalValElem_bsc.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
+        //uiCache.totalValElem_polygon.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
+
+        ui.nowloadingElem.style.display = "none";
+        
+        ui.divTotalETHvalue.innerText = `ETH ${numberWithCommas(parseFloat(coins.totaleth).toFixed(2))}`;
+        ui.divTotalBTCvalue.innerText = `BTC ${numberWithCommas(parseFloat(coins.totalbtc).toFixed(2))}`;
     }
 
-    ui.totalValElem_eth.innerText = `$ ${numberWithCommas(parseFloat(total_address_val_usd).toFixed(2))}`;
-    ui.totalValElem_eth.dataset.val = total_address_val_usd;
-    //uiCache.totalValElem_bsc.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
-    //uiCache.totalValElem_polygon.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
-
-    ui.nowloadingElem.style.display = "none";
-    
-    ui.divTotalETHvalue.dataset.val = total_address_val_eth;
-    ui.divTotalETHvalue.innerText = `ETH ${numberWithCommas(total_address_val_eth.toFixed(2))}`;
-    ui.divTotalBTCvalue.dataset.val = total_address_val_btc;
-    ui.divTotalBTCvalue.innerText = `BTC ${numberWithCommas(total_address_val_btc.toFixed(2))}`;
 
     ui.checkButton.disabled = false;
     ui.btn_metamask.disabled = false;
@@ -446,9 +432,20 @@ async function buildPortfolio() //addr is now an array
     // uiCache.chainswitcher_switchrow.style.visibility = "visible";
     // ui_sortTokenDivs(chain);
 
-    await pollAddressTokens("BSC", addrs[0], async function(){
-        await pollAddressTokens("POLYGON", addrs[0], function(){
+    let ethResponse = resp;
+
+    await pollAddressTokens("BSC", addrs[0], async function(bscResp)
+    {
+        await pollAddressTokens("POLYGON", addrs[0], function(polygonResp)
+        {
+            let crossChainUSD = numberWithCommas((parseFloat(ethResponse.totalusd) + parseFloat(bscResp.totalusd) + parseFloat(polygonResp.totalusd)).toFixed(2));
+            let crossChainETH = numberWithCommas((parseFloat(ethResponse.totaleth) + parseFloat(bscResp.totaleth) + parseFloat(polygonResp.totaleth)).toFixed(2));
+            let crossChainBTC = numberWithCommas((parseFloat(ethResponse.totalbtc) + parseFloat(bscResp.totalbtc) + parseFloat(polygonResp.totalbtc)).toFixed(2));
         
+            document.querySelector(".cross_chain_total-usd").innerText = "$ "+crossChainUSD;
+            document.querySelector(".cross_chain_total-eth").innerText = "ETH "+crossChainETH;
+            document.querySelector(".cross_chain_total-btc").innerText = "BTC "+crossChainBTC;
+
         });
     });
 }
@@ -473,55 +470,11 @@ function uiAddAddressBox(_inp)
     ui.newaddresslink.before(_clone);
 }
 
-// function ui_sortTokenDivs(chain)
-// {
-//     let contentBase;
-//     if (chain == "eth")   contentBase = uiCache.content_eth;
-//     if (chain == "bsc")   contentBase = uiCache.content_bsc;
-//     if (chain == "polygon") contentBase = uiCache.content_polygon;
-
-//     let tokenDivEntries = contentBase.querySelectorAll('.tokenp');
-//     let orderedList = [];
-//     for (let i = 0; i < tokenDivEntries.length; i++)
-//     {
-//         let e = tokenDivEntries[i];
-//         orderedList.push(e);
-//         e.parentNode.removeChild(e);
-//     }
-
 //     orderedList.sort(function(a, b)
 //     {
 //         return parseFloat(a.querySelector('.usd_value').dataset.val) - 
 //         parseFloat(b.querySelector('.usd_value').dataset.val);
 //     });
-
-//     let myvalElem;
-//     if (chain == "eth")   myvalElem = uiCache.totalValElem_eth;
-//     if (chain == "bsc")   myvalElem = uiCache.totalValElem_bsc;
-//     if (chain == "polygon") myvalElem = uiCache.totalValElem_polygon;
-
-//     //resinsert divs sorted
-//     //also calc percentages
-//     let totalval = parseFloat(myvalElem.dataset.val);
-//     for (let i = 0; i < orderedList.length; i++)
-//     {
-//         let e = orderedList[i];
-//         let myval = parseFloat(e.querySelector('.usd_value').dataset.val);
-//         //(small / total) * 100 = percent
-//         let perc = ((myval / totalval) * 100.0);
-//         let percdiv = e.querySelector('.perc');
-//         percdiv.dataset.val = perc;
-//         e.dataset.percval = perc;
-//         percdiv.innerText = perc.toFixed(1) + "%";
-//         percdiv.title = `${perc.toFixed(1)}% of your portfolio's USD value`;
-
-//         e.classList.remove("animate__animated");
-        
-//         if (chain == "eth")   uiCache.chainbuttonETH.after(e);
-//         if (chain == "bsc")   uiCache.chainbuttonBSC.after(e);
-//         if (chain == "polygon") uiCache.chainbuttonPOLYGON.after(e);
-//     }
-// }
 
 function getAllInputAddresses()
 {
@@ -605,15 +558,11 @@ async function pollAddressTokens(_chain, _address, callback)
     {
         let coins = resp.items;
         console.log(resp);
-        let subtotal = 0;
-        let subtotalETH = 0.0;
-        let subtotalBTC = 0.0;
         for (let i = 0; i < coins.length; i++)
         {
             const c = coins[i];
             if (c == null || c.type == "dust") continue;
             c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
-            subtotal+=parseFloat(c.quote);
 
             let clone = baseSmallTokenElement.cloneNode(true);
             clone.className += " cloned "+c.contract_ticker_symbol.toUpperCase();
@@ -642,9 +591,9 @@ async function pollAddressTokens(_chain, _address, callback)
         }
         //totalbox.style.display = "flex";
 
-        totalbox.querySelector(".smallttot_btcv").innerText = `BTC ${numberWithCommas(subtotalBTC.toFixed(2))}`;
-        totalbox.querySelector(".smallttot_ethv").innerText = `ETH ${numberWithCommas(subtotalETH.toFixed(2))}`;
-        totalbox.querySelector(".smalltotaldiv-usdtotal").innerText = `$ ${numberWithCommas(subtotal.toFixed(2))}`;
+        totalbox.querySelector(".smallttot_btcv").innerText = `BTC ${numberWithCommas(parseFloat(resp.totalbtc).toFixed(2))}`;
+        totalbox.querySelector(".smallttot_ethv").innerText = `ETH ${numberWithCommas(parseFloat(resp.totaleth).toFixed(2))}`;
+        totalbox.querySelector(".smalltotaldiv-usdtotal").innerText = `$ ${numberWithCommas(parseFloat(resp.totalusd).toFixed(2))}`;
         totalbox.style.visibility = "visible";
         
     }
@@ -652,7 +601,7 @@ async function pollAddressTokens(_chain, _address, callback)
     if (_chain == "BSC")             document.querySelector(".content_bsc .loader").style.display = "none";
     else if (_chain == "POLYGON")    document.querySelector(".content_polygon .loader").style.display = "none";
 
-    callback();
+    callback(resp);
 }
 
 //filter helper

@@ -81,6 +81,7 @@ body
     border: 1px solid grey;
     flex: 1;
     position: relative;
+    margin-top: 0;
 }
 
 .token_container
@@ -413,7 +414,7 @@ span.input_label_unit
     color: #ffffff;
     margin-left: 20px;
     margin-right: 20px;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 .totaldiv-label
@@ -431,6 +432,12 @@ span.input_label_unit
 {
     margin-left: 20px;
     display: inline-block;
+}
+
+.totaldiv-val
+{
+    text-shadow: 3px 3px 2px rgb(0 0 0);
+    margin-left: 20px;
 }
 
 .tot_btcv
@@ -761,6 +768,7 @@ span.input_label_unit
     color: rgb(150, 195, 255);
 }
 
+
 #btn_main_check
 {
 
@@ -822,11 +830,13 @@ span.input_label_unit
     margin-right: 20px;
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
 }
 
 .smalltotaldiv-coinvals
 {
     font-size: 12px;
+    margin-right: 20px;
 }
 
 .smallttot_btcv
@@ -838,6 +848,45 @@ span.input_label_unit
 {
     color: cyan;
 }
+
+
+.cross_chain_total
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 20px;
+}
+
+.cross_chain_total-crypto
+{
+    margin-left: 50px;
+}
+
+.cross_chain_total-btc, .cross_chain_total-eth
+{
+    font-size: 20px;
+}
+
+.cross_chain_total-usd
+{
+    color: white;
+    font-size: 40px;
+    margin-left: 30px;
+    text-shadow: 3px 3px 2px rgb(0 0 0);
+}
+
+.cross_chain_total-btc
+{
+    color: orange;
+}
+
+.cross_chain_total-eth
+{
+    color: cyan;
+}
+
 
 @keyframes loader_spin
 {

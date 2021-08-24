@@ -96,107 +96,107 @@
 
     <div class='maincolumn eth_gradient'>
 
-        <!-- <div class='chainswitcher_switchrow'>
-            <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM MAINNET</div>
-            <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE SMART CHAIN</div>
-            <div data-chain='polygon' class="chainbutton chainbutton_polygon">POLYGON POLYGON</div>
-        </div> -->
-
         <div class='nowloading'>
             <span>Building  Portfolio</span><div class="loadingio-spinner-eclipse-f1acnqblv1t"><div class="ldio-v3xoc9chw0a">
                 <div></div>
                 </div></div>
         </div>
 
-        <!-- add loader spinner for each chain -->
-        <div class='whichaddress'></div>
-        <div class='token_container'>
-            <!-- <div > -->
-                <div class='content content_eth' data-chain='eth'>
-                    <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM</div>
-                    <h1>Tokens will appear here</h1>
-                    <div class='totaldiv' data-chain='eth'>
-                        <!-- <div class='totaldiv-label'></div> -->
-                        <div class='totaldiv-val-container'>
+        <div class='cross_chain-container'>
+
+            <div class='whichaddress'></div>
+
+            <div class='cross_chain_total'>
+                <div class='cross_chain_total-crypto'>
+                    <div class='cross_chain_total-btc'></div>
+                    <div class='cross_chain_total-eth'></div>
+                </div>
+                <div class='cross_chain_total-usd'></div>
+            </div>
+
+            <div class='token_container'>
+                    <div class='content content_eth' data-chain='eth'>
+                        <div data-chain='eth' class="chainbutton chainbutton_eth">ETHEREUM</div>
+                        <h1>Tokens will appear here</h1>
+                        <div class='totaldiv' data-chain='eth'>
                             <div class='coin_vals'>
                                 <div class='tot_btcv'></div>
                                 <div class='tot_ethv'></div>
                             </div>
                             <div class='totaldiv-val'>$0</div>
                         </div>
-                    </div>
-                    
-                    <div class='tokenp'>
-                        <div class='tokenp_left'>
-                            <div class='tokenicon' ></div>
-                            <div class='tokenp_text'>
-                                <div class='tokenname'>base</div>
-                                <div class='tokendetails'></div>
-                            </div>
-                        </div>
-                        <div class='tokenp_right'>
-                            <div class='value_totals'>
-                                <div>
-                                    <div class='btc_value'>0</div>
-                                    <div class='eth_value'>0</div>
-                                </div>
-                                <div class='usdchange'> %</div><div class='usd_value' data-val='0'>0</div>
-                            </div>
-                            <div class="coin_holdings">
-                                <div class='token_total'>0</div>
-                                <div class='perc'>? %</div>
-                            </div>
-                        </div>
-                        <div class='token_action_bar'>
-                            <div class='token_action_but token_action_but_explorer'>Explorer</div>
-                            <div class='token_action_but token_action_but_swap'>Swap</div>
-                        </div>
-                    </div>
-                    <div class="loader"><div class="loader-gfx"></div></div>
-                </div>
-            <!-- </div> -->
-            <div >
-                <div class='content content_bsc' data-chain='bsc' >
-                    <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE</div>
-                    <div class='smalltotaldiv' data-chain='bsc'>
-                        <div class='smalltotaldiv-coinvals'>
-                            <div class='smallttot_btcv'></div>
-                            <div class='smallttot_ethv'></div>
-                        </div>
-                        <div class='smalltotaldiv-usdtotal'></div>
-                    </div>
-
-                        <div class="smalltoken">
-                            <div class='tokenicon' >TST</div>
-                            <div class='smalltoken-content'>
-                                <div class='smalltoken-name'>Contract Name</div>
-                                <div class='smalltoken-values'>
-                                    <span class='smalltoken-usd'>$433</span>
-                                    <span class='smalltoken-coins'> [ 99 TST ] </span>
+                        
+                        <div class='tokenp'>
+                            <div class='tokenp_left'>
+                                <div class='tokenicon' ></div>
+                                <div class='tokenp_text'>
+                                    <div class='tokenname'>base</div>
+                                    <div class='tokendetails'></div>
                                 </div>
                             </div>
-                            <div class='token_action_bar' style='display: flex; flex-direction: column;'>
+                            <div class='tokenp_right'>
+                                <div class='value_totals'>
+                                    <div>
+                                        <div class='btc_value'>0</div>
+                                        <div class='eth_value'>0</div>
+                                    </div>
+                                    <div class='usdchange'> %</div><div class='usd_value' data-val='0'>0</div>
+                                </div>
+                                <div class="coin_holdings">
+                                    <div class='token_total'>0</div>
+                                    <div class='perc'>? %</div>
+                                </div>
+                            </div>
+                            <div class='token_action_bar'>
                                 <div class='token_action_but token_action_but_explorer'>Explorer</div>
                                 <div class='token_action_but token_action_but_swap'>Swap</div>
                             </div>
                         </div>
-                    
-                    <div class="loader"><div class="loader-gfx"></div></div>
-                </div>
-                <div class='content content_polygon' data-chain='polygon'>
-                    <div data-chain='polygon' class="chainbutton chainbutton_polygon">POLYGON</div>
-                    <div class='smalltotaldiv' data-chain='polygon'>
-                        <div class='smalltotaldiv-coinvals'>
-                            <div class='smallttot_btcv'></div>
-                            <div class='smallttot_ethv'></div>
-                        </div>
-                        <div class='smalltotaldiv-usdtotal'></div>
+                        <div class="loader"><div class="loader-gfx"></div></div>
                     </div>
-                    <div class="loader"><div class="loader-gfx"></div></div>
+                <div >
+                    <div class='content content_bsc' data-chain='bsc' >
+                        <div data-chain='bsc' class="chainbutton chainbutton_bsc">BINANCE</div>
+                        <div class='smalltotaldiv' data-chain='bsc'>
+                            <div class='smalltotaldiv-coinvals'>
+                                <div class='smallttot_btcv'></div>
+                                <div class='smallttot_ethv'></div>
+                            </div>
+                            <div class='smalltotaldiv-usdtotal'></div>
+                        </div>
+
+                            <div class="smalltoken">
+                                <div class='tokenicon' >TST</div>
+                                <div class='smalltoken-content'>
+                                    <div class='smalltoken-name'>Contract Name</div>
+                                    <div class='smalltoken-values'>
+                                        <span class='smalltoken-usd'>$433</span>
+                                        <span class='smalltoken-coins'> [ 99 TST ] </span>
+                                    </div>
+                                </div>
+                                <div class='token_action_bar' style='display: flex; flex-direction: column;'>
+                                    <div class='token_action_but token_action_but_explorer'>Explorer</div>
+                                    <div class='token_action_but token_action_but_swap'>Swap</div>
+                                </div>
+                            </div>
+                        
+                        <div class="loader"><div class="loader-gfx"></div></div>
+                    </div>
+                    <div class='content content_polygon' data-chain='polygon'>
+                        <div data-chain='polygon' class="chainbutton chainbutton_polygon">POLYGON</div>
+                        <div class='smalltotaldiv' data-chain='polygon'>
+                            <div class='smalltotaldiv-coinvals'>
+                                <div class='smallttot_btcv'></div>
+                                <div class='smallttot_ethv'></div>
+                            </div>
+                            <div class='smalltotaldiv-usdtotal'></div>
+                        </div>
+                        <div class="loader"><div class="loader-gfx"></div></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
+        </div>
         
     </div>
 
