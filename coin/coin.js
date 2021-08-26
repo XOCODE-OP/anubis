@@ -81,29 +81,22 @@ async function init()
     contractJson = await(await fetch('../abis/StakerERC20_NoOwner.json')).json(); 
     if (!BLOCKCHAIN_EVENT_LOG) d.querySelector(".logbox").style.display = "none";
 
-    //d.querySelector(".sendmessagebox .sendbutton").click = buttonSendTransactionWithMessage;
     await loadWeb3();
 }
 
 async function auxBlockchainMessage()
 {
     const sendtoaddress = d.querySelector(".section_blockchain_sendmessage .datasendtoaddress").value;
-    let amount = Number.parseFloat( d.querySelector(".section_blockchain_sendmessage .dataamount").value );
+    // let amount = Number.parseFloat( d.querySelector(".section_blockchain_sendmessage .dataamount").value );
+    // amount = amount * 1000000000000000000;
+    let amount = 0;
     const message = d.querySelector(".section_blockchain_sendmessage .datamessage").value;
-
-    amount = amount * 1000000000000000000;
 
     console.log("sendtoaddress", sendtoaddress);
     console.log("amount", amount);
     console.log("message", message);
-    let tx = await sendTransactionWithMessage(accountAddress, sendtoaddress, message, amount);
 
-    document.querySelector(".section_blockchain_sendmessage .blockchain_sendmessage-tx").innerHTML = `<a href='https://rinkeby.etherscan.io/tx/${tx.transactionHash}' target='_blank'>Link to transaction via block explorer</a>`;
-}
-
-async function sendTransactionWithMessage(_fromAddr, _toAddr, msg, amount)
-{
-    let hex = web3.utils.utf8ToHex(msg);
+    let hex = web3.utils.utf8ToHex(message);
     // console.log("Message: ", msg);
     // console.log("Hex: ", hex);
     // console.log("Revert: ", web3.utils.hexToUtf8(hex));
@@ -111,16 +104,33 @@ async function sendTransactionWithMessage(_fromAddr, _toAddr, msg, amount)
     const DEFAULT_GASLIMIT_SENDING_ETH = 42000;
 
     let txTransfer = {};
-    txTransfer.from = _fromAddr;
-    txTransfer.to = _toAddr;
+    txTransfer.from = accountAddress;
+    txTransfer.to = sendtoaddress;
     txTransfer.gas = DEFAULT_GASLIMIT_SENDING_ETH;
     txTransfer.value = amount;
     txTransfer.data = hex;
-    console.log(`Trying to send ETH from address ${txTransfer.from} to ${txTransfer.to}. Gaslimit: ${txTransfer.gas}. Amount: ${txTransfer.value}. With Message: ${msg}`);
-    let tx = await web3.eth.sendTransaction(txTransfer);
-    console.log("tx", tx);
-    console.log(`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`);
-    return tx;
+    console.log(`Trying to send ETH from address ${txTransfer.from} to ${txTransfer.to}. Gaslimit: ${txTransfer.gas}. Amount: ${txTransfer.value}. With Message: ${message}`);
+    d.querySelector(".auxbox .loader").style.visibility = "visible";
+
+    try {
+        let tx = await web3.eth.sendTransaction(txTransfer);
+        console.log("tx", tx);
+        console.log(`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`);
+        if (tx) 
+        {
+            d.querySelector(".auxbox .loader").style.visibility = "hidden";
+            document.querySelector(".section_blockchain_sendmessage .blockchain_sendmessage-tx").innerHTML = 
+            `<span class='statusok'>SUCCESS </span> <a href='https://rinkeby.etherscan.io/tx/${tx.transactionHash}' target='_blank'>Link to transaction via block explorer</a>`;
+            await initContract();
+            rebuildUI();
+        }
+    } catch (error) {
+        d.querySelector(".auxbox .loader").style.visibility = "hidden";
+        document.querySelector(".section_blockchain_sendmessage .blockchain_sendmessage-tx").innerHTML = 
+            `<span class='warning'>FAILURE</span>`;
+        console.log("error", error);
+    }
+    
 }
 
 function wrongNetwork(networkID)
@@ -136,8 +146,9 @@ function wrongNetwork(networkID)
 async function initContract()
 {
     if (networkID != DEPLOYED_NETWORK) return false;
-
+    
     contract = new window.web3.eth.Contract(contractJson.abi, contractAddress);
+    
     if (!contract || contract == null)
     {
         console.error("Contract could not be found.");
@@ -148,10 +159,13 @@ async function initContract()
     contractSymbol = await contract.methods.symbol().call();
     contractPaused = await contract.methods.paused().call();
 
-    accountBalance   = await contract.methods.balanceOf(accountAddress).call();
-    stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
-    allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
-
+    if (!contractPaused)
+    {
+        accountBalance   = await contract.methods.balanceOf(accountAddress).call();
+        stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
+        allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
+    }
+    
     if (BLOCKCHAIN_EVENT_LOG)
     {
         let options = {
@@ -179,7 +193,7 @@ async function initContract()
             .on('error', err => console.error("events.Approval onerror", err))
             .on('connected', str => console.log("events.Approval onconnected", str));
     }
-
+}
 /*
 PAST EVENTS
 
@@ -219,7 +233,7 @@ subscription.on('connected', nr => console.log(nr))
 
 web3.eth.clearSubscriptions() //Resets subscriptions.
     */
-}
+
 
 async function loadWeb3() // this will popup the connect metamask window for confirm
 {
@@ -260,6 +274,7 @@ async function loadWeb3() // this will popup the connect metamask window for con
     rebuildUI();
 }
 
+
 async function contractInteraction_togglePause()
 {
     console.log("contractInteraction_togglePause()", "current pause state:", contractPaused);
@@ -267,13 +282,14 @@ async function contractInteraction_togglePause()
     if (contractPaused == true) setTo = false;
     console.log("setTo", setTo);
     //await contract.methods.setPaused(setTo).call();
+    d.querySelector(".networkbox .loader").style.visibility = "visible";
 
     try {
         let tx = await contract.methods.setPaused(setTo).send({ from: accountAddress });
         console.log(tx);
         if (tx) 
         {
-            d.querySelector(".networkbox .loader").style.visibility = "visible";
+            d.querySelector(".networkbox .loader").style.visibility = "hidden";
             await initContract();
             rebuildUI();
         }
@@ -427,7 +443,7 @@ function rebuildUI()
     d.querySelector(".networkbox .networkbox-id").innerText = networkIDToString(networkID);
     d.querySelector(".networkbox .networkbox-symbol").innerText = contractSymbol;
     d.querySelector(".networkbox .networkbox-totalsupply").innerText = web3.utils.fromWei(totalSupply);
-    d.querySelector(".networkbox .networkbox-paused").innerText = contractPaused;
+    d.querySelector(".networkbox .networkbox-paused").innerHTML = (contractPaused ? "<span class='warning'>PAUSED</span>" : "<span class='statusok'>ACTIVE</span>");
 
     if (contract != null)
     {
@@ -442,6 +458,7 @@ function rebuildUI()
 
     d.querySelector(".networkbox .loader").style.visibility = "hidden";
     d.querySelector(".walletbox .walletaddress").innerHTML = "" + accountAddress;
+    d.querySelector(".walletbox .walletaddress").title = "" + accountAddress;
     d.querySelector(".walletbox .loader").style.visibility = "hidden";
     if (networkID != DEPLOYED_NETWORK) wrongNetwork(networkID);
 
@@ -449,11 +466,22 @@ function rebuildUI()
     {
         d.querySelector(".stakingbox .loader").style.visibility = "hidden";
         d.querySelector(".functionbox .loader").style.visibility = "hidden";
+        d.querySelector(".auxbox .loader").style.visibility = "hidden";
     }
 
-    document.querySelector(".walletbox .balanceamount").innerText = web3.utils.fromWei(accountBalance);
-    document.querySelector(".walletbox .staking_balance").innerText = web3.utils.fromWei(stakingBalance);
-    document.querySelector(".walletbox .approvedamount").innerText = web3.utils.fromWei(allowanceBalance);
+    if (!contractPaused)
+    {
+        document.querySelector(".walletbox .balanceamount").innerHTML = web3.utils.fromWei(accountBalance)+" "+contractSymbol;
+        document.querySelector(".walletbox .staking_balance").innerHTML = web3.utils.fromWei(stakingBalance)+" "+contractSymbol;
+        document.querySelector(".walletbox .approvedamount").innerHTML = web3.utils.fromWei(allowanceBalance)+" "+contractSymbol;
+    }
+    else
+    {
+        document.querySelector(".walletbox .balanceamount").innerHTML = "<span class='warning'>CONTRACT PAUSED</span>";
+        document.querySelector(".walletbox .staking_balance").innerHTML = "<span class='warning'>CONTRACT PAUSED</span>";;
+        document.querySelector(".walletbox .approvedamount").innerHTML = "<span class='warning'>CONTRACT PAUSED</span>";;
+    }
+    
 }
 
 async function auxSignProof()
@@ -478,6 +506,7 @@ async function auxSignProof()
         d.querySelector(".section_signproof").querySelector(".error").innerHTML = "SIGNATURE FAILURE";
         d.querySelector(".section_signproof").querySelector(".error").style.visibility = "visible";
     }
+
 }
 
 async function requestRinkebyNetwork()

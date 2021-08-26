@@ -131,22 +131,6 @@
             text-transform: uppercase;
         }
 
-        .nftlist_entries
-        {
-            text-align: left;
-            padding: 0 20px;
-        }
-
-        .nftlist_item
-        {
-            margin: 2px 0;
-            padding: 4px 10px;
-            background-color: rgba(10,10,10, 0.3);
-            max-width: 400px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
         .error
         {
             color: rgb(231, 100, 100);
@@ -239,6 +223,19 @@
             width: calc(100% - 20px);
         }
 
+        .tableval
+        {
+            text-align: right;
+            padding-left: 20px;
+        }
+
+        .addressellipsis
+        {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
         .logo
         {
             
@@ -269,14 +266,19 @@
             background-color: rgba(28, 28, 28, 0.8);
         }
 
-        .tableval
-        {
-            text-align: right;
-        }
-
         .highlight
         {
             color: yellow;
+        }
+
+        .statusok
+        {
+            color: rgb(53, 180, 47);
+        }
+
+        .warning
+        {
+            color:rgb(255, 99, 99);
         }
 
         .address
@@ -299,14 +301,12 @@
         <a href='../' class='crossnav_button'>Start</a>
         <a href='../assets/' class='crossnav_button' data-link='assets'>Assets</a>
         <a href='../nft/' class='crossnav_button' data-link='nft'>NFT</a>
-        <a href='../ipfs/' class='crossnav_button' data-link='ipfs'>IPFS</a>
+        <!-- <a href='../ipfs/' class='crossnav_button' data-link='ipfs'>IPFS</a> -->
         <a href='../coin/' class='crossnav_button crossnav_button_chosen' data-link='coin'>Coin</a>
         <a href='../game/' class='crossnav_button' data-link='game'>Game</a>
         <img class='crossnav_title crossnav_bigimg' src='../img/nav_title.png' />
         <img class='crossnav_title crossnav_smallimg' src='../img/nav_title_small.png' />
     </div>
-
-
 
 
     <div class='content_inner'>
@@ -339,10 +339,24 @@
 
         <article class='box walletbox'>
             <h3 class='box-title'>Your holdings</h3>
-            <div>Wallet Address: <span class='walletaddress'></span></div>
-            <div>Balance: <span class='balanceamount'></span> SENO</div>
-            <div>Contract Spending Allowance: <span class='approvedamount'></span> SENO</div>
-            <div>Amount Staked: <span class='staking_balance'></span> SENO</div>
+            <div class='content table'>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Wallet Address:</div>
+                    <div style='display: table-cell;' class='tableval walletaddress addressellipsis'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Balance:</div>
+                    <div style='display: table-cell;' class='tableval balanceamount'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Contract Spending Allowance:</div>
+                    <div style='display: table-cell;' class='tableval approvedamount'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Amount Staked:</div>
+                    <div style='display: table-cell;' class='tableval staking_balance'></div>
+                </div>
+            </div>
             <div class='tilebutton butAddMyTokenToMetamask' onclick='addMyTokenToMetamask();'>Add TOKENNAME Token to Metamask</div>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
@@ -402,7 +416,7 @@
                 <h4>Send message on blockchain</h4>
                 <p>Using blockchain to chat or to make statements, stamping a message into the blockchain:</p>
                 <input type='text' class='datasendtoaddress' placeholder="Send To address" />
-                <input type='text' class='dataamount' placeholder="1.0 ETH" />
+                <!-- <input type='text' class='dataamount' placeholder="1.0 ETH" /> -->
                 <input type='text' class='datamessage' placeholder="Message" />
                 <div class='tilebutton' onclick='auxBlockchainMessage();'>send</div>
                 <div class='info'>
@@ -415,6 +429,7 @@
                 <div class='tilebutton' onclick='auxAddNetwork();'>Add network to metamask</div>
                 <div class='error'></div>
             </section>
+            <div class="loader"><div class="loader-gfx"></div></div>
         </article>
         
 
