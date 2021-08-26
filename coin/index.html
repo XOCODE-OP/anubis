@@ -17,6 +17,9 @@
             margin: 0;
             padding: 0;
             transition: all 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-smooth: always;
         }
 
         button,
@@ -46,7 +49,20 @@
             /* background: linear-gradient(to right, #414345, #232526);  */
             background: linear-gradient(to right, #0e182c, #243764);
             font-weight: 100;
-            color: rgb(221, 221, 188);
+            /* color: rgb(221, 221, 188); */
+            color: #EEE;
+        }
+
+        a
+        {
+            color: yellow;
+            text-decoration: none;
+        }
+
+        a:hover
+        {
+            color: orange;
+            text-decoration: none;
         }
 
         @keyframes loader_spin
@@ -89,11 +105,17 @@
 
             text-align: center;
             min-width: 200px;
+            max-width: 500px;
             margin: 20px;
             display: inline-block;
-            padding: 6px;
             border: 1px solid rgba(226, 226, 198, 0.788);
             position: relative;
+            font-size: 20px;
+        }
+
+        .box>p, .box>a
+        {
+            margin: 6px;
         }
 
         button
@@ -126,8 +148,41 @@
 
         .error
         {
-            color: rgb(243, 135, 85);
+            color: rgb(231, 100, 100);
             visibility: hidden;
+        }
+
+        .success
+        {
+            color: rgb(53, 180, 47);
+            visibility: hidden;
+        }
+
+        input
+        {
+            font-family: 'titillium';
+            font-weight: 100;
+            font-size: 22px;
+            color: white;
+            background-color: rgb(33, 33, 33);
+            padding: 2px 6px;
+            border: 1px solid transparent;
+            margin: 2px auto;
+        }
+
+        input:hover
+        {
+            border-color: white; 
+        }
+
+        input:active, input:focus
+        {
+            border-color: orange;   
+        }
+
+        input::placeholder
+        {
+            color: grey;
         }
 
         .tilebutton
@@ -137,24 +192,50 @@
             display: block;
             font-size: 22px;
             padding: 16px 30px;
-            margin: 5px 0;
+            margin: 5px 10px;
             cursor: pointer;
             user-select: none;
             color: rgb(203, 211, 211);
             background-color: rgb(20, 63, 78);
+            border: 1px solid transparent;
         }
 
         .tilebutton:hover
         {
             /* filter: invert(); */
             /* filter: contrast(2.1); */
-            filter: brightness(2.0);
+            /* filter: brightness(2.0); */
+            color: rgb(255, 255, 255);
+            background-color: rgb(41, 123, 153);
+        }
+
+        .tilebutton:active
+        {
+            /* filter: invert(); */
+            /* filter: contrast(2.1); */
+            /* filter: brightness(2.0); */
+            color: orange;
+            background-color: rgb(21, 23, 24);
+            border-color: orange;
+            transition: all 1ms ease;
         }
 
         .tilebutton.smalltilebutton:hover
         {
             background-color: wheat;
             color: black;
+        }
+
+        .content
+        {
+            text-align: left;
+        }
+
+        .table
+        {
+            display: table;
+            margin: 10px;
+            width: calc(100% - 20px);
         }
 
         .logo
@@ -167,148 +248,37 @@
             display: block;
         }
 
+        h1, h2, h3, h4
+        {
+            background-color: #111;
+            margin-bottom: 10px;
+        }
+
+        .box section h4
+        {
+            font-size: 20px;
+        }
+
+        .box section
+        {
+            /* border: 1px solid #EEE; */
+            margin: 20px 0px;
+            padding: 10px 0px;
+            padding-top: 0;
+            background-color: rgba(28, 28, 28, 0.8);
+        }
+
+        .tableval
+        {
+            text-align: right;
+        }
+
 
     </style>
 
     <link href="../cross_nav.css" rel="stylesheet"  />
     <script src='../web3.min.js'></script>
-
-    <script>
-        const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5});
-        const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
-        
-        const d = document;
-        let accountAddress = null;
-        let networkID = null;
-
-        function networkIDToString(_id)
-        {
-            _id = parseInt(_id);
-            switch (_id) 
-            {
-                case ETH_NETWORK_IDS.MAINNET:
-                    return "Mainnet";
-                    break;
-                case ETH_NETWORK_IDS.ROPSTEN:
-                    return "Ropsten";
-                    break;
-                case ETH_NETWORK_IDS.KOVAN:
-                    return "Kovan";
-                    break;
-                case ETH_NETWORK_IDS.RINKEBY:
-                    return "Rinkeby";
-                    break;
-                case ETH_NETWORK_IDS.GOERLI:
-                    return "Goerli";
-                    break;
-                default:
-                    return "unknown network ID: " + _id
-            }
-            return "unknown network ID: " + _id;
-        }
-
-        d.addEventListener('DOMContentLoaded', function()
-        {
-            init();
-        });
-
-        async function init()
-        {
-            //d.querySelector(".sendmessagebox .sendbutton").click = buttonSendTransactionWithMessage;
-            d.querySelector(".sendmessagebox .sendbutton").addEventListener('click', function()
-            {
-                const sendtoaddress = d.querySelector(".sendmessagebox .datasendtoaddress").value;
-                let amount = Number.parseFloat( d.querySelector(".sendmessagebox .dataamount").value );
-                const message = d.querySelector(".sendmessagebox .datamessage").value;
-
-                amount = amount * 1000000000000000000;
-
-                console.log("sendtoaddress", sendtoaddress);
-                console.log("amount", amount);
-                console.log("message", message);
-                sendTransactionWithMessage(accountAddress, sendtoaddress, message, amount);
-            });
-            await loadWeb3();
-        }
-
-        async function sendTransactionWithMessage(_fromAddr, _toAddr, msg, amount)
-        {
-            let hex = web3.utils.utf8ToHex(msg);
-            // console.log("Message: ", msg);
-            // console.log("Hex: ", hex);
-            // console.log("Revert: ", web3.utils.hexToUtf8(hex));
-
-            const DEFAULT_GASLIMIT_SENDING_ETH = 42000;
-
-            let txTransfer = {};
-            txTransfer.from = _fromAddr;
-            txTransfer.to = _toAddr;
-            txTransfer.gas = DEFAULT_GASLIMIT_SENDING_ETH;
-            txTransfer.value = amount;
-            txTransfer.data = hex;
-            console.log(`Trying to send ETH from address ${txTransfer.from} to ${txTransfer.to}. Gaslimit: ${txTransfer.gas}. Amount: ${txTransfer.value}. With Message: ${msg}`);
-            let tx = await web3.eth.sendTransaction(txTransfer);
-            console.log("tx", tx);
-            console.log(`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`);
-            return tx;
-        }
-
-        function wrongNetwork(networkID)
-        {
-            //TODO: push network error message to ui
-            console.log("wrong current network", networkIDToString(networkID));
-
-            d.querySelector(".networkbox .error").innerHTML = "WRONG NETWORK.<br />Please switch to network " + networkIDToString(DEPLOYED_NETWORK);
-            d.querySelector(".networkbox .error").style.visibility = "visible";
-        }
-
-        async function loadWeb3() // this will popup the connect metamask window for confirm
-        {
-            if (window.ethereum) 
-            {
-                window.web3 = new Web3(window.ethereum);
-                await window.ethereum.enable();
-
-                window.ethereum.on('accountsChanged', async function (accounts) 
-                {
-                    accountAddress = accounts[0];
-                    console.log('account was changed to ', accountAddress);
-                    rebuildUI();
-                });
-
-                window.ethereum.on('networkChanged', async function(_nid)
-                {
-                    console.log('network was changed to ', networkIDToString(_nid));
-                    networkID = _nid; 
-                    rebuildUI();
-                });
-                console.log('NETWORK:', networkIDToString(window.ethereum.networkVersion));
-            }
-            else if (window.web3) 
-            {
-                window.web3 = new Web3(window.web3.currentProvider);
-            }
-            else
-            {
-                console.log("ERROR: no web3 provider");
-            }
-            accountAddress = (await window.web3.eth.getAccounts())[0];
-            networkID = await window.web3.eth.net.getId();
-            rebuildUI();
-        }
-
-        function rebuildUI()
-        {
-            d.querySelector(".error").style.visibility = "hidden";
-            d.querySelector(".networkbox .box-title").innerHTML = "Network: " + networkIDToString(networkID);
-            d.querySelector(".networkbox .loader").style.visibility = "hidden";
-            d.querySelector(".walletbox .box-title").innerHTML = "Your Wallet Address: " + accountAddress;
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-            if (networkID != DEPLOYED_NETWORK) wrongNetwork(networkID);
-        }
-
-       
-    </script>
+    <script src='./coin.js'></script>
 </head>
 <body>
 
@@ -324,76 +294,114 @@
         <img class='crossnav_title crossnav_smallimg' src='../img/nav_title_small.png' />
     </div>
 
+
+
+
     <div class='content_inner'>
 
         <article class='box networkbox'>
-            <h3 class='box-title'>Loading...</span></h3>
+            <h3 class='box-title'></h3>
+            <div class='content table'>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Network:</div>
+                    <div style='display: table-cell;' class='tableval networkbox-id'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Symbol:</div>
+                    <div style='display: table-cell;' class='tableval networkbox-symbol'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Total Supply:</div>
+                    <div style='display: table-cell;' class='tableval networkbox-totalsupply'></div>
+                </div>
+                <div style='display: table-row;'>
+                    <div style='display: table-cell;'>Contract Paused:</div>
+                    <div style='display: table-cell;' class='tableval networkbox-paused'></div>
+                </div>
+            </div>
+            <div class='success'></div>
             <div class='error'></div>
             <div class="loader"><div class="loader-gfx"></div></div>
+            <div class='tilebutton networkchanger' onclick="requestRinkebyNetwork();" >Switch to Rinkeby</div>
         </article>
 
         <article class='box walletbox'>
-            <h3 class='box-title'>Loading...</span></h3>
+            <h3 class='box-title'></h3>
+            <p class='content'>Loading...</p>
+            <div>Balance: <span class='balanceamount'>0</span></div>
+            <div class='tilebutton butAddMyTokenToMetamask' onclick='addMyTokenToMetamask();'>Add TOKENNAME Token to Metamask</div>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
 
-        <article class='box '>
+        <article class='box stakingbox'>
             <h3 class='box-title'>Staking</span></h3>
             <div>
-                <input type='text' class='dataamount' placeholder="" />
+                <input type='text' class='dataamount' placeholder="staking amount" />
                 <div class='tilebutton sendbutton'>stake</div>
                 <div class='tilebutton sendbutton'>unstake</div>
-                <div>amount staked: <span>0</span></div>
+                <div>amount staked: <span class='staking_balance'>0</span></div>
             </div>
 
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
 
-        <article class='box '>
-            <h3 class='box-title'>Staking</span></h3>
-            <div>
-                <div>Send</div>
-                <div>Approve</div>
-                <div>Receive</div>
-                <div>Mint</div>
-                <div>Burn</div>
-            </div>
-
-            <div class="loader"><div class="loader-gfx"></div></div>
-        </article>
-        <article class='box '>
-            <h3 class='box-title'>Pause contract</span></h3>
-
+        <article class='box functionbox'>
+            <h3 class='box-title'>Coin Functions</span></h3>
+            <div class='tilebutton' onclick="contractInteraction_togglePause();">Pause Contract</div>
+            <div class='tilebutton'>Approve</div>
+            <section>
+                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
+                <div class='tilebutton'>Send</div>    
+            </section>
+            <section class='section_mint'>
+                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
+                <div class='tilebutton' onclick='mintMe();'>Mint</div>
+            </section>
+            <section class='section_burn'>
+                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
+                <div class='tilebutton' onclick='burnMe();'>Burn</div>
+            </section>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
 
         <article class='box '>
             <h3 class='box-title'>INSTRUCTIONS</span></h3>
-            <div>https://faucet.rinkeby.io</div>
-            <div class="loader"><div class="loader-gfx"></div></div>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+            <a href='https://faucet.rinkeby.io' target='_blank'>https://faucet.rinkeby.io</a>
         </article>
 
-        <article class='box signbox'>
-            <h3 class='box-title'>AUX Sign to prove ownership</h3>
-            <button onclick='signProcess();'>Sign</button>
-            <div class='error'></div>
-        </article>
-        
-
-        <article class='box sendmessagebox'>
-            <div class="blocklist">
-                <h3 class='box-title'>AUX Send Message on blockchain</h3>
-                <p>using blockchain to chat or to make statements or any reason to stamp a random message into the blockchain:</p>
+        <article class='box auxbox'>
+            <h3 class='box-title'>Auxiliary Functions</h3>
+            <section class='section_signproof'>
+                <h4>Sign to prove ownership</h4>
+                <div class='tilebutton' onclick='auxSignProof();'>Sign</div>
+                <div class='error'></div>
+                <div class='success'></div>
+            </section>
+            <section class='section_blockchain_sendmessage'>
+                <h4>Send message on blockchain</h4>
+                <p>Using blockchain to chat or to make statements, stamping a random message into the blockchain:</p>
                 <input type='text' class='datasendtoaddress' placeholder="Send To address" />
                 <input type='text' class='dataamount' placeholder="1.0 ETH" />
                 <input type='text' class='datamessage' placeholder="Message" />
-                <div class='tilebutton sendbutton'>send</div>
+                <div class='tilebutton' onclick='auxBlockchainMessage();'>send</div>
                 <div class='info'>
-                    link to transaction: LINK<br />
-                    Scroll down to Input Data, switch view input to UTF8 and you will be able to see and read the message written to the blockchain.
+                    <div class='blockchain_sendmessage-tx'></div>
+                    How to read: Scroll down to Input Data, switch view input to UTF8 and you will be able to see and read the message written to the blockchain.
                 </div>
-            </div>
+            </section>
+            <section>
+                <h4>Add token to Metamask</h4>
+                <div class='tilebutton' onclick='auxAddToMetamask();'>Add Token</div>
+                <div class='error'></div>
+            </section>
+            <section class=''>
+                <h4>Request Metamask to change network</h4>
+                <div class='tilebutton' onclick='auxAddNetwork();'>Add network to metamask</div>
+                <div class='error'></div>
+            </section>
         </article>
+        
 
     </div>
     
