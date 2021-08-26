@@ -128,6 +128,7 @@
             font-family: 'titillium';
             font-weight: 500;
             font-size: 32px;
+            text-transform: uppercase;
         }
 
         .nftlist_entries
@@ -273,6 +274,17 @@
             text-align: right;
         }
 
+        .highlight
+        {
+            color: yellow;
+        }
+
+        .address
+        {
+            text-overflow: ellipsis;
+            width: 50px;
+        }
+
 
     </style>
 
@@ -326,9 +338,11 @@
         </article>
 
         <article class='box walletbox'>
-            <h3 class='box-title'></h3>
-            <p class='content'>Loading...</p>
-            <div>Balance: <span class='balanceamount'>0</span></div>
+            <h3 class='box-title'>Your holdings</h3>
+            <div>Wallet Address: <span class='walletaddress'></span></div>
+            <div>Balance: <span class='balanceamount'></span> SENO</div>
+            <div>Contract Spending Allowance: <span class='approvedamount'></span> SENO</div>
+            <div>Amount Staked: <span class='staking_balance'></span> SENO</div>
             <div class='tilebutton butAddMyTokenToMetamask' onclick='addMyTokenToMetamask();'>Add TOKENNAME Token to Metamask</div>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
@@ -337,9 +351,8 @@
             <h3 class='box-title'>Staking</span></h3>
             <div>
                 <input type='text' class='dataamount' placeholder="staking amount" />
-                <div class='tilebutton sendbutton'>stake</div>
-                <div class='tilebutton sendbutton'>unstake</div>
-                <div>amount staked: <span class='staking_balance'>0</span></div>
+                <div class='tilebutton sendbutton' onclick='stakeMe();'>stake</div>
+                <div class='tilebutton sendbutton' onclick='unstakeMe();'>unstake</div>
             </div>
 
             <div class="loader"><div class="loader-gfx"></div></div>
@@ -348,17 +361,16 @@
         <article class='box functionbox'>
             <h3 class='box-title'>Coin Functions</span></h3>
             <div class='tilebutton' onclick="contractInteraction_togglePause();">Pause Contract</div>
-            <div class='tilebutton'>Approve</div>
-            <section>
-                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
-                <div class='tilebutton'>Send</div>    
+            <section class='section_approve'>
+                <input type='text' class='dataamount' placeholder="1.0" />    
+                <div class='tilebutton' onclick='approveMe();'>Approve</div>
             </section>
             <section class='section_mint'>
-                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
+                <input type='text' class='dataamount' placeholder="1.0" />    
                 <div class='tilebutton' onclick='mintMe();'>Mint</div>
             </section>
             <section class='section_burn'>
-                <input type='text' class='dataamount' placeholder="1.0 ETH" />    
+                <input type='text' class='dataamount' placeholder="1.0" />    
                 <div class='tilebutton' onclick='burnMe();'>Burn</div>
             </section>
             <div class="loader"><div class="loader-gfx"></div></div>
@@ -366,8 +378,16 @@
 
         <article class='box '>
             <h3 class='box-title'>INSTRUCTIONS</span></h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-            <a href='https://faucet.rinkeby.io' target='_blank'>https://faucet.rinkeby.io</a>
+            <p>This DApp is a technology showcase. The ERC20 (SENO) is depolyed on the Ethereum Rinkeby Testnet.<br />
+                In order to interact with this DApp, <a href='https://metamask.io/' target='_blank'>Metamask</a> is used.<br/>
+                Your wallet will require Rinkeby Ethereum to pay gas fees. Use the <a href='https://faucet.rinkeby.io' target='_blank'>Rinkeby faucet at https://faucet.rinkeby.io</a> to get free Ethereum. </p>
+        </article>
+
+        <article class='box logbox'>
+            <h3 class='box-title'>CONTRACT EVENT LOGS</span></h3>
+            <div class='content'>
+
+            </div>
         </article>
 
         <article class='box auxbox'>
@@ -380,20 +400,15 @@
             </section>
             <section class='section_blockchain_sendmessage'>
                 <h4>Send message on blockchain</h4>
-                <p>Using blockchain to chat or to make statements, stamping a random message into the blockchain:</p>
+                <p>Using blockchain to chat or to make statements, stamping a message into the blockchain:</p>
                 <input type='text' class='datasendtoaddress' placeholder="Send To address" />
                 <input type='text' class='dataamount' placeholder="1.0 ETH" />
                 <input type='text' class='datamessage' placeholder="Message" />
                 <div class='tilebutton' onclick='auxBlockchainMessage();'>send</div>
                 <div class='info'>
                     <div class='blockchain_sendmessage-tx'></div>
-                    How to read: Scroll down to Input Data, switch view input to UTF8 and you will be able to see and read the message written to the blockchain.
+                    <u>How to read:</u> Scroll down to Input Data, switch view input to UTF8 and you will be able to see and read the message written to the blockchain.
                 </div>
-            </section>
-            <section>
-                <h4>Add token to Metamask</h4>
-                <div class='tilebutton' onclick='auxAddToMetamask();'>Add Token</div>
-                <div class='error'></div>
             </section>
             <section class=''>
                 <h4>Request Metamask to change network</h4>

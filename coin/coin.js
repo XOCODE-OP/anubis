@@ -9,13 +9,17 @@
 
 const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5, 
     BSC: 56, BSC_TEST: 97, POLYGON: 137, POLYGON_TEST: 80001, GANACHE: 5777});
-const DEPLOYED_NETWORK = ETH_NETWORK_IDS.GANACHE;
+const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
+const BLOCKCHAIN_EVENT_LOG = false;
 
-const coinContractAddress = "0x5E9daA2534Fc4813006a10B51845C8AB56bf3325";
+const contractAddress = "0x7C4DBFF5496c64DdA9323e21837B0c69802F4E2f";
 // const coinContractName    = "TestERC20";
 const d = document;
 let accountAddress = null;
 let accountBalance = 0;
+let stakingBalance = 0;
+let allowanceBalance = 0;
+
 let networkID = null;
 let contractJson = null;
 let contract = null;
@@ -75,6 +79,7 @@ d.addEventListener('DOMContentLoaded', function()
 async function init()
 {
     contractJson = await(await fetch('../abis/StakerERC20_NoOwner.json')).json(); 
+    if (!BLOCKCHAIN_EVENT_LOG) d.querySelector(".logbox").style.display = "none";
 
     //d.querySelector(".sendmessagebox .sendbutton").click = buttonSendTransactionWithMessage;
     await loadWeb3();
@@ -132,19 +137,88 @@ async function initContract()
 {
     if (networkID != DEPLOYED_NETWORK) return false;
 
-    contract = new window.web3.eth.Contract(contractJson.abi, coinContractAddress);
+    contract = new window.web3.eth.Contract(contractJson.abi, contractAddress);
     if (!contract || contract == null)
     {
         console.error("Contract could not be found.");
         return false;
     }
-    totalSupply =  web3.utils.fromWei(await contract.methods.totalSupply().call());
+    totalSupply =  await contract.methods.totalSupply().call();
     contractName = await contract.methods.name().call();
     contractSymbol = await contract.methods.symbol().call();
     contractPaused = await contract.methods.paused().call();
 
-    accountBalance = await contract.methods.balanceOf(accountAddress).call();
-    console.log("type of accountbalance", accountBalance);
+    accountBalance   = await contract.methods.balanceOf(accountAddress).call();
+    stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
+    allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
+
+    if (BLOCKCHAIN_EVENT_LOG)
+    {
+        let options = {
+            filter: {
+                value: [],
+            },
+            fromBlock: 0
+        };
+        contract.events.Approval(options)
+            .on('data', function(tx) {
+                let _eventName = tx.event;
+                let _blockHash = tx.blockHash;
+                let _blockNumber = tx.blockNumber;
+                let _values = tx.returnValues;
+                let _html = "Undeclared event";
+                if (_eventName == "Approval")
+                {
+                    _html = `\n<p>APPROVAL. Owner <span class='address'>${_values.owner}</span> # Spender <span class='address'>${_values.spender}</span> # Amount <span class='address'>${web3.utils.fromWei(_values.value)}</span></p>`;
+                }
+                console.log("full EVENT", tx);
+                console.log("CHAIN EVENT", _eventName, _values);
+                document.querySelector(".logbox .content").innerHTML += _html;
+            })
+            .on('changed', changed => console.log("events.Approval onchanged", changed))
+            .on('error', err => console.error("events.Approval onerror", err))
+            .on('connected', str => console.log("events.Approval onconnected", str));
+    }
+
+/*
+PAST EVENTS
+
+let options = {
+    filter: {
+        value: ['1000', '1337']    //Only get events where transfer value was 1000 or 1337
+    },
+    fromBlock: 0,                  //Number || "earliest" || "pending" || "latest"
+    toBlock: 'latest'
+};
+
+myContract.getPastEvents('Transfer', options)
+    .then(results => console.log(results))
+    .catch(err => throw err);
+
+*/
+
+    /*
+This method of subscribing to events is like a “catch-all” method. If you want you can listen to all event logs emitted from the blockchain with this method. 
+
+let options = {
+    fromBlock: 0,
+    address: ['address-1', 'address-2'],    //Only get events from specific addresses
+    topics: []                              //What topics to subscribe to
+};
+
+let subscription = web3.eth.subscribe('logs', options,(err,event) => {
+    if (!err)
+    console.log(event)
+});
+
+subscription.on('data', event => console.log(event))
+subscription.on('changed', changed => console.log(changed))
+subscription.on('error', err => { throw err })
+subscription.on('connected', nr => console.log(nr))
+
+
+web3.eth.clearSubscriptions() //Resets subscriptions.
+    */
 }
 
 async function loadWeb3() // this will popup the connect metamask window for confirm
@@ -193,11 +267,89 @@ async function contractInteraction_togglePause()
     if (contractPaused == true) setTo = false;
     console.log("setTo", setTo);
     //await contract.methods.setPaused(setTo).call();
-    let tx = await contract.methods.setPaused(setTo).send({ from: accountAddress });
-    console.log(tx);
 
-    await initContract();
-    rebuildUI();
+    try {
+        let tx = await contract.methods.setPaused(setTo).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
+        {
+            d.querySelector(".networkbox .loader").style.visibility = "visible";
+            await initContract();
+            rebuildUI();
+        }
+    } catch (error) {
+        d.querySelector(".networkbox .loader").style.visibility = "hidden";
+        console.log("error", error);
+    }
+    
+}
+
+async function approveMe()
+{
+    // _approve(address spender, uint256 amount
+    let amount = parseFloat(document.querySelector(".functionbox .section_approve input").value).toString();
+    let strAmount = ""+web3.utils.toWei(amount).toString();
+    console.log("Gonna approve", strAmount);
+    d.querySelector(".walletbox .loader").style.visibility = "visible";
+    
+    try {
+        let tx = await contract.methods.approve( contractAddress, strAmount ).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
+        {
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
+            await initContract();
+            rebuildUI();
+        }
+    } catch (error) {
+        d.querySelector(".walletbox .loader").style.visibility = "hidden";
+        console.log("error", error);
+    }
+}
+
+async function stakeMe()
+{
+    let amount = parseFloat(document.querySelector(".stakingbox input").value).toString();
+    let strAmount = ""+web3.utils.toWei(amount).toString();
+    console.log("Gonna stake", strAmount);
+    d.querySelector(".walletbox .loader").style.visibility = "visible";
+    
+    try {
+        let tx = await contract.methods.createStake( strAmount ).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
+        {
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
+            await initContract();
+            rebuildUI();
+        }
+    } catch (error) {
+        d.querySelector(".walletbox .loader").style.visibility = "hidden";
+        console.log("error", error);
+    }
+}
+
+async function unstakeMe()
+{
+    let amount = parseFloat(document.querySelector(".stakingbox input").value).toString();
+    let strAmount = ""+web3.utils.toWei(amount).toString();
+    console.log("Gonna removeStake", strAmount);
+    d.querySelector(".walletbox .loader").style.visibility = "visible";
+    
+    try {
+        let tx = await contract.methods.removeStake( strAmount ).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
+        {
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
+            await initContract();
+            rebuildUI();
+        }
+    } catch (error) {
+        d.querySelector(".walletbox .loader").style.visibility = "hidden";
+        console.log("error", error);
+    }
+    
 }
 
 async function burnMe()
@@ -208,15 +360,20 @@ async function burnMe()
     console.log("Gonna burn", strAmount);
     // web3.utils.from
     //poll amount from textbox
-    let tx = await contract.methods.burn( accountAddress, strAmount ).send({ from: accountAddress });
-    console.log(tx);
-    if (tx)
-    {
-        setTimeout(async function()
+    d.querySelector(".walletbox .loader").style.visibility = "visible";
+    
+    try {
+        let tx = await contract.methods.burn( accountAddress, strAmount ).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
         {
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
             await initContract();
             rebuildUI();
-        }, 7000);
+        }
+    } catch (error) {
+        d.querySelector(".walletbox .loader").style.visibility = "hidden";
+        console.log("error", error);
     }
 }
 
@@ -228,59 +385,38 @@ async function mintMe()
     console.log("Gonna mint", strAmount);
     // web3.utils.from
     //poll amount from textbox
-    let tx = await contract.methods.mint( accountAddress, strAmount ).send({ from: accountAddress });
-    console.log(tx);
-    if (tx)
-    {
-        setTimeout(async function()
+    d.querySelector(".walletbox .loader").style.visibility = "visible";
+    try {
+        let tx = await contract.methods.mint( accountAddress, strAmount ).send({ from: accountAddress });
+        console.log(tx);
+        if (tx) 
         {
+            d.querySelector(".walletbox .loader").style.visibility = "hidden";
             await initContract();
             rebuildUI();
-        }, 7000);
+        }
+    } catch (error) {
+        d.querySelector(".walletbox .loader").style.visibility = "hidden";
+        console.log("error", error);
     }
+    
 }
 
 async function addMyTokenToMetamask()
 {
-    await ethereum.request(
+    const wasAdded =await ethereum.request(
     {
         method: 'wallet_watchAsset',
         params: {
             type: 'ERC20', 
             options: {
-            address: '', 
-            symbol: '', 
-            decimals: 0, 
-            image: '', 
+            address: contractAddress, 
+            symbol: 'SENO', 
+            decimals: 18
+            //image: '', 
             },
         },
     });
-}
-
-async function auxAddToMetamask()
-{
-    const wasAdded = await ethereum.request(
-    {
-        method: 'wallet_watchAsset',
-        params: {
-            type: 'ERC20', 
-            options: {
-            address: '0xd00981105e61274c8a5cd5a88fe7e037d935b513', 
-            symbol: 'TUT', 
-            decimals: 18, 
-            image: 'http://placekitten.com/200/300', 
-            },
-        },
-    });
-    
-    if (wasAdded)
-    {
-        //added
-    }
-    else
-    {
-        //rejected
-    }
 }
 
 function rebuildUI()
@@ -290,7 +426,7 @@ function rebuildUI()
     d.querySelector(".networkbox .box-title").innerHTML = "Chain Data";
     d.querySelector(".networkbox .networkbox-id").innerText = networkIDToString(networkID);
     d.querySelector(".networkbox .networkbox-symbol").innerText = contractSymbol;
-    d.querySelector(".networkbox .networkbox-totalsupply").innerText = totalSupply;
+    d.querySelector(".networkbox .networkbox-totalsupply").innerText = web3.utils.fromWei(totalSupply);
     d.querySelector(".networkbox .networkbox-paused").innerText = contractPaused;
 
     if (contract != null)
@@ -305,8 +441,7 @@ function rebuildUI()
     }
 
     d.querySelector(".networkbox .loader").style.visibility = "hidden";
-    d.querySelector(".walletbox .box-title").innerHTML = "Your Wallet Address:";
-    d.querySelector(".walletbox .content").innerHTML = "" + accountAddress;
+    d.querySelector(".walletbox .walletaddress").innerHTML = "" + accountAddress;
     d.querySelector(".walletbox .loader").style.visibility = "hidden";
     if (networkID != DEPLOYED_NETWORK) wrongNetwork(networkID);
 
@@ -317,6 +452,8 @@ function rebuildUI()
     }
 
     document.querySelector(".walletbox .balanceamount").innerText = web3.utils.fromWei(accountBalance);
+    document.querySelector(".walletbox .staking_balance").innerText = web3.utils.fromWei(stakingBalance);
+    document.querySelector(".walletbox .approvedamount").innerText = web3.utils.fromWei(allowanceBalance);
 }
 
 async function auxSignProof()
