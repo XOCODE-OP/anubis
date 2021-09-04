@@ -2,9 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>NFT boys</title>
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap" rel="stylesheet"> -->
+    <title>NFT</title>
     <style>
+
+@font-face {
+            font-family: 'titillium';
+            src: url('TitilliumWeb-Regular.ttf') format('opentype');
+        } 
+
+        *{
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-smooth: always;
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea,html input[type="button"],
+        input[type="reset"],
+        input[type="submit"],button[disabled],
+        html input[disabled],button::-moz-focus-inner,
+        input::-moz-focus-inner, input[type="checkbox"],
+        input[type="radio"], input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button, input[type="search"], input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-decoration
+        {
+            border:none;
+            background-image:none;
+            background-color:transparent;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+        }
+
+        body
+        {
+            font-family: 'titillium';
+            /* background: linear-gradient(to right, #414345, #232526);  */
+            background: linear-gradient(to right, #0e182c, #243764);
+            font-weight: 100;
+            /* color: rgb(221, 221, 188); */
+            color: #EEE;
+        }
+
+        a
+        {
+            color: yellow;
+            text-decoration: none;
+        }
+
+        a:hover
+        {
+            color: orange;
+            text-decoration: none;
+        }
 
         @keyframes loader_spin
         {
@@ -12,25 +68,11 @@
             100% { transform: rotate(360deg); }
         }
 
-        @font-face {
-            font-family: 'titillium';
-            src: url('TitilliumWeb-Regular.ttf') format('opentype');
-        } 
-
-        body
-        {
-            /* background: linear-gradient(90deg, rgba(94,61,116,1) 0%, rgba(96,14,122,1) 50%, rgba(18,55,91,1) 100%); */
-            background: linear-gradient(90deg, rgb(67, 43, 83) 0%, rgb(55, 8, 70) 50%, rgb(11, 34, 58) 100%);
-            color: rgb(221, 221, 188);
-            font-family: 'titillium';
-            font-weight: 100;
-            padding: 0;
-            margin: 0;
-        }
-
         .content_inner
         {
             padding: 10px;
+            display: flex;
+            flex-direction: row;
         }
 
         .loader
@@ -61,12 +103,18 @@
             vertical-align: top;
 
             text-align: center;
-            min-width: 200px;
+            min-width: 300px;
+            max-width: 500px;
             margin: 20px;
             display: inline-block;
-            padding: 6px;
-            border: 1px solid rgba(226, 226, 198, 0.788);
             position: relative;
+            font-size: 20px;
+            box-shadow: 0px 0px 3px 1px orange;
+        }
+
+        .box>p, .box>a
+        {
+            margin: 6px;
         }
 
         button
@@ -79,27 +127,48 @@
             font-family: 'titillium';
             font-weight: 500;
             font-size: 32px;
-        }
-
-        .nftlist_entries
-        {
-            text-align: left;
-            padding: 0 20px;
-        }
-
-        .nftlist_item
-        {
-            margin: 2px 0;
-            padding: 4px 10px;
-            background-color: rgba(10,10,10, 0.3);
-            max-width: 400px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            text-transform: uppercase;
         }
 
         .error
         {
-            color: rgb(243, 135, 85);
+            color: rgb(231, 100, 100);
+            visibility: hidden;
+        }
+
+        .success
+        {
+            color: rgb(53, 180, 47);
+            visibility: hidden;
+        }
+
+        input
+        {
+            font-family: 'titillium';
+            font-weight: 100;
+            font-size: 22px;
+            color: white;
+            background-color: rgb(33, 33, 33);
+            padding: 2px 6px;
+            border: 1px solid transparent;
+            margin: 2px auto;
+            display: block;
+            width: 86%;
+        }
+
+        input:hover
+        {
+            border-color: white; 
+        }
+
+        input:active, input:focus
+        {
+            border-color: orange;   
+        }
+
+        input::placeholder
+        {
+            color: grey;
         }
 
         .tilebutton
@@ -109,18 +178,32 @@
             display: block;
             font-size: 22px;
             padding: 16px 30px;
-            margin: 5px 0;
+            margin: 5px 10px;
             cursor: pointer;
             user-select: none;
             color: rgb(203, 211, 211);
             background-color: rgb(20, 63, 78);
+            border: 1px solid transparent;
         }
 
         .tilebutton:hover
         {
             /* filter: invert(); */
             /* filter: contrast(2.1); */
-            filter: brightness(2.0);
+            /* filter: brightness(2.0); */
+            color: rgb(255, 255, 255);
+            background-color: rgb(41, 123, 153);
+        }
+
+        .tilebutton:active
+        {
+            /* filter: invert(); */
+            /* filter: contrast(2.1); */
+            /* filter: brightness(2.0); */
+            color: orange;
+            background-color: rgb(21, 23, 24);
+            border-color: orange;
+            transition: all 1ms ease;
         }
 
         .tilebutton.smalltilebutton:hover
@@ -129,203 +212,91 @@
             color: black;
         }
 
+        .content
+        {
+            text-align: left;
+        }
+
+        .table
+        {
+            display: table;
+            margin: 10px;
+            width: calc(100% - 20px);
+        }
+
+        .tableval
+        {
+            text-align: right;
+            padding-left: 20px;
+        }
+
+        .addressellipsis
+        {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+
         .logo
         {
             
         }
 
+        .blocklist > *
+        {
+            display: block;
+        }
+
+        h1, h2, h3, h4
+        {
+            background-color: #111;
+            margin-bottom: 10px;
+        }
+
+        .box section h4
+        {
+            font-size: 20px;
+        }
+
+        .box section
+        {
+            margin-top: 20px;
+            padding: 10px 0px;
+            padding-top: 0;
+            background-color: rgba(28, 28, 28, 0.8);
+        }
+
+        .highlight
+        {
+            color: yellow;
+        }
+
+        .statusok
+        {
+            color: rgb(53, 180, 47);
+        }
+
+        .warning
+        {
+            color:rgb(255, 99, 99);
+        }
+
+        .address
+        {
+            text-overflow: ellipsis;
+            width: 50px;
+        }
+
+        p
+        {
+            margin: 8px;
+            padding: 6px 12px;
+            background-color: rgba(155,155,155, 0.1);
+        }
     </style>
     <script src='../web3.min.js'></script>
     <!-- <script src='./erc20abi.js'></script> -->
-    <script>
-        const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5});
-        const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
-
-        let d = document;
-        let ui = {}; //uicache
-        //const erc20ABI = abi();
-
-        let accountAddress;
-        let nftcontractJson;
-        let contractAddress;
-        let contractABI;
-        let contract;
-
-        let totalSupply;
-        let chainData = [];
-
-        function networkIDToString(_id)
-        {
-            _id = parseInt(_id);
-            switch (_id) 
-            {
-                case ETH_NETWORK_IDS.MAINNET:
-                    return "Mainnet";
-                    break;
-                case ETH_NETWORK_IDS.ROPSTEN:
-                    return "Ropsten";
-                    break;
-                case ETH_NETWORK_IDS.KOVAN:
-                    return "Kovan";
-                    break;
-                case ETH_NETWORK_IDS.RINKEBY:
-                    return "Rinkeby";
-                    break;
-                case ETH_NETWORK_IDS.GOERLI:
-                    return "Goerli";
-                    break;
-                default:
-                    return "unknown network ID: " + _id
-            }
-            return "unknown network ID: " + _id;
-        }
-
-        async function init()
-        {
-            const nftcontractJsonFILE = await fetch('../abis/MyNFTContract.json'); 
-            nftcontractJson = await nftcontractJsonFILE.json();
-
-            await loadWeb3();
-            let r = await initContract();
-            if (r != -1) await loadChainData();
-            if (r != -1) buildUI();
-        }
-
-        d.addEventListener('DOMContentLoaded', function()
-        {
-            ui.signbox = d.querySelector(".signbox");
-
-            //d.querySelector("#muhfield").innerHTML = "yello";
-            init();
-        });
-
-        function wrongNetwork(networkID)
-        {
-            //TODO: push network error message to ui
-            console.log("wrong current network", networkIDToString(networkID));
-        }
-
-        async function loadWeb3() // this will popup the connect metamask window for confirm
-        {
-            if (window.ethereum) 
-            {
-                window.web3 = new Web3(window.ethereum);
-                await window.ethereum.enable();
-
-                window.ethereum.on('accountsChanged', function (accounts) 
-                {
-                    console.log('accountsChanges', accounts);
-                });
-
-                window.ethereum.on('networkChanged', function(networkId)
-                {
-                    console.log('networkChanged', networkId);
-                    if (networkId != DEPLOYED_NETWORK) wrongNetwork(networkId);
-                });
-                console.log('NETWORK:', networkIDToString(window.ethereum.networkVersion));
-            }
-            else if (window.web3) 
-            {
-                window.web3 = new Web3(window.web3.currentProvider);
-            }
-            else
-            {
-                console.log("ERROR: no web3 provider");
-            }
-            let accounts = await window.web3.eth.getAccounts();
-            accountAddress = accounts[0];
-            d.querySelector(".walletbox .walletaddress").innerHTML = accountAddress;
-            // d.querySelector(".walletbox .loader").style.display = "none";
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        }
-
-        async function initContract()
-        {
-            const providerNetworkId = await window.web3.eth.net.getId();
-            if (providerNetworkId != DEPLOYED_NETWORK)
-            {
-                wrongNetwork(providerNetworkId);
-                return -1;
-            }
-            //which network. ganache has a network ID, and so does mainnet ETH etc
-            const contractNetworkData = nftcontractJson.networks[providerNetworkId];
-            if (!contractNetworkData)
-            {
-                console.log("NO contractNetworkData. Not deployed.");
-                return -1;
-            }
-            contractAddress = contractNetworkData.address; 
-            contractABI = nftcontractJson.abi;
-            contract = new window.web3.eth.Contract(contractABI, contractAddress);
-        }
-
-        async function loadChainData()
-        {
-            totalSupply = 0;
-            totalSupply = await contract.methods.totalSupply().call();
-            d.querySelector(".contractbox .loader").style.visibility = "hidden";
-
-            chainData = [];
-
-            for (let i = 0; i < totalSupply; i++)
-            {
-                const r = await contract.methods.someData(i).call();
-                chainData.push(r);
-            }
-        }
-
-        function buildUI()
-        {
-            d.querySelector(".totalsupply").innerHTML = totalSupply;
-            d.querySelector(".contractaddress").innerHTML = contractAddress;
-            
-            d.querySelector(".nftlist_entries").innerHTML = "";
-            let entriesHTML = "";
-            for (let i = 0; i < totalSupply; i++)
-            {
-                entriesHTML+=`<div class='nftlist_item'>${chainData[i]}</div>`;
-            }
-            d.querySelector(".nftlist_entries").innerHTML = entriesHTML;
-
-            d.querySelector(".tokendatabox .loader").style.visibility = "hidden";
-        }
-
-        async function mint(_data, _fromAddress)
-        {
-            let receipt = await contract.methods.mint(_data).send({ from: _fromAddress });
-            console.log("receipt", receipt);
-            await this.loadChainData();
-            buildUI();
-        }
-
-        async function sign(_data)
-        {
-            //in the rest of of the dapp, you already check here, if the account here mismatches the account polled earlier and WARN
-            let accounts = await web3.eth.getAccounts();
-            let msg = _data;
-            let sig = await web3.eth.personal.sign(msg, accounts[0], "for unlocked metamask this password field is not relevant");
-            let whoSigned = await web3.eth.accounts.recover(msg, sig);
-            return (whoSigned == accounts[0]);
-        }
-
-        async function signProcess()
-        {
-            let accounts = await web3.eth.getAccounts();
-            if (accounts[0] != accountAddress)
-            {
-                ui.signbox.querySelector(".error").innerHTML = "Wrong account selected.";
-                return;
-            }
-
-            let message = "I hereby whatever";
-
-            let result = await sign(message);
-            console.log(result);
-            if (result) ui.signbox.innerHTML = "Signature Success";
-            else        ui.signbox.querySelector(".error").innerHTML = "SIGNATURE FAILURE";
-        }
-
-    </script>
+    <script src='nft.js'></script>
     <link href="../cross_nav.css" rel="stylesheet"  />
 </head>
 <body>
@@ -342,114 +313,124 @@
         <img class='crossnav_title crossnav_smallimg' src='../img/nav_title_small.png' />
     </div>
 
+    <!-- <img src='https://picsum.photos/id/55/400/500' /> -->
+
     <div class="content_inner">
 
-        <!-- <div class='inlineblock'>
-            <div><img src='../img/logoa2.png' /></div>
-        </div> -->
+        <div>
 
-        <article class='box signbox'>
-            <h3 class='box-title'>Network: Rinkeby</h3>
-            <p>Ethereum has gotten very expensive, gas price wise. Therefore, this smart contract has been deployed on Rinkeby, since it is just a showcase. To obtain Rinkeby Ether, in order to interact with this frontend and smart contract, use this link <a href='https://faucet.rinkeby.io'>https://faucet.rinkeby.io</a></p>
-            <p>The code used here would have zero changes as opposed to Mainnet, except for the network ID.</p>
-            <div class="loader"><div class="loader-gfx"></div></div>
-        </article>
+            <article class='box '>
+                <h3 class='box-title'>INSTRUCTIONS</span></h3>
+                <p>This DApp is a technology showcase. This NFT contract (ERC721) is depolyed on the Ethereum Rinkeby Testnet.<br />
+                    In order to interact with this DApp, <a href='https://metamask.io/' target='_blank'>Metamask</a> is used.<br/>
+                    Your wallet will require Rinkeby Ethereum to pay gas fees. Use the <a href='https://faucet.rinkeby.io' target='_blank'>Rinkeby faucet at https://faucet.rinkeby.io</a> to get free Ethereum. </p>
+            </article>
     
-        <div style='width: auto; display: inline-block;'>
-            <div class='tilebutton'>Lock</div>
-            <div class='tilebutton'>Unlock</div>
-            <div class='tilebutton'>mint</div>
-            <div class='tilebutton'>burn</div>
-            <div class='tilebutton'>sign</div>
+            <br />
+            
+
         </div>
 
-        <img src='https://picsum.photos/id/55/400/500' />
-    
-        <article class='box walletbox'>
-            <h3 class='box-title'>Wallet Address</h3>
-            <div class='walletaddress'></div>
-            <div class="loader"><div class="loader-gfx"></div></div>
-        </article>
-    
-        <article class='box contractbox'>
-            <h3 class='box-title'>Contract</h3>
-            <div>Total Supply: <span class='totalsupply'></span></div>
-            <div>Address: <span class='contractaddress'></span></div>
-            <div class="loader"><div class="loader-gfx"></div></div>
-        </article>
         
+        <div>
+
+            <article class='box networkbox'>
+                <h3 class='box-title'>contract</h3>
+                <div class='content table'>
+                    <div style='display: table-row;'>
+                        <div style='display: table-cell;'>Network:</div>
+                        <div style='display: table-cell;' class='tableval networkbox-id'></div>
+                    </div>
+                    <div style='display: table-row;'>
+                        <div style='display: table-cell;'>Contract Name:</div>
+                        <div style='display: table-cell;' class='tableval networkbox-name'></div>
+                    </div>
+                    <div style='display: table-row;' class='walletbox'>
+                        <div style='display: table-cell;'>Your Wallet Address:</div>
+                        <div style='display: table-cell;' class='tableval walletaddress addressellipsis'></div>
+                    </div>
+                    <div style='display: table-row;'>
+                        <div style='display: table-cell;'>Contract Paused:</div>
+                        <div style='display: table-cell;' class='tableval networkbox-paused'></div>
+                    </div>
+                </div>
+                <div class='success'></div>
+                <div class='error'></div>
+                <div class="loader"><div class="loader-gfx"></div></div>
+                <div class='tilebutton networkchanger' onclick="requestRinkebyNetwork();" >Switch to Rinkeby</div>
+            </article>
+
+            <br />
+
+            <article class='box functionbox'>
+                <h3 class='box-title'>Functions</span></h3>
+                <div class='tilebutton' onclick='mintNewNFT();'>Mint new nft</div>
+                <div class='tilebutton' onclick="contractInteraction_togglePause();">Pause Contract</div>
+                
+                <div class="loader"><div class="loader-gfx"></div></div>
+            </article>
+
+        </div>
+       
         <article class='box tokendatabox'>
-            <h3 class='box-title'>List of Tokens</h3>
-            <div class='nftlist_entries'></div>
+            <h3 class='box-title'>Your Tokens</h3>
+            <section class='section_nft' data-tokenid='tokenid'>
+                have a burn option as a little button on every nft.<br />
+                show is visually if its locked
+                <p>TITLE OF NFT</p>
+                <p>IMAGE OF NFT</p>
+                <p>TEXT OF NFT</p>
+                <p>UUID OF NFT</p>
+                <div class='tilebutton' onclick='burnMe(tokenid);'>Burn nft</div>
+                <div class='tilebutton' onclick='lockNFT(tokenid);'>Lock nft</div>
+                <div class='tilebutton' onclick='unlockNFT(tokenid);'>Unlock nft</div>
+            </section>
+            <div class='nftlist_entries'>entries</div>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
     
-        <article class='box'>
-            <h3 class='box-title'>Mint new Token</h3>
-            <input type='text' placeholder="data" id='field_tokendata' />
-            <button onclick='mint( d.querySelector("#field_tokendata").value , accountAddress);'>Mint</button>
-        </article>
-    
-        <article class='box signbox'>
-            <h3 class='box-title'>Sign to prove ownership</h3>
-            <button onclick='signProcess();'>Sign</button>
-            <div class='error'></div>
-        </article>
-
     
         <article class='box'>
-            <pre style='text-align: left;'>
-
-                MARRIAGE CERTIFICATE EXAMPLE
-
+            <div style='text-align: left; font-size: 16px; margin: 30px'>
+                <strong >NFT & ERC20 USE CASES:</strong><br />
+                Games<br />
+                Paywall pass<br />
+                Ticket to event, passes<br />
+                Proof/key to consume content via decrypt or acknowledgement<br />
+                Art<br />
+                Funds — Providing liquidity, participation<br />
+                Corporate debt<br />
+                Corporate equity<br />
+                Loans<br />
+                Collectibles<br />
+                Intellectual property — patents, licenses<br />
+                Tokenized Commodities (oil, coffee beans...)<br />
+                Precious metals<br />
+                Tokenized Assets<br />
+                Sports teams, athletes, celebrities<br />
+                Certificates<br />
+                Gift cards, Redeemables<br />
+                Music and media - NFT is key to consume<br />
+                Domains<br />
+                Digital assets<br />
+                Tokenized Energy<br />
+                Fractional ownership<br />
+                Loyalty/Reward points<br />
+                Investment Options<br />
+                Identity<br />
+                Keys, tickets, passes<br />
+                Real Estate<br />
+                Legal Titles<br />
+                Supply Chain
+                <br />
+                <br />
+                <strong >MARRIAGE CERTIFICATE EXAMPLE:</strong><br />
+                <p>
                 A decentralized and reconigzed smart contract exists that creates marriage certificates. 2 people, can sign a transaction with their keys to mint a marriage NFT. as long as the NFT exists marriage is valid.
                 Both may sign another transaction at any time to burn the NFT and thereby nullify the marriage.
                 In case of disputes, one key signer may start a decentralized arbitration court like kleros. If they decide yes, using their decision plus the one key, the NFT gets burned.
-
-    NFT use cases
-    
-    add ipfs support
-    add time stamp
-    
-    card games
-    car property asset titles
-    let to unlock hidden content
-    ticket to event
-    proof/key to consume content
-    Precious metals
-    Art
-    Funds — Providing liquidity, participation
-    Corporate debt
-    Corporate equity
-    Loans
-    Collectibles — Physical & Digital
-    Collectible cars
-    Real estate — commercial, residential, etc
-    Intellectual property — patents, licenses
-    Commodities — oil, coffee beans, etc.
-    Sports teams, athletes, celebrities
-    Licenses
-    Certificates
-    Gift cards
-    Music — when a customer “buys” a song from iTunes, 
-        they’re not acquiring ownership of the song, however, 
-        they’re purchasing the right, a license, 
-        to listen to the music under certain conditions
-    Domains
-    In-game assets
-    Digital asset bundles — gaming and non-gaming
-    Asset bundles
-    Energy
-    Fractional ownership
-    Loyalty/Reward points
-    Investment options
-    Identity
-    Keys or passes
-    Estate planning
-    Supply chain
-    Wine
-    Luxury goods
-            </pre>
+                </p>
+            </div>
         </article>
 
         <!-- <div style='width: 200px; height: 200px; display: inline-block; border: 1px solid white; position: relative;'>

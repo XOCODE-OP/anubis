@@ -9,23 +9,22 @@
 
 const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5, 
     BSC: 56, BSC_TEST: 97, POLYGON: 137, POLYGON_TEST: 80001, GANACHE: 5777});
-const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
+const DEPLOYED_NETWORK = ETH_NETWORK_IDS.GANACHE;
 const BLOCKCHAIN_EVENT_LOG = false;
 
-const contractAddress = "0x7C4DBFF5496c64DdA9323e21837B0c69802F4E2f";
-// const coinContractName    = "TestERC20";
+const contractAddress = "0xeD818F6845017841119ff48AfC73Bc61E42995fB";
 const d = document;
 let accountAddress = null;
-let accountBalance = 0;
-let stakingBalance = 0;
-let allowanceBalance = 0;
+// let accountBalance = 0;
+// let stakingBalance = 0;
+// let allowanceBalance = 0;
 
 let networkID = null;
 let contractJson = null;
 let contract = null;
 
 //from chain:
-let totalSupply = 0;
+// let totalSupply = 0;
 let contractName = null;
 let contractSymbol = null;
 let contractPaused = null;
@@ -37,38 +36,27 @@ function networkIDToString(_id)
     {
         case ETH_NETWORK_IDS.MAINNET:
             return "Ethereum Mainnet";
-            break;
         case ETH_NETWORK_IDS.ROPSTEN:
             return "Ropsten";
-            break;
         case ETH_NETWORK_IDS.KOVAN:
             return "Kovan";
-            break;
         case ETH_NETWORK_IDS.RINKEBY:
             return "Rinkeby";
-            break;
         case ETH_NETWORK_IDS.GOERLI:
             return "Goerli";
-            break;
         case ETH_NETWORK_IDS.GANACHE:
             return "Ganache";
-            break;
         case ETH_NETWORK_IDS.BSC:
             return "Binance Smart Chain Mainnet";
-            break;
         case ETH_NETWORK_IDS.BSC_TEST:
             return "Binance Smart Chain TESTnet";
-            break;
         case ETH_NETWORK_IDS.POLYGON:
             return "Polygon Mainnet";
-            break;
         case ETH_NETWORK_IDS.POLYGON_TEST:
             return "Polygon TESTnet";
-            break;
         default:
-            return "unknown network ID: " + _id
+            return "unknown network ID: " + _id;
     }
-    return "unknown network ID: " + _id;
 }
 
 d.addEventListener('DOMContentLoaded', function()
@@ -78,59 +66,8 @@ d.addEventListener('DOMContentLoaded', function()
 
 async function init()
 {
-    contractJson = await(await fetch('../abis/StakerERC20_NoOwner.json')).json(); 
-    if (!BLOCKCHAIN_EVENT_LOG) d.querySelector(".logbox").style.display = "none";
-
+    contractJson = await(await fetch('../abis/Showcase721.json')).json(); 
     await loadWeb3();
-}
-
-async function auxBlockchainMessage()
-{
-    const sendtoaddress = d.querySelector(".section_blockchain_sendmessage .datasendtoaddress").value;
-    // let amount = Number.parseFloat( d.querySelector(".section_blockchain_sendmessage .dataamount").value );
-    // amount = amount * 1000000000000000000;
-    let amount = 0;
-    const message = d.querySelector(".section_blockchain_sendmessage .datamessage").value;
-
-    console.log("sendtoaddress", sendtoaddress);
-    console.log("amount", amount);
-    console.log("message", message);
-
-    let hex = web3.utils.utf8ToHex(message);
-    // console.log("Message: ", msg);
-    // console.log("Hex: ", hex);
-    // console.log("Revert: ", web3.utils.hexToUtf8(hex));
-
-    const DEFAULT_GASLIMIT_SENDING_ETH = 42000;
-
-    let txTransfer = {};
-    txTransfer.from = accountAddress;
-    txTransfer.to = sendtoaddress;
-    txTransfer.gas = DEFAULT_GASLIMIT_SENDING_ETH;
-    txTransfer.value = amount;
-    txTransfer.data = hex;
-    console.log(`Trying to send ETH from address ${txTransfer.from} to ${txTransfer.to}. Gaslimit: ${txTransfer.gas}. Amount: ${txTransfer.value}. With Message: ${message}`);
-    d.querySelector(".auxbox .loader").style.visibility = "visible";
-
-    try {
-        let tx = await web3.eth.sendTransaction(txTransfer);
-        console.log("tx", tx);
-        console.log(`https://rinkeby.etherscan.io/tx/${tx.transactionHash}`);
-        if (tx) 
-        {
-            d.querySelector(".auxbox .loader").style.visibility = "hidden";
-            document.querySelector(".section_blockchain_sendmessage .blockchain_sendmessage-tx").innerHTML = 
-            `<span class='statusok'>SUCCESS </span> <a href='https://rinkeby.etherscan.io/tx/${tx.transactionHash}' target='_blank'>Link to transaction via block explorer</a>`;
-            await initContract();
-            rebuildUI();
-        }
-    } catch (error) {
-        d.querySelector(".auxbox .loader").style.visibility = "hidden";
-        document.querySelector(".section_blockchain_sendmessage .blockchain_sendmessage-tx").innerHTML = 
-            `<span class='warning'>FAILURE</span>`;
-        console.log("error", error);
-    }
-    
 }
 
 function wrongNetwork(networkID)
@@ -154,16 +91,16 @@ async function initContract()
         console.error("Contract could not be found.");
         return false;
     }
-    totalSupply =  await contract.methods.totalSupply().call();
+    // totalSupply =  await contract.methods.totalSupply().call();
     contractName = await contract.methods.name().call();
     contractSymbol = await contract.methods.symbol().call();
     contractPaused = await contract.methods.paused().call();
 
     if (!contractPaused)
     {
-        accountBalance   = await contract.methods.balanceOf(accountAddress).call();
-        stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
-        allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
+        // accountBalance   = await contract.methods.balanceOf(accountAddress).call();
+        // stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
+        // allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
     }
     
     if (BLOCKCHAIN_EVENT_LOG)
@@ -393,8 +330,22 @@ async function burnMe()
     }
 }
 
-async function mintMe()
+async function mintNewNFT()
 {
+    //createShowcaseNFT
+    //const nftcontractJsonFILE = await fetch(`https://templeosiris.herokuapp.com/create_showcase_nft?wallet=${accountAddress}`); 
+    const osirisNFT = await(await fetch(`127.0.0.1:3000/create_showcase_nft?wallet=${accountAddress}`)).json(); 
+    /*
+        {
+            "wallet_addr": "asdf",
+            "minted": false,
+            "nft": "176da7db-b352-4ad4-bfcd-64c4f4e75766",
+            "picid": "https://picsum.photos/id/1/400/500",
+            "title": "NFT title",
+            "text": "This is a text associated with this NFT specifically. Note that for this showcase, for simplicity, the text is the same for every NFT. However the image will be different for each NFT. In a practical NFT, it will store relevant data here."
+        }
+    */
+
     let amount = parseFloat(document.querySelector(".functionbox .section_mint input").value).toString();
     let strAmount = ""+web3.utils.toWei(amount).toString();
     console.log(typeof strAmount);
@@ -418,27 +369,9 @@ async function mintMe()
     
 }
 
-async function addMyTokenToMetamask()
-{
-    const wasAdded =await ethereum.request(
-    {
-        method: 'wallet_watchAsset',
-        params: {
-            type: 'ERC20', 
-            options: {
-            address: contractAddress, 
-            symbol: 'SENO', 
-            decimals: 18
-            //image: '', 
-            },
-        },
-    });
-}
-
 function rebuildUI()
 {
     
-
     if (contract != null)
     {
         d.querySelector(".networkbox .success").innerText = "SYSTEM READY";
@@ -451,9 +384,8 @@ function rebuildUI()
     }
 
     d.querySelector(".networkbox .loader").style.visibility = "hidden";
-    d.querySelector(".walletbox .walletaddress").innerHTML = "" + accountAddress;
-    d.querySelector(".walletbox .walletaddress").title = "" + accountAddress;
-    d.querySelector(".walletbox .loader").style.visibility = "hidden";
+    d.querySelector(".networkbox .walletaddress").innerHTML = "" + accountAddress;
+    d.querySelector(".networkbox .walletaddress").title = "" + accountAddress;
 
     if (networkID != DEPLOYED_NETWORK)
     {
@@ -464,22 +396,22 @@ function rebuildUI()
     d.querySelector(".networkbox .error").style.visibility = "hidden";
     d.querySelector(".networkbox .networkchanger").style.display = "none";
     d.querySelector(".networkbox .networkbox-id").innerText = networkIDToString(networkID);
-    d.querySelector(".networkbox .networkbox-symbol").innerText = contractSymbol;
-    d.querySelector(".networkbox .networkbox-totalsupply").innerText = web3.utils.fromWei(totalSupply);
+    d.querySelector(".networkbox .networkbox-name").innerText = contractName;
+    // d.querySelector(".networkbox .networkbox-totalsupply").innerText = web3.utils.fromWei(totalSupply);
     d.querySelector(".networkbox .networkbox-paused").innerHTML = (contractPaused ? "<span class='warning'>PAUSED</span>" : "<span class='statusok'>ACTIVE</span>");
 
     if (contract != null)
     {
-        d.querySelector(".stakingbox .loader").style.visibility = "hidden";
+        // d.querySelector(".stakingbox .loader").style.visibility = "hidden";
         d.querySelector(".functionbox .loader").style.visibility = "hidden";
-        d.querySelector(".auxbox .loader").style.visibility = "hidden";
+        d.querySelector(".tokendatabox .loader").style.visibility = "hidden";
     }
 
     if (!contractPaused)
     {
-        document.querySelector(".walletbox .balanceamount").innerHTML = web3.utils.fromWei(accountBalance)+" "+contractSymbol;
-        document.querySelector(".walletbox .staking_balance").innerHTML = web3.utils.fromWei(stakingBalance)+" "+contractSymbol;
-        document.querySelector(".walletbox .approvedamount").innerHTML = web3.utils.fromWei(allowanceBalance)+" "+contractSymbol;
+        // document.querySelector(".walletbox .balanceamount").innerHTML = web3.utils.fromWei(accountBalance)+" "+contractSymbol;
+        // document.querySelector(".walletbox .staking_balance").innerHTML = web3.utils.fromWei(stakingBalance)+" "+contractSymbol;
+        // document.querySelector(".walletbox .approvedamount").innerHTML = web3.utils.fromWei(allowanceBalance)+" "+contractSymbol;
     }
     else
     {
@@ -533,66 +465,6 @@ async function requestRinkebyNetwork()
     {
         console.error(error);
         return;
-    }
-    
-}
-
-
-async function auxAddNetwork()
-{
-    /*
-    0x38	56	Binance Smart Chain Main Network (bsc-mainnet)
-    0x61	97	Binance Smart Chain Test Network (bsc-testnet)
-    */
-
-    if (window.ethereum)
-    {
-        try
-        {
-            // check if the chain to connect to is installed
-            await window.ethereum.request(
-            {
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x38' }], // chainId must be in hexadecimal numbers
-            });
-        }
-        catch (error)
-        {
-            // This error code indicates that the chain has not been added to MetaMask
-            // if it is not, then install it into the user MetaMask
-            if (error.code === 4902)
-            {
-                try
-                {
-                    await window.ethereum.request(
-                    {
-                        method: 'wallet_addEthereumChain',
-                        params: [
-                            {
-                                chainId: '0x38', //chain id has to be in hex
-                                chainName: 'Binance Smart Chain Mainnet',
-                                nativeCurrency: {
-                                    name: "Binance Coin",
-                                    symbol: "BNB", // 2-6 characters long
-                                    decimals: 18
-                                },
-                                rpcUrls: ['https://bsc-dataseed1.binance.org/'],
-                                blockExplorerUrls: ['https://bscscan.com']
-                            },
-                        ],
-                    });
-                }
-                catch (addError)
-                {
-                    console.error(addError);
-                }
-            }
-            console.error(error);
-        }
-    }
-    else
-    {
-        console.log('MetaMask is not installed.');
     }
     
 }

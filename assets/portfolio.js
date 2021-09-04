@@ -366,6 +366,7 @@ async function buildPortfolio() //addr is now an array
         let coins = resp;
         // let strhtml = "";
         let prevElement = ui.totalDivElem_eth;
+        let iconPollList = [];
         for (let i = 0; i < coins.items.length; i++)
         {
             if (coins.items[i] == null) continue;
@@ -376,7 +377,9 @@ async function buildPortfolio() //addr is now an array
 
             // console.log(`${token.contract_ticker_symbol}  adding ${parseFloat(token.eth_value_total)}  ${token.eth_value_total}`)
 
-            div_elem = addUITokenETH(token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
+            div_elem = addUITokenETH(i, token.contract_address, token.contract_name, token.contract_ticker_symbol, token.balance_fullcoins, token.anubisicon); //token.anubislogo
+
+            iconPollList.push( {element: div_elem, address: token.contract_address} );
 
             div_elem.querySelector('.eth_value').innerText  = `ETH ${numberWithCommas(parseFloat(token.eth_value_total).toFixed(2))}`;
             div_elem.querySelector('.eth_value').dataset.val = token.total_eth;
@@ -407,10 +410,11 @@ async function buildPortfolio() //addr is now an array
                 }, 300);
             });
             
-            
             prevElement.after(div_elem);
             prevElement = div_elem;
+
         }
+
         ui.totalValElem_eth.innerText = `$ ${numberWithCommas(parseFloat(coins.totalusd).toFixed(2))}`;
         //uiCache.totalValElem_bsc.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
         //uiCache.totalValElem_polygon.innerText = `$ ${numberWithCommas(total_usd.toFixed(2))}`;
@@ -491,11 +495,12 @@ function getAllInputAddresses()
     return all;
 }
 
-function addUITokenETH(_name, _symbol, _token_total, _icon) //add chain to ensure multi polling
+function addUITokenETH(_delay, _address, _name, _symbol, _token_total, _icon) //add chain to ensure multi polling
 {
     let clone = baseTokenElement.cloneNode(true);
     //clone.id = 'elem2';
     clone.className += " cloned "+_symbol;
+    clone.dataset.contractaddress = _address;
     _token_total = parseFloat(_token_total);
     clone.querySelector('.token_total').innerText  = numberWithCommas(_token_total.toFixed(2)) + " " + _symbol;
     clone.querySelector('.tokenname').innerText  = _name;
@@ -504,8 +509,8 @@ function addUITokenETH(_name, _symbol, _token_total, _icon) //add chain to ensur
         if (_icon != "ETHEREUM")
         {
             // console.log("Setting icon for ", _symbol, "to", _icon, clone.querySelector('.tokenicon').style.backgroundImage);
-            clone.querySelector('.tokenicon').style.backgroundImage = `url('${_icon}')`;   
-            clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
+            //clone.querySelector('.tokenicon').style.backgroundImage = `url('${_icon}')`;   
+            //clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
         }
         else
         {
@@ -518,6 +523,21 @@ function addUITokenETH(_name, _symbol, _token_total, _icon) //add chain to ensur
     }
     clone.style.visibility = "visible";
     ui.chainbuttonETH.after(clone);
+
+    let delay = 2000 * _delay;
+    setTimeout(async function()
+    {
+        let res = await(await fetch(`https://etherscan.io/token/${_address}`)).text();
+        let part = res.split("<main")[1].split("avatar")[1].split("src='")[1].split("' />")[0];
+        let full = "https://etherscan.io" + part;
+
+        if (part && part.length > 6)
+        {
+            clone.querySelector('.tokenicon').style.backgroundImage = `url('${full}')`;   
+            clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
+        }
+
+    }, delay);
 
     return clone;
 }
