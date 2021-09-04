@@ -531,10 +531,13 @@ function addUITokenETH(_delay, _address, _name, _symbol, _token_total, _icon) //
         let part = res.split("<main")[1].split("avatar")[1].split("src='")[1].split("' />")[0];
         let full = "https://etherscan.io" + part;
 
+        console.log("full", full);
+
         if (part && part.length > 6)
         {
             clone.querySelector('.tokenicon').style.backgroundImage = `url('${full}')`;   
             clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
+            console.log("full being set");
         }
 
     }, delay);
