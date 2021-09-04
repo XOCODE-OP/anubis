@@ -27,12 +27,22 @@ let ui = {};
 // let current_chain = "eth";
 let gasdata = null;
 const DISABLE_METAMASK = false;
+let tokenCases;
+const ANUBIS_VERSION_NUM = "0.2.0121";
 
-const ANUBIS_VERSION_NUM = "0.2.0021";
+window.onbeforeunload = function () {
+    window.scrollTo(0, 0);
+  }
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
     console.log("ANUBIS VERSION " + ANUBIS_VERSION_NUM);
+
+    async function pollCases()
+    {
+        tokenCases = await (await fetch("https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/tokenlist.json")).json();
+    }
+    pollCases();
 
     ui.checkButton         = document.querySelector("#btn_main_check");
     ui.checkButton.disabled = true;
@@ -504,42 +514,42 @@ function addUITokenETH(_delay, _address, _name, _symbol, _token_total, _icon) //
     _token_total = parseFloat(_token_total);
     clone.querySelector('.token_total').innerText  = numberWithCommas(_token_total.toFixed(2)) + " " + _symbol;
     clone.querySelector('.tokenname').innerText  = _name;
-    if (_icon)
-    {
-        if (_icon != "ETHEREUM")
-        {
-            // console.log("Setting icon for ", _symbol, "to", _icon, clone.querySelector('.tokenicon').style.backgroundImage);
-            //clone.querySelector('.tokenicon').style.backgroundImage = `url('${_icon}')`;   
-            //clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
-        }
-        else
-        {
-            clone.querySelector('.tokenicon').style.backgroundImage = `url('${ETHEREUM_ICON_BASE64}')`;   
-        } 
-    }
-    else
-    {
-        clone.querySelector('.tokenicon').innerText = `${_symbol.toUpperCase().substring(0, 3)}`;   
-    }
+    clone.querySelector('.tokenicon').innerText = `${_symbol.toUpperCase().substring(0, 3)}`; 
+    
     clone.style.visibility = "visible";
     ui.chainbuttonETH.after(clone);
 
-    let delay = 2000 * _delay;
+    let delay = 100 * _delay;
     setTimeout(async function()
     {
-        let res = await(await fetch(`https://etherscan.io/token/${_address}`)).text();
-        let part = res.split("<main")[1].split("avatar")[1].split("src='")[1].split("' />")[0];
-        let full = "https://etherscan.io" + part;
-
-        console.log("full", full);
-
-        if (part && part.length > 6)
+        if (_address == "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") //eth
         {
-            clone.querySelector('.tokenicon').style.backgroundImage = `url('${full}')`;   
+            clone.querySelector('.tokenicon').style.backgroundImage = `url('${ETHEREUM_ICON_BASE64}')`;  
             clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
-            console.log("full being set");
+            clone.querySelector('.tokenicon').innerText = "";
         }
-
+        else
+        {
+            let correctCaseAddress = _address;
+            let found = false;
+            for (let i = 0; i < tokenCases.tokens.length; i++)
+            {
+                const e = tokenCases.tokens[i].address;
+                if (e.toLowerCase() == _address.toLowerCase())
+                {
+                    correctCaseAddress = e;
+                    found = true;
+                    break;
+                }
+            }
+            if (found)
+            {
+                let picurl = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${correctCaseAddress}/logo.png`;
+                clone.querySelector('.tokenicon').style.backgroundImage = `url('${picurl}')`;   
+                clone.querySelector('.tokenicon').style.backgroundColor = `transparent`;   
+                clone.querySelector('.tokenicon').innerText = "";
+            }
+        }
     }, delay);
 
     return clone;
@@ -580,7 +590,7 @@ async function pollAddressTokens(_chain, _address, callback)
     else 
     {
         let coins = resp.items;
-        console.log(resp);
+        // console.log(resp);
         for (let i = 0; i < coins.length; i++)
         {
             const c = coins[i];
