@@ -73,6 +73,7 @@
             padding: 10px;
             display: flex;
             flex-direction: row;
+            align-items: start;
         }
 
         .loader
@@ -260,9 +261,8 @@
 
         .box section
         {
-            margin-top: 20px;
-            padding: 10px 0px;
-            padding-top: 0;
+            margin-bottom: 6px;
+            padding: 5px 0px;
             background-color: rgba(28, 28, 28, 0.8);
         }
 
@@ -285,6 +285,78 @@
         {
             text-overflow: ellipsis;
             width: 50px;
+        }
+
+        .collist
+        {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        .nftlist_entries
+        {
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -ms-overflow-style: none;  /* Internet Explorer 10+ */
+            scrollbar-width: none;
+        }
+
+        .nftlist_entries::-webkit-scrollbar {
+            width: 6px;  /* Remove scrollbar space */
+            /* background: transparent;  Optional: just make scrollbar invisible */
+            background: #000;  
+        }
+        /* Optional: show position indicator in red */
+        .nftlist_entries::-webkit-scrollbar-thumb {
+            background: rgb(0, 104, 81);
+        }
+
+        .section_nft 
+        {
+            padding: 0 !important;
+            
+        }
+
+        .section_nft img
+        {
+            width: 300px;
+        }
+
+        .section_nft .section_title
+        {
+            margin: 4px 0 !important;
+            cursor: pointer;
+            background-color: #111;
+        }
+
+        .section_nft .section_title:hover
+        {
+            background-color: #2874a7;
+        }
+
+        .section_nft .section_uuid
+        {
+            font-family: monospace;
+            font-size: 11px;
+            color: gray;
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .section_nft .section_textcontent
+        {
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+            margin: 3px;
+        }
+
+        .section_nft .section_button
+        {
+            padding: 3px 16px;
+            width: 100%;
         }
 
         p
@@ -346,12 +418,16 @@
                         <div style='display: table-cell;' class='tableval networkbox-name'></div>
                     </div>
                     <div style='display: table-row;' class='walletbox'>
-                        <div style='display: table-cell;'>Your Wallet Address:</div>
+                        <div style='display: table-cell;'>Your Wallet:</div>
                         <div style='display: table-cell;' class='tableval walletaddress addressellipsis'></div>
                     </div>
                     <div style='display: table-row;'>
-                        <div style='display: table-cell;'>Contract Paused:</div>
+                        <div style='display: table-cell;'>State:</div>
                         <div style='display: table-cell;' class='tableval networkbox-paused'></div>
+                    </div>
+                    <div style='display: table-row;'>
+                        <div style='display: table-cell;'>Next Token ID:</div>
+                        <div style='display: table-cell;' class='tableval networkbox-nexttokenid'></div>
                     </div>
                 </div>
                 <div class='success'></div>
@@ -365,7 +441,7 @@
             <article class='box functionbox'>
                 <h3 class='box-title'>Functions</span></h3>
                 <div class='tilebutton' onclick='mintNewNFT();'>Mint new nft</div>
-                <div class='tilebutton' onclick="contractInteraction_togglePause();">Pause Contract</div>
+                <div class='tilebutton' onclick="contractInteraction_togglePause();">Toggle Pause</div>
                 
                 <div class="loader"><div class="loader-gfx"></div></div>
             </article>
@@ -374,18 +450,7 @@
        
         <article class='box tokendatabox'>
             <h3 class='box-title'>Your Tokens</h3>
-            <section class='section_nft' data-tokenid='tokenid'>
-                have a burn option as a little button on every nft.<br />
-                show is visually if its locked
-                <p>TITLE OF NFT</p>
-                <p>IMAGE OF NFT</p>
-                <p>TEXT OF NFT</p>
-                <p>UUID OF NFT</p>
-                <div class='tilebutton' onclick='burnMe(tokenid);'>Burn nft</div>
-                <div class='tilebutton' onclick='lockNFT(tokenid);'>Lock nft</div>
-                <div class='tilebutton' onclick='unlockNFT(tokenid);'>Unlock nft</div>
-            </section>
-            <div class='nftlist_entries'>entries</div>
+            <div class='nftlist_entries'></div>
             <div class="loader"><div class="loader-gfx"></div></div>
         </article>
     

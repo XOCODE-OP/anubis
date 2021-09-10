@@ -9,10 +9,10 @@
 
 const ETH_NETWORK_IDS = Object.freeze({MAINNET: 1, ROPSTEN: 3, KOVAN: 42, RINKEBY: 4, GOERLI: 5, 
     BSC: 56, BSC_TEST: 97, POLYGON: 137, POLYGON_TEST: 80001, GANACHE: 5777});
-const DEPLOYED_NETWORK = ETH_NETWORK_IDS.GANACHE;
+const DEPLOYED_NETWORK = ETH_NETWORK_IDS.RINKEBY;
 const BLOCKCHAIN_EVENT_LOG = false;
 
-const contractAddress = "0xeD818F6845017841119ff48AfC73Bc61E42995fB";
+const contractAddress = "0x60d7c98458Ea3558d8F6335fE5745E4F08a33412";
 const d = document;
 let accountAddress = null;
 // let accountBalance = 0;
@@ -25,6 +25,7 @@ let contract = null;
 
 //from chain:
 // let totalSupply = 0;
+let contractNextID = -1;
 let contractName = null;
 let contractSymbol = null;
 let contractPaused = null;
@@ -95,13 +96,8 @@ async function initContract()
     contractName = await contract.methods.name().call();
     contractSymbol = await contract.methods.symbol().call();
     contractPaused = await contract.methods.paused().call();
+    contractNextID  = await contract.methods.nextTokenID().call();
 
-    if (!contractPaused)
-    {
-        // accountBalance   = await contract.methods.balanceOf(accountAddress).call();
-        // stakingBalance   = await contract.methods.stakeOf(accountAddress).call();
-        // allowanceBalance = await contract.methods.allowance(accountAddress, contractAddress).call();
-    }
     
     if (BLOCKCHAIN_EVENT_LOG)
     {
@@ -184,7 +180,7 @@ async function loadWeb3() // this will popup the connect metamask window for con
             accountAddress = accounts[0];
             console.log('account was changed to', accountAddress);
             await initContract();
-            rebuildUI();
+            await rebuildUI();
         });
 
         window.ethereum.on('networkChanged', async function(_nid)
@@ -192,7 +188,7 @@ async function loadWeb3() // this will popup the connect metamask window for con
             console.log('network was changed to', networkIDToString(_nid));
             networkID = _nid; 
             await initContract();
-            rebuildUI();
+            await rebuildUI();
         });
         console.log('NETWORK:', networkIDToString(window.ethereum.networkVersion));
     }
@@ -208,7 +204,7 @@ async function loadWeb3() // this will popup the connect metamask window for con
     accountAddress = (await window.web3.eth.getAccounts())[0];
     networkID = await window.web3.eth.net.getId();
     await initContract();
-    rebuildUI();
+    await rebuildUI();
 }
 
 
@@ -228,7 +224,7 @@ async function contractInteraction_togglePause()
         {
             d.querySelector(".networkbox .loader").style.visibility = "hidden";
             await initContract();
-            rebuildUI();
+            await rebuildUI();
         }
     } catch (error) {
         d.querySelector(".networkbox .loader").style.visibility = "hidden";
@@ -237,140 +233,202 @@ async function contractInteraction_togglePause()
     
 }
 
-async function approveMe()
-{
-    // _approve(address spender, uint256 amount
-    let amount = parseFloat(document.querySelector(".functionbox .section_approve input").value).toString();
-    let strAmount = ""+web3.utils.toWei(amount).toString();
-    console.log("Gonna approve", strAmount);
-    d.querySelector(".walletbox .loader").style.visibility = "visible";
-    
-    try {
-        let tx = await contract.methods.approve( contractAddress, strAmount ).send({ from: accountAddress });
-        console.log(tx);
-        if (tx) 
-        {
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-            await initContract();
-            rebuildUI();
-        }
-    } catch (error) {
-        d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        console.log("error", error);
-    }
-}
-
-async function stakeMe()
-{
-    let amount = parseFloat(document.querySelector(".stakingbox input").value).toString();
-    let strAmount = ""+web3.utils.toWei(amount).toString();
-    console.log("Gonna stake", strAmount);
-    d.querySelector(".walletbox .loader").style.visibility = "visible";
-    
-    try {
-        let tx = await contract.methods.createStake( strAmount ).send({ from: accountAddress });
-        console.log(tx);
-        if (tx) 
-        {
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-            await initContract();
-            rebuildUI();
-        }
-    } catch (error) {
-        d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        console.log("error", error);
-    }
-}
-
-async function unstakeMe()
-{
-    let amount = parseFloat(document.querySelector(".stakingbox input").value).toString();
-    let strAmount = ""+web3.utils.toWei(amount).toString();
-    console.log("Gonna removeStake", strAmount);
-    d.querySelector(".walletbox .loader").style.visibility = "visible";
-    
-    try {
-        let tx = await contract.methods.removeStake( strAmount ).send({ from: accountAddress });
-        console.log(tx);
-        if (tx) 
-        {
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-            await initContract();
-            rebuildUI();
-        }
-    } catch (error) {
-        d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        console.log("error", error);
-    }
-    
-}
-
-async function burnMe()
-{
-    let amount = parseFloat(document.querySelector(".functionbox .section_burn input").value).toString();
-    let strAmount = ""+web3.utils.toWei(amount).toString();
-    console.log(typeof strAmount);
-    console.log("Gonna burn", strAmount);
-    // web3.utils.from
-    //poll amount from textbox
-    d.querySelector(".walletbox .loader").style.visibility = "visible";
-    
-    try {
-        let tx = await contract.methods.burn( accountAddress, strAmount ).send({ from: accountAddress });
-        console.log(tx);
-        if (tx) 
-        {
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
-            await initContract();
-            rebuildUI();
-        }
-    } catch (error) {
-        d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        console.log("error", error);
-    }
-}
-
 async function mintNewNFT()
 {
-    //createShowcaseNFT
-    //const nftcontractJsonFILE = await fetch(`https://templeosiris.herokuapp.com/create_showcase_nft?wallet=${accountAddress}`); 
-    const osirisNFT = await(await fetch(`127.0.0.1:3000/create_showcase_nft?wallet=${accountAddress}`)).json(); 
-    /*
-        {
-            "wallet_addr": "asdf",
-            "minted": false,
-            "nft": "176da7db-b352-4ad4-bfcd-64c4f4e75766",
-            "picid": "https://picsum.photos/id/1/400/500",
-            "title": "NFT title",
-            "text": "This is a text associated with this NFT specifically. Note that for this showcase, for simplicity, the text is the same for every NFT. However the image will be different for each NFT. In a practical NFT, it will store relevant data here."
-        }
-    */
+    const osirisNFT = await(await fetch(`https://templeosiris.herokuapp.com/create_showcase_nft?addr=${accountAddress}`)).json(); 
 
-    let amount = parseFloat(document.querySelector(".functionbox .section_mint input").value).toString();
-    let strAmount = ""+web3.utils.toWei(amount).toString();
-    console.log(typeof strAmount);
-    console.log("Gonna mint", strAmount);
-    // web3.utils.from
-    //poll amount from textbox
-    d.querySelector(".walletbox .loader").style.visibility = "visible";
-    try {
-        let tx = await contract.methods.mint( accountAddress, strAmount ).send({ from: accountAddress });
+    console.log("Gonna mint NFT", osirisNFT);
+
+    d.querySelector(".tokendatabox .loader").style.visibility = "visible";
+    d.querySelector(".functionbox .loader").style.visibility = "visible";
+    // try {
+        let tx = await contract.methods.mint(accountAddress, osirisNFT.nftuuid).send({ from: accountAddress });
         console.log(tx);
         if (tx) 
         {
-            d.querySelector(".walletbox .loader").style.visibility = "hidden";
             await initContract();
-            rebuildUI();
+            await rebuildUI();
+
+            //send success to the server, which will sync, and thereby also remove it from the unminted list
+            //await
+            //THEN rebuild
         }
-    } catch (error) {
-        d.querySelector(".walletbox .loader").style.visibility = "hidden";
-        console.log("error", error);
-    }
+    // } catch (error) {
+    //     d.querySelector(".tokendatabox .loader").style.visibility = "hidden";
+    //     console.log("error in mint");
+    //     //console.log("error", error);
+    // }
     
 }
 
-function rebuildUI()
+function getAllNFTsOfAddress()
 {
+    //const osirisNFT = await(await fetch(`https://templeosiris.herokuapp.com/get_showcase_nft_data?nft=${nftuuid}`)).json(); 
+}
+
+function validAddress(address)
+{
+    address = address.toLowerCase();
+    return /^(0x)?[0-9a-f]{40}$/i.test(address);
+}
+
+async function rebuildUI()
+{
+    d.querySelector(".nftlist_entries").innerHTML = "";
+    let tokensOfAddr = null;
+    if (!contractPaused) 
+    {
+        console.log("fetching get_showcase_nfts");
+        tokensOfAddr = await(await fetch(`https://templeosiris.herokuapp.com/get_showcase_nfts?addr=${accountAddress}`)).json(); 
+        console.log("tokensOfAddr", accountAddress, tokensOfAddr);
+        const nftEntriesListDiv = d.querySelector(".nftlist_entries");
+        for (let i = 0; i < tokensOfAddr.length; i++)
+        {
+            const e = tokensOfAddr[i];
+
+            //collist
+
+            const section = document.createElement("section");
+            section.classList.add("section_nft");
+
+            const title = document.createElement("p");
+            title.innerText = ""+e.title;
+            title.classList.add("section_title");
+
+            const allcontent = document.createElement("div");
+            allcontent.classList.add("section_allcontent");
+            allcontent.style.display = "none";
+
+            title.addEventListener('click', function (){
+                if (allcontent.style.display == "none") allcontent.style.display = "block";
+                else allcontent.style.display = "none";
+            });
+
+            const uuid = document.createElement("p");
+            uuid.innerText = ""+e.nftuuid;
+            uuid.classList.add("section_uuid");
+
+            const image = document.createElement("img");
+            image.src = e.image;
+
+            const textcontent = document.createElement("p");
+            textcontent.innerText = ""+e.textcontent;
+            textcontent.classList.add("section_textcontent");
+
+            const collist = document.createElement("div");
+            collist.classList.add("collist");
+
+            const burnbutton = document.createElement("div");
+            burnbutton.classList.add("tilebutton");
+            burnbutton.classList.add("section_button");
+            burnbutton.innerText = "BURN";
+            burnbutton.addEventListener('click', async function (){
+                let myTokenID = e.tokenid;
+                console.log("burn", myTokenID);
+                d.querySelector(".tokendatabox .loader").style.visibility = "visible";
+                d.querySelector(".functionbox .loader").style.visibility = "visible";
+                let tx = await contract.methods.burn( myTokenID ).send({ from: accountAddress });
+                console.log(tx);
+                if (tx) 
+                {
+                    await initContract();
+                    await rebuildUI();
+                }
+            });
+
+            const lockbutton = document.createElement("div");
+            lockbutton.classList.add("tilebutton");
+            lockbutton.classList.add("section_button");
+            if (e.locked)
+            {
+                lockbutton.innerText = "UNLOCK";
+                const lockednote = document.createElement("p");
+                lockednote.innerText = "THIS NFT IS LOCKED";
+                textcontent.appendChild(lockednote);
+                lockbutton.addEventListener('click', async function ()
+                {
+                    let myTokenID = e.tokenid;
+                    console.log("unlock", myTokenID);
+
+                    d.querySelector(".tokendatabox .loader").style.visibility = "visible";
+                    d.querySelector(".functionbox .loader").style.visibility = "visible";
+                    let tx = await contract.methods.setLocked( myTokenID, false ).send({ from: accountAddress });
+                    console.log(tx);
+                    if (tx) 
+                    {
+                        await initContract();
+                        await rebuildUI();
+                    }
+
+                });
+            }
+            else
+            {
+                lockbutton.innerText = "LOCK";
+                lockbutton.addEventListener('click', async function ()
+                {
+                    let myTokenID = e.tokenid;
+                    console.log("lock", myTokenID);
+
+                    d.querySelector(".tokendatabox .loader").style.visibility = "visible";
+                    d.querySelector(".functionbox .loader").style.visibility = "visible";
+                    let tx = await contract.methods.setLocked( myTokenID, true ).send({ from: accountAddress });
+                    console.log(tx);
+                    if (tx) 
+                    {
+                        await initContract();
+                        await rebuildUI();
+                    }
+                });
+            }
+
+            const transferp = document.createElement("p");
+            transferp.style.display = "flex";
+            transferp.style.flexDirection = "row";
+            const transferToAddressField = document.createElement("input");
+            transferToAddressField.placeholder = "To Address 0x...";
+            const transferButton = document.createElement("div");
+            transferButton.classList.add("tilebutton");
+            transferButton.classList.add("section_button");
+            transferButton.innerText = "Transfer";
+            transferButton.addEventListener('click', async function ()
+            {
+                let toAddr = transferToAddressField.value;
+                if (!validAddress(toAddr))
+                {
+                    console.log("Invalid address");
+                    return;
+                }
+
+                console.log("transfer to", toAddr);
+                d.querySelector(".functionbox .loader").style.visibility = "visible";
+                d.querySelector(".tokendatabox .loader").style.visibility = "visible";
+                let tx = await contract.methods.safeTransferFrom( accountAddress, toAddr, e.tokenid ).send({ from: accountAddress });
+                console.log(tx);
+                if (tx) 
+                {
+                    await initContract();
+                    await rebuildUI();
+                }
+            });
+            transferp.appendChild(transferToAddressField);
+            transferp.appendChild(transferButton);
+                
+            collist.appendChild(burnbutton);
+            collist.appendChild(lockbutton);
+
+            allcontent.appendChild(uuid);
+            allcontent.appendChild(image);
+            allcontent.appendChild(textcontent);
+            allcontent.appendChild(collist);
+            allcontent.appendChild(transferp);
+
+            section.appendChild(title);
+            section.appendChild(allcontent);
+
+            nftEntriesListDiv.appendChild(section);
+        }
+    }
     
     if (contract != null)
     {
@@ -397,6 +455,8 @@ function rebuildUI()
     d.querySelector(".networkbox .networkchanger").style.display = "none";
     d.querySelector(".networkbox .networkbox-id").innerText = networkIDToString(networkID);
     d.querySelector(".networkbox .networkbox-name").innerText = contractName;
+    d.querySelector(".networkbox .networkbox-nexttokenid").innerText = contractNextID;
+    
     // d.querySelector(".networkbox .networkbox-totalsupply").innerText = web3.utils.fromWei(totalSupply);
     d.querySelector(".networkbox .networkbox-paused").innerHTML = (contractPaused ? "<span class='warning'>PAUSED</span>" : "<span class='statusok'>ACTIVE</span>");
 
@@ -420,7 +480,7 @@ function rebuildUI()
         document.querySelector(".walletbox .approvedamount").innerHTML = "<span class='warning'>CONTRACT PAUSED</span>";;
     }
 
-    
+    d.querySelector(".tokendatabox .loader").style.visibility = "hidden";
     
 }
 
@@ -459,7 +519,7 @@ async function requestRinkebyNetwork()
             params: [{ chainId: '0x4' }]
         });    
         await initContract();
-        rebuildUI();
+        await rebuildUI();
     }
     catch (error)
     {
