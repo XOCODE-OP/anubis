@@ -28,7 +28,7 @@ let ui = {};
 let gasdata = null;
 const DISABLE_METAMASK = false;
 let tokenCases;
-const ANUBIS_VERSION_NUM = "0.2.0121";
+const ANUBIS_VERSION_NUM = "0.2.0123";
 
 window.onbeforeunload = function () {
     window.scrollTo(0, 0);
