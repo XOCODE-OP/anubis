@@ -334,6 +334,9 @@ async function buildPortfolio() //addr is now an array
     // switchChain("eth");
     let addrs = getAllInputAddresses();
     saveDataToLocalStorage(addrs);
+    document.querySelector(".cross_chain_total-usd").innerText = "";
+    document.querySelector(".cross_chain_total-eth").innerText = "";
+    document.querySelector(".cross_chain_total-btc").innerText = "";
 
     ui.whichaddressElem.innerHTML = `ADDRESS: &nbsp; ${addrs[0]}`;
 

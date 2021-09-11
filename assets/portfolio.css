@@ -345,19 +345,11 @@ span.input_label_unit
     text-align: center;
 }
 
-.chainbutton_eth
+.chainbutton img
 {
-    background-image: url(https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880);
-}
-
-.chainbutton_bsc
-{
-    background-image: url(https://logos.covalenthq.com/tokens/0xb8c77482e45f1f44de1745f52c74426c631bdd52.png);
-}
-
-.chainbutton_polygon
-{
-    background-image: url(https://logos.covalenthq.com/tokens/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png);
+    height: 30px;
+    width: auto;
+    margin: 0;
 }
 
 
