@@ -573,7 +573,7 @@ async function pollAddressTokens(_chain, _address, callback)
     let resp = await fetchJson(url);
     // console.log(resp);
 
-    if (!resp || resp == null || !resp.items || !resp.items.length)
+    if (!resp || resp == null)
     {
         console.error(`Error: Problem with ${_chain} chain poll`, resp);
         ui.content_box.innerHTML = "Network error, try again.";
@@ -581,46 +581,49 @@ async function pollAddressTokens(_chain, _address, callback)
     else 
     {
         let coins = resp.items;
-        // console.log(resp);
-        for (let i = 0; i < coins.length; i++)
+        if (resp.items && resp.items.length > 0)
         {
-            const c = coins[i];
-            if (c == null || c.type == "dust") continue;
-            c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
+            // console.log(resp);
+            for (let i = 0; i < coins.length; i++)
+            {
+                const c = coins[i];
+                if (c == null || c.type == "dust") continue;
+                c.fraction_balance = decimalsToFraction(parseInt(c.balance), parseInt(c.contract_decimals));
 
-            let clone = baseSmallTokenElement.cloneNode(true);
-            clone.className += " cloned "+c.contract_ticker_symbol.toUpperCase();
-            clone.dataset.contract = ``;
-            clone.dataset.usdval = ``;
-            clone.querySelector(".tokenicon").innerText = `${c.contract_ticker_symbol.toUpperCase().substring(0, 3)}`;
-            // console.log(clone);
-            clone.querySelector(".smalltoken-name").innerText = ` ${c.contract_name}`;
-            clone.querySelector(".smalltoken-usd").innerText = `$${numberWithCommas(parseFloat(c.quote).toFixed(2))}`;
-            clone.querySelector(".smalltoken-coins").innerText = ` [ ${numberWithCommas(c.fraction_balance.toFixed(2))}  ${c.contract_ticker_symbol.toUpperCase()}] `;
-            clone.querySelector('.token_action_but_explorer').addEventListener("click", function(event)
-            {
-                window.open(`https://${explorer}.com/token/${c.contract_address.toLowerCase()}`, "_blank");
-            });
-            clone.querySelector('.token_action_but_swap').addEventListener("click", function(event)
-            {
-                location.hash = "#trade"; 
-                document.querySelector("#trade_iframe").src = "about:blank";
-                setTimeout(async function()
+                let clone = baseSmallTokenElement.cloneNode(true);
+                clone.className += " cloned "+c.contract_ticker_symbol.toUpperCase();
+                clone.dataset.contract = ``;
+                clone.dataset.usdval = ``;
+                clone.querySelector(".tokenicon").innerText = `${c.contract_ticker_symbol.toUpperCase().substring(0, 3)}`;
+                // console.log(clone);
+                clone.querySelector(".smalltoken-name").innerText = ` ${c.contract_name}`;
+                clone.querySelector(".smalltoken-usd").innerText = `$${numberWithCommas(parseFloat(c.quote).toFixed(2))}`;
+                clone.querySelector(".smalltoken-coins").innerText = ` [ ${numberWithCommas(c.fraction_balance.toFixed(2))}  ${c.contract_ticker_symbol.toUpperCase()}] `;
+                clone.querySelector('.token_action_but_explorer').addEventListener("click", function(event)
                 {
-                    document.querySelector("#trade_iframe").src = `${swapurl}?inputCurrency=${c.contract_address}&outputCurrency=${c.contract_address}`;     
-                }, 300);
-            });
-            if (_chain == "BSC")            document.querySelector(".content_bsc .loader").before(clone);
-            else if (_chain == "POLYGON")   document.querySelector(".content_polygon .loader").before(clone);
-        }
-        //totalbox.style.display = "flex";
+                    window.open(`https://${explorer}.com/token/${c.contract_address.toLowerCase()}`, "_blank");
+                });
+                clone.querySelector('.token_action_but_swap').addEventListener("click", function(event)
+                {
+                    location.hash = "#trade"; 
+                    document.querySelector("#trade_iframe").src = "about:blank";
+                    setTimeout(async function()
+                    {
+                        document.querySelector("#trade_iframe").src = `${swapurl}?inputCurrency=${c.contract_address}&outputCurrency=${c.contract_address}`;     
+                    }, 300);
+                });
+                if (_chain == "BSC")            document.querySelector(".content_bsc .loader").before(clone);
+                else if (_chain == "POLYGON")   document.querySelector(".content_polygon .loader").before(clone);
+            }
+            //totalbox.style.display = "flex";
 
-        totalbox.querySelector(".smallttot_btcv").innerText = `BTC ${numberWithCommas(parseFloat(resp.totalbtc).toFixed(2))}`;
-        totalbox.querySelector(".smallttot_ethv").innerText = `ETH ${numberWithCommas(parseFloat(resp.totaleth).toFixed(2))}`;
-        totalbox.querySelector(".smalltotaldiv-usdtotal").innerText = `$ ${numberWithCommas(parseFloat(resp.totalusd).toFixed(2))}`;
-        totalbox.style.visibility = "visible";
-        
+            totalbox.querySelector(".smallttot_btcv").innerText = `BTC ${numberWithCommas(parseFloat(resp.totalbtc).toFixed(2))}`;
+            totalbox.querySelector(".smallttot_ethv").innerText = `ETH ${numberWithCommas(parseFloat(resp.totaleth).toFixed(2))}`;
+            totalbox.querySelector(".smalltotaldiv-usdtotal").innerText = `$ ${numberWithCommas(parseFloat(resp.totalusd).toFixed(2))}`;
+            totalbox.style.visibility = "visible";
+        }
     }
+        
 
     if (_chain == "BSC")             document.querySelector(".content_bsc .loader").style.display = "none";
     else if (_chain == "POLYGON")    document.querySelector(".content_polygon .loader").style.display = "none";
